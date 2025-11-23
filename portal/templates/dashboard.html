@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WatchTheFall Portal</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#00ff00">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WTF Portal">
+    
+    <!-- App Icons -->
+    <link rel="manifest" href="/portal/static/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23000' width='100' height='100'/%3E%3Ctext y='70' font-size='70' fill='%2300ff00' font-family='Arial,sans-serif' font-weight='bold'%3E⚡%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%23000' width='180' height='180' rx='40'/%3E%3Ctext x='90' y='130' font-size='100' fill='%2300ff00' font-family='Arial,sans-serif' font-weight='bold' text-anchor='middle'%3E⚡%3C/text%3E%3C/svg%3E">
     <style>
         * {
             margin: 0;
@@ -266,6 +277,11 @@
         let uploadedFilename = null;
         let activeJobId = null;
         let statusPollInterval = null;
+        
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/portal/static/sw.js').catch(() => {});
+        }
         
         // Load templates
         fetch('/api/templates')
