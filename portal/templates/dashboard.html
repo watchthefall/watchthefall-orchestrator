@@ -425,8 +425,6 @@
     <div id="minimizedModalsContainer" style="position:fixed; bottom:0; left:0; right:0; z-index:9999; pointer-events:none; padding:8px; display:flex; flex-direction:column; gap:8px;"></div>
     
     <script>
-        let uploadedFilename = null;
-        let activeJobId = null;
         let statusPollInterval = null;
         
         // Register service worker for PWA
@@ -573,16 +571,6 @@
                 </div>
             `).join('');
         }
-        
-        // Load templates
-        fetch('/api/templates')
-            .then(r => r.json())
-            .then(data => {
-                const select = document.getElementById('templateSelect');
-                select.innerHTML = data.templates.map(t => 
-                    `<option value="${t.name}">${t.display_name}</option>`
-                ).join('');
-            });
         
         // ========== PHASE B: CLIENT-SIDE WATERMARK SYSTEM ==========
         let selectedVideoFile = null;
@@ -1284,41 +1272,6 @@
         }
         // ========== END PHASE B ==========
         
-        // File upload
-        document.getElementById('fileInput').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const uploadZone = document.getElementById('uploadZone');
-            const uploadText = document.getElementById('uploadText');
-            
-            uploadText.innerHTML = '<p>⏳ Uploading...</p>';
-            uploadZone.classList.add('active');
-            
-            const formData = new FormData();
-            formData.append('video', file);
-            
-            try {
-                const response = await fetch('/api/videos/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    uploadedFilename = result.filename;
-                    uploadText.innerHTML = `<p style="color: #00ff00;">✓ ${file.name}</p><p style="font-size: 12px; color: #888; margin-top: 5px;">Ready to process</p>`;
-                    document.getElementById('processBtn').disabled = false;
-                } else {
-                    throw new Error(result.error);
-                }
-            } catch (err) {
-                uploadText.innerHTML = `<p style="color: #ff5555;">✗ Upload failed: ${err.message}</p>`;
-                uploadZone.classList.remove('active');
-            }
-        });
-        
         // Helpers (fetch batch + paste/drag + reset)
         async function fetchBatchUrls(targetUrls) {
             const response = await fetch('/api/videos/fetch', {
@@ -1499,134 +1452,6 @@
                 document.getElementById('fetchLinksBtn').disabled = false;
             }
         });
-        
-        // Process video
-        document.getElementById('processBtn').addEventListener('click', async () => {
-            if (!uploadedFilename) return;
-            
-            // Clear any existing status polling
-            if (statusPollInterval) {
-                clearInterval(statusPollInterval);
-                statusPollInterval = null;
-            }
-            
-            const template = document.getElementById('templateSelect').value;
-            const aspectRatio = document.getElementById('aspectRatioSelect').value;
-            const statusDiv = document.getElementById('statusMessage');
-            
-            statusDiv.innerHTML = '<div class="status processing">⏳ Processing video...</div>';
-            document.getElementById('processBtn').disabled = true;
-            
-            async function tryProcess(retries = 2) {
-                try {
-                    const response = await fetch('/api/videos/process', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            filename: uploadedFilename,
-                            template: template,
-                            aspect_ratio: aspectRatio
-                        })
-                    });
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`Server error (${response.status}): ${errorText}`);
-                    }
-                    const text = await response.text();
-                    if (!text || text.trim() === '') throw new Error('Backend returned empty response');
-                    const result = JSON.parse(text);
-                    if (!result.success) throw new Error(result.error || 'Processing failed');
-                    activeJobId = result.job_id;
-                    statusDiv.innerHTML = `<div class=\"status processing\">Processing... Job ID: ${result.job_id}</div>`;
-                    pollJobStatus(result.job_id);
-                } catch (err) {
-                    if (retries > 0) {
-                        statusDiv.innerHTML = `<div class=\"status queued\">Retrying... (${retries})</div>`;
-                        await new Promise(res => setTimeout(res, 1000));
-                        return tryProcess(retries - 1);
-                    }
-                    console.error('Process error:', err);
-                    statusDiv.innerHTML = `<div class=\"status failed\">✗ Error: ${err.message}</div>`;
-                    document.getElementById('processBtn').disabled = false;
-                }
-            }
-            
-            tryProcess();
-        });
-        
-        // Poll job status
-        function pollJobStatus(jobId) {
-            // Clear any existing interval
-            if (statusPollInterval) {
-                clearInterval(statusPollInterval);
-            }
-            
-            statusPollInterval = setInterval(async () => {
-                // Only poll if this is still the active job
-                if (activeJobId !== jobId) {
-                    clearInterval(statusPollInterval);
-                    return;
-                }
-                
-                try {
-                    const response = await fetch(`/api/videos/status/${jobId}`);
-                    const job = await response.json();
-                    
-                    const statusDiv = document.getElementById('statusMessage');
-                    
-                    if (job.status === 'completed') {
-                        clearInterval(statusPollInterval);
-                        statusPollInterval = null;
-                        statusDiv.innerHTML = `
-                            <div class="status completed">
-                                ✓ Processing complete!<br>
-                                <a href="${job.download_url}" class="download-link" download="${job.output_file}">📥 Download ${job.output_file}</a> <button class="share-btn" data-url="${job.download_url}" data-filename="${job.output_file}" style="margin-left:10px;">🤝 Share</button>
-                                <button onclick="openBrandModalForUrl('${job.download_url}', '${job.output_file}')" style="margin-left:10px; background:#00aa00; color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">🎨 Add Watermarks</button>
-                            </div>
-                        `;
-                        loadRecentJobs();
-                        // Save history
-                        saveHistoryEntry({ type: 'process', name: job.output_file, url: job.download_url });
-                        // Auto-download
-                        if (autoDownloadEnabled && job.download_url) {
-                            const a = document.createElement('a');
-                            a.href = job.download_url;
-                            a.download = job.output_file || 'video.mp4';
-                            document.body.appendChild(a);
-                            a.click();
-                            a.remove();
-                        }
-                        renderHistory();
-                        resetUpload();
-                    } else if (job.status === 'failed') {
-                        clearInterval(statusPollInterval);
-                        statusPollInterval = null;
-                        statusDiv.innerHTML = `<div class=\"status failed\">✗ Processing failed: ${job.error || 'Unknown error'}</div>`;
-                        resetUpload();
-                    } else {
-                        // Still processing - update status message
-                        statusDiv.innerHTML = `<div class=\"status processing\">⏳ Processing... Job ID: ${jobId}</div>`;
-                    }
-                } catch (err) {
-                    console.error('Status poll error:', err);
-                    clearInterval(statusPollInterval);
-                    statusPollInterval = null;
-                }
-            }, 2000);
-        }
-        
-        // Reset upload
-        function resetUpload() {
-            uploadedFilename = null;
-            activeJobId = null;
-            document.getElementById('processBtn').disabled = false;
-            document.getElementById('uploadText').innerHTML = `
-                <p style="font-size: 18px; margin-bottom: 10px;">📁 Click or drag video here</p>
-                <p style="color: #888; font-size: 14px;">Supported: MP4, MOV, AVI (max 500MB)</p>
-            `;
-            document.getElementById('uploadZone').classList.remove('active');
-            document.getElementById('fileInput').value = '';
-        }
         
         // Load recent jobs
         function loadRecentJobs() {
