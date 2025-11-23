@@ -16,10 +16,7 @@ from .config import (
     SECRET_KEY, PORTAL_AUTH_KEY, OUTPUT_DIR,
     MAX_UPLOAD_SIZE, BRANDS_DIR
 )
-from .database import (
-    get_recent_logs,
-    log_event
-)
+from .database import log_event
 
 app = Flask(__name__, 
             template_folder='templates',
@@ -45,11 +42,9 @@ def test_page():
         'message': 'WatchTheFall Portal is running',
         'endpoints': [
             '/portal/',
-            '/api/videos/upload',
-            '/api/videos/process',
-            '/api/videos/status/<job_id>',
-            '/api/system/logs',
-            '/api/system/queue'
+            '/api/videos/fetch',
+            '/api/videos/download/<filename>',
+            '/api/videos/convert-watermark'
         ]
     })
 
@@ -183,22 +178,6 @@ def download_video(filename):
 # API: BRANDS (Static JSON)
 # ============================================================================
 # Templates endpoint removed - frontend loads brands.json directly
-
-# ============================================================================
-# API: SYSTEM & LOGS
-# ============================================================================
-
-@app.route('/api/system/logs', methods=['GET'])
-def get_logs():
-    """Get system logs"""
-    try:
-        limit = request.args.get('limit', 50, type=int)
-        logs = get_recent_logs(limit)
-        return jsonify({'logs': logs})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-# Queue endpoint removed - no server-side job queue
 
 # ============================================================================
 # API: WATERMARK CONVERSION (WebM to MP4)
