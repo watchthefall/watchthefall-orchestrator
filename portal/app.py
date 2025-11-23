@@ -423,20 +423,30 @@ def convert_watermark():
         
         # FFmpeg command: Convert WebM to MP4 with H.264 codec (Instagram compatible)
         # -c:v libx264: H.264 video codec
-        # -preset fast: Encoding speed (faster = lower quality, slower = better quality)
-        # -crf 23: Quality (18-28, lower = better quality, 23 is default)
-        # -c:a aac: AAC audio codec (Instagram compatible)
+        # -preset fast: Encoding speed
+        # -crf 23: Quality (18-28, lower = better quality)
+        # -profile:v baseline: Compatibility profile for all devices
+        # -level 3.0: H.264 level for mobile compatibility
+        # -pix_fmt yuv420p: Pixel format (required for compatibility)
+        # -c:a aac: AAC audio codec
         # -b:a 128k: Audio bitrate
+        # -ar 44100: Audio sample rate
         # -movflags +faststart: Optimize for web streaming
+        # -max_muxing_queue_size 1024: Prevent muxing errors
         cmd = [
             'ffmpeg',
             '-i', temp_webm,
             '-c:v', 'libx264',
             '-preset', 'fast',
             '-crf', '23',
+            '-profile:v', 'baseline',
+            '-level', '3.0',
+            '-pix_fmt', 'yuv420p',
             '-c:a', 'aac',
             '-b:a', '128k',
+            '-ar', '44100',
             '-movflags', '+faststart',
+            '-max_muxing_queue_size', '1024',
             '-y',  # Overwrite output file
             output_path
         ]

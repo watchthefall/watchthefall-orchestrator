@@ -965,10 +965,11 @@
                     const a = document.createElement('a');
                     a.href = r.url;
                     a.download = r.filename;
+                    a.target = '_blank';  // Open in new tab to ensure proper download
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
-                }, index * 500); // Stagger downloads by 500ms to avoid browser blocking
+                }, index * 800); // Increased stagger to 800ms for server requests
             });
             
             // Auto-close modal after downloads start (2 seconds delay)
