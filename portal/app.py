@@ -91,13 +91,26 @@ def upload_video():
         filepath = os.path.join(UPLOAD_DIR, unique_filename)
         file.save(filepath)
         
-        log_event('info', None, f'File uploaded: {filename}')
+        # Check file size and warn if too large for Render free tier
+        file_size_mb = os.path.getsize(filepath) / (1024 * 1024)
+        size_warning = None
+        if file_size_mb > 25:
+            size_warning = f"Warning: File is {file_size_mb:.1f}MB. Render free tier may fail on files >25MB. Consider using a shorter clip."
+            print(f"[UPLOAD WARNING] {size_warning}")
         
-        return jsonify({
+        log_event('info', None, f'File uploaded: {filename} ({file_size_mb:.2f}MB)')
+        
+        response = {
             'success': True,
             'filename': unique_filename,
-            'message': 'Video uploaded successfully'
-        })
+            'message': 'Video uploaded successfully',
+            'size_mb': round(file_size_mb, 2)
+        }
+        
+        if size_warning:
+            response['warning'] = size_warning
+        
+        return jsonify(response)
         
     except Exception as e:
         log_event('error', None, f'Upload failed: {str(e)}')

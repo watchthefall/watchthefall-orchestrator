@@ -46,6 +46,10 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         input_size_mb = os.path.getsize(video_path) / (1024 * 1024)
         print(f"[PROCESSOR] Input video: {video_path} ({input_size_mb:.2f}MB)")
         
+        # CRITICAL: Reject large files on Render free tier to prevent OOM
+        if input_size_mb > 25:
+            raise Exception(f"Video too large for Render free tier ({input_size_mb:.1f}MB). Maximum: 25MB. Please use a shorter clip or lower resolution.")
+        
         # Output filename
         output_filename = f"{template_name}_{job_id}.mp4"
         output_path = os.path.join(OUTPUT_DIR, output_filename)
