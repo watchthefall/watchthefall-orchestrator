@@ -421,6 +421,19 @@
             </div>
             
             <p style="color:#888; font-size:14px; margin-bottom:15px;">Choose up to 10 brands to watermark this video. Each will be downloaded separately.</p>
+            
+            <!-- Quality Preset Selector -->
+            <div style="margin-bottom:15px; padding:10px; background:rgba(0,255,0,0.05); border:1px solid #333; border-radius:6px;">
+                <label style="color:#aaa; font-size:13px; display:block; margin-bottom:6px;">⚡ Quality Preset:</label>
+                <select id="qualitySelect" style="width:100%; padding:6px; background:#1a1a1a; color:#0f0; border:1px solid #333; border-radius:4px;">
+                    <option value="auto" selected>Auto (Network & Device)</option>
+                    <option value="fast">Fast (720p, 24fps, ~3Mbps)</option>
+                    <option value="balanced">Balanced (1080p, 27fps, ~4Mbps)</option>
+                    <option value="high">High (1080p, 30fps, ~5Mbps)</option>
+                </select>
+                <div id="qualityInfo" style="color:#666; font-size:11px; margin-top:4px;">📊 Detecting...</div>
+            </div>
+            
             <div class="brand-grid" id="modalBrandGrid">
                 <p style="color:#666;">Loading brands...</p>
             </div>
@@ -569,6 +582,64 @@
         let pendingVideoBlob = null;
         let pendingVideoFilename = null;
         
+        // Quality preset detection
+        function getQualityPreset() {
+            const selected = document.getElementById('qualitySelect')?.value;
+            
+            // Manual selection overrides auto
+            if (selected && selected !== 'auto') {
+                const presets = {
+                    fast: { name: 'Fast', width: 720, height: 1280, fps: 24, bitrate: 3000000 },
+                    balanced: { name: 'Balanced', width: 1080, height: 1920, fps: 27, bitrate: 4000000 },
+                    high: { name: 'High', width: 1080, height: 1920, fps: 30, bitrate: 5000000 }
+                };
+                return presets[selected];
+            }
+            
+            // Auto detection
+            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            const memory = navigator.deviceMemory || 4;
+            const cores = navigator.hardwareConcurrency || 4;
+            
+            let preset = 'balanced';
+            let reason = 'default';
+            
+            if (conn) {
+                const effectiveType = conn.effectiveType;
+                const downlink = conn.downlink || 5;
+                const rtt = conn.rtt || 100;
+                const saveData = conn.saveData || false;
+                
+                if (saveData || effectiveType === 'slow-2g' || effectiveType === '2g' || downlink < 2 || rtt > 300) {
+                    preset = 'fast';
+                    reason = `${effectiveType || 'slow network'}`;
+                } else if (effectiveType === '3g' || downlink < 5 || rtt > 200) {
+                    preset = 'balanced';
+                    reason = effectiveType || '3g';
+                } else if (effectiveType === '4g' && downlink >= 5 && rtt <= 200) {
+                    preset = 'high';
+                    reason = '4g, good signal';
+                }
+            }
+            
+            // Downgrade for low-end devices
+            if (memory < 4 || cores < 4) {
+                if (preset === 'high') preset = 'balanced';
+                else if (preset === 'balanced') preset = 'fast';
+                reason += `, low device memory/cores`;
+            }
+            
+            const presets = {
+                fast: { name: 'Fast', width: 720, height: 1280, fps: 24, bitrate: 3000000 },
+                balanced: { name: 'Balanced', width: 1080, height: 1920, fps: 27, bitrate: 4000000 },
+                high: { name: 'High', width: 1080, height: 1920, fps: 30, bitrate: 5000000 }
+            };
+            
+            const result = presets[preset];
+            result.reason = reason;
+            return result;
+        }
+        
         // Brand modal functions
         function closeBrandModal() {
             document.getElementById('brandModal').classList.remove('active');
@@ -597,6 +668,15 @@
                 if (!brandsLoaded) {
                     alert('Loading brands... please wait a moment and try again.');
                     return;
+                }
+                
+                // Detect quality preset and show info
+                const preset = getQualityPreset();
+                const qualityInfoDiv = document.getElementById('qualityInfo');
+                if (preset.reason) {
+                    qualityInfoDiv.textContent = `📊 Auto: ${preset.name} (${preset.width}x${preset.height}, ${preset.fps}fps) - ${preset.reason}`;
+                } else {
+                    qualityInfoDiv.textContent = `📊 ${preset.name}: ${preset.width}x${preset.height}, ${preset.fps}fps, ~${(preset.bitrate/1000000).toFixed(1)}Mbps`;
                 }
                 
                 // Fetch video as blob
@@ -714,13 +794,13 @@
             if (!pendingVideoBlob || !selected.length) return;
             
             const statusDiv = document.getElementById('modalStatus');
-            statusDiv.innerHTML = '<div class="status processing">⏳ Processing watermarks...</div>';
-            document.getElementById('modalGenerateBtn').disabled = true;
+            const preset = getQualityPreset();
             
-            // Show device info on screen
+            // Show initial status with quality info
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const deviceInfo = `📱 Device: ${isMobile ? 'Mobile' : 'Desktop'}<br>🌐 Browser: ${navigator.userAgent.split(' ').slice(-2).join(' ')}`;
+            const deviceInfo = `📱 Device: ${isMobile ? 'Mobile' : 'Desktop'}<br>🌐 Browser: ${navigator.userAgent.split(' ').slice(-2).join(' ')}<br>⚡ Quality: ${preset.name} (${preset.width}x${preset.height}, ${preset.fps}fps)`;
             statusDiv.innerHTML = `<div class="status processing">⏳ Initializing...<br><small style="color:#888;">${deviceInfo}</small></div>`;
+            document.getElementById('modalGenerateBtn').disabled = true;
             
             const results = [];
             
@@ -729,10 +809,27 @@
                 const watermarkFile = selected[i].getAttribute('data-file');
                 
                 try {
-                    statusDiv.innerHTML = `<div class="status processing">⏳ Processing ${i+1}/${selected.length}: ${brandName}...</div>`;
+                    // Progress bar
+                    const progressHTML = `
+                        <div class="status processing">
+                            ⏳ Processing ${i+1}/${selected.length}: <strong>${brandName}</strong><br>
+                            <div style="background:#333; border-radius:4px; overflow:hidden; height:8px; margin-top:6px;">
+                                <div id="progressBar${i}" style="background:#0f0; height:100%; width:0%; transition:width 0.3s;"></div>
+                            </div>
+                            <small id="progressText${i}" style="color:#888;">Starting...</small>
+                        </div>
+                    `;
+                    statusDiv.innerHTML = progressHTML;
                     
                     const videoFile = new File([pendingVideoBlob], pendingVideoFilename, { type: pendingVideoBlob.type });
-                    const watermarkedBlob = await applyWatermarkToVideo(videoFile, watermarkFile, brandName);
+                    const watermarkedBlob = await applyWatermarkToVideo(videoFile, watermarkFile, brandName, (progress) => {
+                        // Update progress bar
+                        const bar = document.getElementById(`progressBar${i}`);
+                        const text = document.getElementById(`progressText${i}`);
+                        if (bar) bar.style.width = `${progress}%`;
+                        if (text) text.textContent = `${progress}% complete`;
+                    });
+                    
                     const url = URL.createObjectURL(watermarkedBlob);
                     const filename = `${brandName}_${pendingVideoFilename.replace(/\.[^/.]+$/, '')}.mp4`;
                     
@@ -852,9 +949,13 @@
         });
         
         // Canvas-based watermark application with adaptive opacity (10-20%)
-        async function applyWatermarkToVideo(videoFile, watermarkFileName, brandName) {
+        async function applyWatermarkToVideo(videoFile, watermarkFileName, brandName, onProgress = null) {
             return new Promise(async (resolve, reject) => {
                 try {
+                    // Get quality preset
+                    const preset = getQualityPreset();
+                    console.log(`[WATERMARK] Using preset: ${preset.name} (${preset.width}x${preset.height}, ${preset.fps}fps, ${(preset.bitrate/1000000).toFixed(1)}Mbps)`);
+                    
                     // Mobile/browser detection and capability check
                     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                     console.log(`[WATERMARK] Device: ${isMobile ? 'Mobile' : 'Desktop'}, Browser: ${navigator.userAgent.substring(0, 50)}...`);
@@ -871,6 +972,8 @@
                     }
                     console.log('[WATERMARK] ✓ MediaRecorder and captureStream supported');
                     
+                    if (onProgress) onProgress(5);
+                    
                     // Load video
                     const video = document.createElement('video');
                     video.src = URL.createObjectURL(videoFile);
@@ -881,6 +984,8 @@
                         video.onloadedmetadata = res;
                         video.onerror = rej;
                     });
+                    
+                    if (onProgress) onProgress(10);
                     
                     // Load watermark
                     const watermark = new Image();
@@ -896,9 +1001,11 @@
                         };
                     });
                     
-                    // Force 9:16 aspect ratio
-                    const targetWidth = 1080;
-                    const targetHeight = 1920;
+                    if (onProgress) onProgress(15);
+                    
+                    // Use preset dimensions
+                    const targetWidth = preset.width;
+                    const targetHeight = preset.height;
                     
                     // Canvas setup
                     const canvas = document.createElement('canvas');
@@ -938,9 +1045,11 @@
                     console.log(`[WATERMARK] Watermark position: X=${watermarkX.toFixed(0)}, Y=${watermarkY.toFixed(0)}, W=${watermarkWidth.toFixed(0)}, H=${watermarkHeight.toFixed(0)}`);
                     console.log(`[WATERMARK] Video duration: ${video.duration.toFixed(2)}s, Size: ${video.videoWidth}x${video.videoHeight}`);
                     
-                    // Encode using MediaRecorder
-                    const stream = canvas.captureStream ? canvas.captureStream(30) : canvas.mozCaptureStream(30);
-                    console.log(`[WATERMARK] Canvas stream created: ${stream.getVideoTracks().length} video tracks`);
+                    if (onProgress) onProgress(20);
+                    
+                    // Encode using MediaRecorder with preset FPS
+                    const stream = canvas.captureStream ? canvas.captureStream(preset.fps) : canvas.mozCaptureStream(preset.fps);
+                    console.log(`[WATERMARK] Canvas stream created: ${stream.getVideoTracks().length} video tracks at ${preset.fps}fps`);
                     
                     // BETTER AUDIO APPROACH: Capture from original video file
                     // Don't use createMediaElementSource as it breaks video playback
@@ -978,16 +1087,16 @@
                     }
                     
                     const chunks = [];
-                    // Try different codecs for mobile compatibility
+                    // Try different codecs for mobile compatibility with preset bitrate
                     let recorderOptions;
                     if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
-                        recorderOptions = { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: 5000000 };
+                        recorderOptions = { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: preset.bitrate };
                     } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
-                        recorderOptions = { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 5000000 };
+                        recorderOptions = { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: preset.bitrate };
                     } else if (MediaRecorder.isTypeSupported('video/webm')) {
-                        recorderOptions = { mimeType: 'video/webm', videoBitsPerSecond: 5000000 };
+                        recorderOptions = { mimeType: 'video/webm', videoBitsPerSecond: preset.bitrate };
                     } else {
-                        recorderOptions = { videoBitsPerSecond: 5000000 };
+                        recorderOptions = { videoBitsPerSecond: preset.bitrate };
                     }
                     
                     const recorder = new MediaRecorder(stream, recorderOptions);
@@ -996,14 +1105,18 @@
                     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
                     recorder.onstop = () => {
                         const blob = new Blob(chunks, { type: 'video/mp4' });
+                        if (onProgress) onProgress(100);
                         resolve(blob);
                     };
                     
-                    recorder.start();
+                    // Use timeslice for better memory management (1 second chunks)
+                    recorder.start(1000);
                     video.currentTime = 0;
                     video.play();
                     
                     let frameCount = 0;
+                    const totalFrames = Math.ceil(video.duration * preset.fps);
+                    
                     // Render loop
                     function render() {
                         if (video.paused || video.ended) {
@@ -1014,11 +1127,18 @@
                         }
                         
                         frameCount++;
+                        
+                        // Update progress (20% -> 95% during rendering)
+                        if (onProgress && frameCount % 10 === 0) {
+                            const renderProgress = Math.min(95, 20 + Math.floor((frameCount / totalFrames) * 75));
+                            onProgress(renderProgress);
+                        }
+                        
                         if (frameCount === 1 || frameCount % 30 === 0) {
                             console.log(`[WATERMARK] Frame ${frameCount}, Time: ${video.currentTime.toFixed(2)}s`);
                         }
                         
-                        // Draw video frame (cropped/scaled to 9:16)
+                        // Draw video frame (cropped/scaled to target aspect ratio)
                         const srcAspect = video.videoWidth / video.videoHeight;
                         const targetAspect = targetWidth / targetHeight;
                         let sx = 0, sy = 0, sw = video.videoWidth, sh = video.videoHeight;
