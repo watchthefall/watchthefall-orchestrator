@@ -105,6 +105,7 @@ def upload_video():
 @app.route('/api/videos/process', methods=['POST'])
 def process_video_endpoint():
     """Process video with template"""
+    job_id = None
     try:
         data = request.json
         
@@ -113,29 +114,45 @@ def process_video_endpoint():
         aspect_ratio = data.get('aspect_ratio', '9:16')
         
         if not filename:
-            return jsonify({'error': 'No filename provided'}), 400
+            return jsonify({'success': False, 'error': 'No filename provided'}), 400
         
         video_path = os.path.join(UPLOAD_DIR, filename)
         
         if not os.path.exists(video_path):
-            return jsonify({'error': 'Video file not found'}), 404
+            return jsonify({'success': False, 'error': 'Video file not found'}), 404
         
         # Create job
         job_id = uuid.uuid4().hex[:12]
         create_job(job_id, filename, template, aspect_ratio)
         
+        print(f"[PROCESS STARTED] Job ID: {job_id}, Template: {template}, Aspect: {aspect_ratio}")
+        
         # Process immediately (in production, this would be queued)
         try:
             output_file = process_video(job_id, video_path, template, aspect_ratio)
             
+            # Guard clause: check if output_file is valid
+            if not output_file or output_file is None:
+                print(f"[PROCESS ERROR] Job {job_id}: process_video returned None or empty")
+                log_event('error', job_id, 'Processing returned no output file')
+                return jsonify({
+                    'success': False,
+                    'error': 'Video processing failed: no output file generated',
+                    'job_id': job_id
+                }), 500
+            
+            print(f"[PROCESS COMPLETED] Job ID: {job_id}, Output: {output_file}")
+            
             return jsonify({
                 'success': True,
                 'job_id': job_id,
-                'message': 'Processing started',
+                'message': 'Processing completed',
+                'output_file': output_file,
                 'status_url': f'/api/videos/status/{job_id}'
             })
         except Exception as proc_error:
             import traceback
+            print(f"[PROCESS EXCEPTION] Job {job_id}:")
             traceback.print_exc()
             log_event('error', job_id, f'Processing failed: {str(proc_error)}')
             return jsonify({
@@ -146,9 +163,14 @@ def process_video_endpoint():
         
     except Exception as e:
         import traceback
+        print(f"[ENDPOINT EXCEPTION] Process endpoint error:")
         traceback.print_exc()
-        log_event('error', None, f'Process request failed: {str(e)}')
-        return jsonify({'error': str(e)}), 500
+        log_event('error', job_id, f'Process request failed: {str(e)}')
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'job_id': job_id
+        }), 500
 
 @app.route('/api/videos/status/<job_id>', methods=['GET'])
 def get_job_status(job_id):

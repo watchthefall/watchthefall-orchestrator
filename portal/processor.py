@@ -21,6 +21,7 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         Path to output video or None on failure
     """
     try:
+        print(f"[PROCESSOR] Starting job {job_id}")
         update_job_status(job_id, 'processing')
         log_event('info', job_id, f'Starting video processing: {template_name}')
         
@@ -40,6 +41,8 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         # Output filename
         output_filename = f"{template_name}_{job_id}.mp4"
         output_path = os.path.join(OUTPUT_DIR, output_filename)
+        
+        print(f"[PROCESSOR] Job {job_id}: Output will be {output_path}")
         
         # Get video dimensions
         dimensions = get_video_dimensions(video_path)
@@ -86,22 +89,32 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
             output_path
         ]
         
+        print(f"[FFMPEG COMMAND] Job {job_id}:")
+        print(f"  {' '.join(cmd)}")
+        
         log_event('info', job_id, f'Running ffmpeg: {" ".join(cmd[:5])}...')
         
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
         
         if result.returncode != 0:
+            print(f"[FFMPEG ERROR] Job {job_id}: Return code {result.returncode}")
+            print(f"  stderr: {result.stderr[:500]}")
             raise Exception(f'FFmpeg failed: {result.stderr[:200]}')
         
         if not os.path.exists(output_path):
+            print(f"[FFMPEG ERROR] Job {job_id}: Output file not created at {output_path}")
             raise Exception('Output file not created')
         
+        print(f"[PROCESSOR] Job {job_id}: Processing complete, output file: {output_filename}")
         log_event('info', job_id, f'Processing complete: {output_filename}')
         update_job_status(job_id, 'completed', output_path=output_filename)
         
         return output_filename
         
     except Exception as e:
+        import traceback
+        print(f"[PROCESSOR ERROR] Job {job_id}:")
+        traceback.print_exc()
         error_msg = str(e)
         log_event('error', job_id, f'Processing failed: {error_msg}')
         update_job_status(job_id, 'failed', error_message=error_msg)

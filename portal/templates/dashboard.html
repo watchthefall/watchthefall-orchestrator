@@ -319,7 +319,27 @@
                     })
                 });
                 
-                const result = await response.json();
+                // Check if response is OK
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server error (${response.status}): ${errorText}`);
+                }
+                
+                // Check if response body is empty
+                const responseText = await response.text();
+                if (!responseText || responseText.trim() === '') {
+                    throw new Error('Backend returned empty response');
+                }
+                
+                // Try to parse JSON
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    console.error('Response text:', responseText);
+                    throw new Error(`Invalid JSON response from server: ${parseError.message}`);
+                }
                 
                 if (result.success) {
                     statusDiv.innerHTML = `<div class="status processing">Processing... Job ID: ${result.job_id}</div>`;
@@ -327,9 +347,10 @@
                     // Poll for status
                     pollJobStatus(result.job_id);
                 } else {
-                    throw new Error(result.error);
+                    throw new Error(result.error || 'Processing failed');
                 }
             } catch (err) {
+                console.error('Process error:', err);
                 statusDiv.innerHTML = `<div class="status failed">✗ Error: ${err.message}</div>`;
                 document.getElementById('processBtn').disabled = false;
             }
