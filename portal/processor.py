@@ -39,6 +39,13 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         update_job_status(job_id, 'processing')
         log_event('info', job_id, f'Starting video processing: {template_name}')
         
+        # Validate input video exists
+        if not os.path.exists(video_path):
+            raise Exception(f"Input video file not found: {video_path}")
+        
+        input_size_mb = os.path.getsize(video_path) / (1024 * 1024)
+        print(f"[PROCESSOR] Input video: {video_path} ({input_size_mb:.2f}MB)")
+        
         # Output filename
         output_filename = f"{template_name}_{job_id}.mp4"
         output_path = os.path.join(OUTPUT_DIR, output_filename)
@@ -46,7 +53,7 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         # Ensure output directory exists
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
-        print(f"[PROCESSOR] Job {job_id}: Output will be {output_path}")
+        print(f"[PROCESSOR] Output will be: {output_path}")
         
         # Calculate target dimensions based on aspect ratio
         if aspect_ratio == '9:16':
@@ -81,28 +88,27 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         
         log_event('info', job_id, f'Running ffmpeg (ultra-low-memory mode): {" ".join(ffmpeg_cmd[:5])}...')
         
-        # Run FFmpeg with full stderr logging for Render debugging
-        process = subprocess.Popen(
+        # Run FFmpeg with full stderr capture for debugging
+        print(f"[PROCESSOR] Executing FFmpeg...")
+        process = subprocess.run(
             ffmpeg_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True
+            text=True,
+            timeout=600
         )
         
-        # Stream ALL stderr for complete debugging visibility
-        stderr_lines = []
-        for line in process.stderr:
-            print(f"[FFMPEG] {line.strip()}")
-            stderr_lines.append(line.strip())
-        
-        # Wait for process to complete
-        process.wait(timeout=600)
+        # Print ALL stderr for complete debugging visibility
+        if process.stderr:
+            print(f"[FFMPEG STDERR - FULL OUTPUT]:")
+            for line in process.stderr.split('\n'):
+                if line.strip():
+                    print(f"  {line}")
         
         if process.returncode != 0:
-            print(f"[FFMPEG ERROR] Job {job_id}: Return code {process.returncode}")
-            error_msg = '\n'.join(stderr_lines[-10:]) if stderr_lines else 'FFmpeg failed'
-            print(f"  Last stderr lines: {error_msg}")
-            raise Exception(f'FFmpeg failed (code {process.returncode}): {error_msg[:200]}')
+            print(f"[FFMPEG ERROR] Return code: {process.returncode}")
+            print(f"[FFMPEG ERROR] Full stderr:\n{process.stderr}")
+            raise Exception(f'FFmpeg failed (code {process.returncode}): {process.stderr[:500]}')
         
         # FORCED OUTPUT VERIFICATION
         if not os.path.exists(output_path) or os.path.getsize(output_path) < 1000:
