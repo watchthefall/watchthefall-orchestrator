@@ -365,9 +365,9 @@
             if (toggle) {
                 toggle.addEventListener('change', (e) => {
                     autoDownloadEnabled = !!e.target.checked;
-                }
+                });
             }
-        }
+        });
         
         // Paste-All button
         document.addEventListener('click', async (e) => {
@@ -386,7 +386,7 @@
                     alert('Clipboard read failed');
                 }
             }
-        }
+        });
         
         // Helpers
         function extractURLs(text) {
@@ -425,7 +425,7 @@
                 const links = [];
                 document.querySelectorAll('.download-link').forEach(a => {
                     if (a.href) links.push(a.href);
-                }
+                });
                 if (links.length) {
                     try {
                         await navigator.clipboard.writeText(links.join('\n'));
@@ -438,7 +438,7 @@
                     alert('No download links found');
                 }
             }
-        }
+        });
         
         function saveHistoryEntry(entry) {
             const key = 'wtf_history';
@@ -476,7 +476,7 @@
                 select.innerHTML = data.templates.map(t => 
                     `<option value="${t.name}">${t.display_name}</option>`
                 ).join('');
-            }
+            });
         
         // ========== PHASE B: CLIENT-SIDE WATERMARK SYSTEM ==========
         let selectedVideoFile = null;
@@ -505,14 +505,14 @@
                             alert('Maximum 10 brands at a time');
                             cb.checked = false;
                         }
-                    }
-                }
-            }
+                    });
+                });
+            });
         
         // Select video file
         document.getElementById('selectVideoBtn').addEventListener('click', () => {
             document.getElementById('watermarkVideoInput').click();
-        }
+        });
         
         document.getElementById('watermarkVideoInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -521,7 +521,7 @@
             document.getElementById('selectedVideoName').textContent = `✓ Selected: ${file.name} (${(file.size/(1024*1024)).toFixed(2)}MB)`;
             const selected = document.querySelectorAll('.brand-check:checked').length;
             document.getElementById('applyWatermarksBtn').disabled = !(selected > 0 && selected <= 10);
-        }
+        });
         
         // Apply watermarks (Canvas-based with adaptive opacity 10-20%)
         document.getElementById('applyWatermarksBtn').addEventListener('click', async () => {
@@ -575,11 +575,11 @@
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
-                }
+                });
             }
             
             document.getElementById('applyWatermarksBtn').disabled = false;
-        }
+        });
         
         // Canvas-based watermark application with adaptive opacity (10-20%)
         async function applyWatermarkToVideo(videoFile, watermarkFileName, brandName) {
@@ -594,7 +594,7 @@
                     await new Promise((res, rej) => {
                         video.onloadedmetadata = res;
                         video.onerror = rej;
-                    }
+                    });
                     
                     // Load watermark
                     const watermark = new Image();
@@ -602,7 +602,7 @@
                     await new Promise((res, rej) => {
                         watermark.onload = res;
                         watermark.onerror = rej;
-                    }
+                    });
                     
                     // Force 9:16 aspect ratio
                     const targetWidth = 1080;
@@ -656,7 +656,7 @@
                     recorder.onstop = () => {
                         const blob = new Blob(chunks, { type: 'video/mp4' });
                         resolve(blob);
-                    }
+                    };
                     
                     recorder.start();
                     video.currentTime = 0;
