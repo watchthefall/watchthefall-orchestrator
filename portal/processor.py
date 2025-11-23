@@ -1,9 +1,13 @@
-"""
+"""  
 Video processor - applies WTF templates to videos
 """
 import os
 import subprocess
 import uuid
+try:
+    import psutil
+except ImportError:
+    psutil = None
 from .config import FFMPEG_BIN, TEMPLATE_DIR, OUTPUT_DIR, TEMP_DIR
 from .database import update_job_status, log_event
 
@@ -21,6 +25,13 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         Path to output video or None on failure
     """
     try:
+        # RAM guard for Render free tier (512MB limit)
+        if psutil:
+            available_mb = psutil.virtual_memory().available / (1024 * 1024)
+            print(f"[RAM CHECK] Job {job_id}: {available_mb:.1f}MB available")
+            if psutil.virtual_memory().available < 100 * 1024 * 1024:
+                raise MemoryError("Not enough RAM for safe processing on Render free tier (< 100MB available)")
+        
         print(f"[PROCESSOR] Starting job {job_id}")
         update_job_status(job_id, 'processing')
         log_event('info', job_id, f'Starting video processing: {template_name}')
@@ -44,9 +55,6 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         
         print(f"[PROCESSOR] Job {job_id}: Output will be {output_path}")
         
-        # Get video dimensions
-        dimensions = get_video_dimensions(video_path)
-        
         # Calculate target dimensions based on aspect ratio
         if aspect_ratio == '9:16':
             target_w, target_h = 1080, 1920
@@ -57,7 +65,7 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         else:
             target_w, target_h = 1080, 1920
         
-        # Build ffmpeg filter
+        # Build ffmpeg filter for low-memory streaming mode
         filters = []
         
         # Scale video to target size
@@ -76,14 +84,18 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         
         filter_complex = ';'.join(filters) if filters else f'scale={target_w}:{target_h}'
         
-        # Run ffmpeg
+        # LOW-MEMORY FFmpeg command for Render free tier
         cmd = [
             FFMPEG_BIN, '-y',
+            '-hwaccel', 'auto',              # Hardware acceleration if available
+            '-threads', '1',                  # Single thread to reduce memory
+            '-buffer_size', '1M',             # Small buffer size
+            '-max_muxing_queue_size', '256',  # Limit queue size
             '-i', video_path,
             '-filter_complex', filter_complex,
             '-c:v', 'libx264',
+            '-preset', 'veryfast',            # Fast preset for low CPU/memory
             '-crf', '23',
-            '-preset', 'medium',
             '-c:a', 'aac',
             '-b:a', '128k',
             output_path
@@ -92,14 +104,31 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         print(f"[FFMPEG COMMAND] Job {job_id}:")
         print(f"  {' '.join(cmd)}")
         
-        log_event('info', job_id, f'Running ffmpeg: {" ".join(cmd[:5])}...')
+        log_event('info', job_id, f'Running ffmpeg (low-memory mode): {" ".join(cmd[:5])}...')
         
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+        # Run FFmpeg with streaming stderr monitoring (low memory)
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True
+        )
         
-        if result.returncode != 0:
-            print(f"[FFMPEG ERROR] Job {job_id}: Return code {result.returncode}")
-            print(f"  stderr: {result.stderr[:500]}")
-            raise Exception(f'FFmpeg failed: {result.stderr[:200]}')
+        # Stream stderr to only log errors (avoid memory buildup)
+        stderr_errors = []
+        for line in process.stderr:
+            if 'error' in line.lower() or 'failed' in line.lower():
+                print(f"[FFMPEG ERROR] {line.strip()}")
+                stderr_errors.append(line.strip())
+        
+        # Wait for process to complete
+        process.wait(timeout=600)
+        
+        if process.returncode != 0:
+            print(f"[FFMPEG ERROR] Job {job_id}: Return code {process.returncode}")
+            error_msg = '\n'.join(stderr_errors[:5]) if stderr_errors else 'FFmpeg failed'
+            print(f"  stderr: {error_msg}")
+            raise Exception(f'FFmpeg failed: {error_msg[:200]}')
         
         if not os.path.exists(output_path):
             print(f"[FFMPEG ERROR] Job {job_id}: Output file not created at {output_path}")

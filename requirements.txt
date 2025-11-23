@@ -13,3 +13,4 @@ pycryptodomex
 yt-dlp
 websockets
 brotli
+psutil==5.9.8
