@@ -218,7 +218,14 @@
             <textarea id="linksInput" placeholder="https://tiktok.com/@user/video/123...&#10;https://instagram.com/reel/abc...&#10;https://x.com/user/status/456..." 
                 style="width:100%; min-height:120px; background:#111; border:1px solid #333; color:#ddd; padding:12px; border-radius:8px; font-size:14px; font-family:monospace; resize:vertical;"></textarea>
             
-            <button id="fetchLinksBtn" style="width:100%; margin-top:12px; background:#00aa00;">📥 Download All Links</button>
+            <div style="display:flex; gap:10px; margin-top:12px;">
+                <button id="fetchLinksBtn" style="flex:1; background:#00aa00;">📥 Download All Links</button>
+                <button id="pasteClipboardBtn" style="flex:1; background:#0066ff;">📋 Paste from Clipboard</button>
+                <button id="resetLinksBtn" style="flex:1; background:#444;">♻ Reset</button>
+            </div>
+            <label style="display:flex; align-items:center; gap:8px; margin-top:10px; font-size:13px; color:#aaa;">
+                <input type="checkbox" id="autoDownloadToggle"> Auto-download when ready
+            </label>
             
             <div id="fetchStatus" style="margin-top:15px;"></div>
         </div>
@@ -270,6 +277,14 @@
                     <p style="color: #666;">Loading logs...</p>
                 </div>
             </div>
+            
+            <!-- History -->
+            <div class="section">
+                <h2>🕘 History</h2>
+                <div id="historyList">
+                    <p style="color: #666;">No history yet</p>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -281,6 +296,116 @@
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/portal/static/sw.js').catch(() => {});
+        }
+        
+        // Auto-download toggle
+        let autoDownloadEnabled = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('autoDownloadToggle');
+            if (toggle) {
+                toggle.addEventListener('change', (e) => {
+                    autoDownloadEnabled = !!e.target.checked;
+                });
+            }
+        });
+        
+        // Paste-All button
+        document.addEventListener('click', async (e) => {
+            if (e.target && e.target.id === 'pasteClipboardBtn') {
+                if (!navigator.clipboard) return;
+                try {
+                    const text = await navigator.clipboard.readText();
+                    const urls = extractURLs(text).slice(0,5);
+                    if (!urls.length) {
+                        alert('No URLs found in clipboard');
+                        return;
+                    }
+                    document.getElementById('linksInput').value = urls.join('\n');
+                    document.getElementById('fetchStatus').innerHTML = '<div class="status queued">📋 Pasted URLs from clipboard.</div>';
+                } catch (err) {
+                    alert('Clipboard read failed');
+                }
+            }
+        });
+        
+        // Helpers
+        function extractURLs(text) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return (text.match(urlRegex) || []).map(u => u.trim());
+        }
+        
+        async function shareVideo(downloadUrl, filename) {
+            try {
+                if (!navigator.share) {
+                    alert('Sharing not supported on this browser');
+                    return;
+                }
+                const res = await fetch(downloadUrl);
+                const blob = await res.blob();
+                const file = new File([blob], filename || 'video.mp4', { type: 'video/mp4' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: filename || 'Video' });
+                } else {
+                    // Fallback: share URL
+                    await navigator.share({ title: filename || 'Video', url: downloadUrl });
+                }
+            } catch (e) {
+                alert('Share failed: ' + e.message);
+            }
+        }
+        
+        // Delegate click for share buttons and copy-all-links
+        document.addEventListener('click', async (e) => {
+            if (e.target && e.target.classList.contains('share-btn')) {
+                const url = e.target.getAttribute('data-url');
+                const name = e.target.getAttribute('data-filename') || 'video.mp4';
+                await shareVideo(url, name);
+            }
+            if (e.target && e.target.id === 'copyAllLinksBtn') {
+                const links = [];
+                document.querySelectorAll('.download-link').forEach(a => {
+                    if (a.href) links.push(a.href);
+                });
+                if (links.length) {
+                    try {
+                        await navigator.clipboard.writeText(links.join('\n'));
+                        e.target.textContent = '✓ Copied!';
+                        setTimeout(() => { e.target.textContent = '📋 Copy All Download Links'; }, 2000);
+                    } catch (err) {
+                        alert('Copy failed: ' + err.message);
+                    }
+                } else {
+                    alert('No download links found');
+                }
+            }
+        });
+        
+        function saveHistoryEntry(entry) {
+            const key = 'wtf_history';
+            let hist = [];
+            try { hist = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+            hist.unshift({ ...entry, ts: Date.now() });
+            hist = hist.slice(0,20);
+            localStorage.setItem(key, JSON.stringify(hist));
+            renderHistory();
+        }
+        function renderHistory() {
+            const key = 'wtf_history';
+            let hist = [];
+            try { hist = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+            const container = document.getElementById('historyList');
+            if (!container) return;
+            if (!hist.length) {
+                container.innerHTML = '<p style="color:#666;">No history yet</p>';
+                return;
+            }
+            container.innerHTML = hist.map(h => `
+                <div class="job-item">
+                    <strong>${h.name || h.filename || 'Video'}</strong>
+                    <div class="job-meta">${new Date(h.ts).toLocaleString()}${h.size_mb ? ` • ${h.size_mb}MB` : ''}
+                    ${h.url ? `<br><a href="${h.url}" class="download-link" download>Download</a> <button class="share-btn" data-url="${h.url}" data-filename="${h.name || 'video.mp4'}" style="margin-left:8px;">🤝 Share to CapCut</button>` : ''}</div>
+                </div>
+            `).join('');
         }
         
         // Load templates
@@ -328,6 +453,99 @@
             }
         });
         
+        // Helpers (fetch batch + paste/drag + reset)
+        async function fetchBatchUrls(targetUrls) {
+            const response = await fetch('/api/videos/fetch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ urls: targetUrls })
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Server error (${response.status}): ${text}`);
+            }
+            return await response.json();
+        }
+        function autoDownloadFile(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename || 'video.mp4';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+        (function(){
+            const linksInput = document.getElementById('linksInput');
+            const fetchStatus = document.getElementById('fetchStatus');
+            const resetBtn = document.getElementById('resetLinksBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', ()=>{
+                    if (linksInput) linksInput.value = '';
+                    if (fetchStatus) fetchStatus.innerHTML = '';
+                });
+            }
+            if (linksInput) {
+                // Paste-to-start
+                linksInput.addEventListener('paste', async (e) => {
+                    const text = (e.clipboardData && e.clipboardData.getData('text')) || '';
+                    const urls = extractURLs(text).slice(0,5);
+                    if (!urls.length) return;
+                    e.preventDefault();
+                    if (urls.length === 1) {
+                        fetchStatus.innerHTML = '<div class="status processing">⏳ Downloading 1 video...</div>';
+                        try {
+                            const result = await fetchBatchUrls(urls);
+                            const r = result.results && result.results[0];
+                            if (result.success && r && r.success) {
+                                saveHistoryEntry({ type: 'link', name: r.filename, url: r.download_url, size_mb: r.size_mb });
+                                fetchStatus.innerHTML = `<div class="status completed">✓ Downloaded <a href="${r.download_url}" class="download-link" download>${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span> <button class="share-btn" data-url="${r.download_url}" data-filename="${r.filename}" style="margin-left:8px;">🤝 Share to CapCut</button></div>`;
+                                if (autoDownloadEnabled) autoDownloadFile(r.download_url, r.filename);
+                                renderHistory();
+                            } else {
+                                fetchStatus.innerHTML = `<div class=\"status failed\">✗ Error: ${r && r.error ? r.error : 'Download failed'}</div>`;
+                            }
+                        } catch (err) {
+                            fetchStatus.innerHTML = `<div class=\"status failed\">✗ Error: ${err.message}</div>`;
+                        } finally {
+                            linksInput.value = '';
+                        }
+                    } else {
+                        linksInput.value = urls.join('\n');
+                        fetchStatus.innerHTML = `<div class=\"status queued\">📋 ${urls.length} URLs pasted. Tap \"Download All Links\".</div>`;
+                    }
+                });
+                // Drag & drop URLs
+                linksInput.addEventListener('dragover', (e)=>{ e.preventDefault(); linksInput.style.borderColor = '#00ff00'; });
+                linksInput.addEventListener('dragleave', ()=>{ linksInput.style.borderColor = '#333'; });
+                linksInput.addEventListener('drop', async (e)=>{
+                    e.preventDefault(); linksInput.style.borderColor = '#333';
+                    const text = (e.dataTransfer && e.dataTransfer.getData('text')) || '';
+                    const urls = extractURLs(text).slice(0,5);
+                    if (!urls.length) return;
+                    if (urls.length === 1) {
+                        fetchStatus.innerHTML = '<div class="status processing">⏳ Downloading 1 video...</div>';
+                        try {
+                            const result = await fetchBatchUrls(urls);
+                            const r = result.results && result.results[0];
+                            if (result.success && r && r.success) {
+                                saveHistoryEntry({ type: 'link', name: r.filename, url: r.download_url, size_mb: r.size_mb });
+                                fetchStatus.innerHTML = `<div class="status completed">✓ Downloaded <a href="${r.download_url}" class="download-link" download>${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span> <button class="share-btn" data-url="${r.download_url}" data-filename="${r.filename}" style="margin-left:8px;">🤝 Share to CapCut</button></div>`;
+                                if (autoDownloadEnabled) autoDownloadFile(r.download_url, r.filename);
+                                renderHistory();
+                            } else {
+                                fetchStatus.innerHTML = `<div class=\"status failed\">✗ Error: ${r && r.error ? r.error : 'Download failed'}</div>`;
+                            }
+                        } catch (err) {
+                            fetchStatus.innerHTML = `<div class=\"status failed\">✗ Error: ${err.message}</div>`;
+                        }
+                    } else {
+                        linksInput.value = urls.join('\n');
+                        fetchStatus.innerHTML = `<div class=\"status queued\">📋 ${urls.length} URLs dropped. Tap \"Download All Links\".</div>`;
+                    }
+                });
+            }
+        })();
+
         // Bulk link fetcher
         document.getElementById('fetchLinksBtn').addEventListener('click', async () => {
             const raw = (document.getElementById('linksInput').value || '').trim();
@@ -342,38 +560,71 @@
             fetchStatus.innerHTML = `<div class="status processing">⏳ Downloading ${urls.length} video${urls.length > 1 ? 's' : ''}...</div>`;
             document.getElementById('fetchLinksBtn').disabled = true;
             
-            try {
+            async function fetchBatch(targetUrls) {
                 const response = await fetch('/api/videos/fetch', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ urls })
+                    body: JSON.stringify({ urls: targetUrls })
                 });
-                
                 if (!response.ok) {
                     const text = await response.text();
                     throw new Error(`Server error (${response.status}): ${text}`);
                 }
-                
-                const result = await response.json();
+                return await response.json();
+            }
+            
+            try {
+                let result = await fetchBatch(urls);
                 if (!result.success) throw new Error(result.error || 'Fetch failed');
+                let finalResults = result.results;
                 
-                const items = result.results.map(r => {
+                // Auto-retry for failures (once)
+                const failed = finalResults.filter(r => !r.success).map(r => r.url);
+                if (failed.length) {
+                    try {
+                        const retry = await fetchBatch(failed);
+                        if (retry.success) {
+                            // Merge: replace failures with retry successes
+                            finalResults = finalResults.map(r => r.success ? r : (retry.results.find(rr => rr.url === r.url) || r));
+                        }
+                    } catch (e) {
+                        // ignore retry errors
+                    }
+                }
+                
+                const items = finalResults.map(r => {
                     if (r.success) {
-                        return `<li style="margin-bottom:8px;">✓ <a href="${r.download_url}" class="download-link" download style="color:#00ff00;">${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span></li>`;
+                        // Save to history
+                        saveHistoryEntry({ type: 'link', name: r.filename, url: r.download_url, size_mb: r.size_mb });
+                        return `<li style="margin-bottom:8px;">✓ <a href="${r.download_url}" class="download-link" download style="color:#00ff00;">${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span> <button class="share-btn" data-url="${r.download_url}" data-filename="${r.filename}" style="margin-left:8px;">🤝 Share to CapCut</button></li>`;
                     }
                     return `<li style="margin-bottom:8px; color:#ff5555;">✗ ${r.url.substring(0, 50)}... — ${r.error}</li>`;
                 }).join('');
                 
                 fetchStatus.innerHTML = `
                     <div class="status completed">
-                        ✓ Downloaded ${result.successful}/${result.total} videos:<br>
+                        ✓ Downloaded ${finalResults.filter(r=>r.success).length}/${finalResults.length} videos:<br>
                         <ul style="margin-top:10px; text-align:left; list-style:none; padding:0;">${items}</ul>
                         <p style="margin-top:12px; font-size:12px; color:#888;">📱 Tap each link to save to your phone</p>
+                        <button id="copyAllLinksBtn" style="margin-top:10px; width:100%; background:#0066ff;">📋 Copy All Download Links</button>
                     </div>
                 `;
                 
+                // Auto-download
+                if (autoDownloadEnabled) {
+                    finalResults.filter(r=>r.success).forEach(r => {
+                        const a = document.createElement('a');
+                        a.href = r.download_url;
+                        a.download = r.filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                    });
+                }
+                
                 document.getElementById('linksInput').value = '';
                 loadRecentJobs();
+                renderHistory();
                 
             } catch (err) {
                 console.error('Fetch error:', err);
@@ -400,53 +651,41 @@
             statusDiv.innerHTML = '<div class="status processing">⏳ Processing video...</div>';
             document.getElementById('processBtn').disabled = true;
             
-            try {
-                const response = await fetch('/api/videos/process', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        filename: uploadedFilename,
-                        template: template,
-                        aspect_ratio: aspectRatio
-                    })
-                });
-                
-                // Check if response is OK
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Server error (${response.status}): ${errorText}`);
-                }
-                
-                // Check if response body is empty
-                const responseText = await response.text();
-                if (!responseText || responseText.trim() === '') {
-                    throw new Error('Backend returned empty response');
-                }
-                
-                // Try to parse JSON
-                let result;
+            async function tryProcess(retries = 2) {
                 try {
-                    result = JSON.parse(responseText);
-                } catch (parseError) {
-                    console.error('JSON parse error:', parseError);
-                    console.error('Response text:', responseText);
-                    throw new Error(`Invalid JSON response from server: ${parseError.message}`);
-                }
-                
-                if (result.success) {
+                    const response = await fetch('/api/videos/process', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            filename: uploadedFilename,
+                            template: template,
+                            aspect_ratio: aspectRatio
+                        })
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Server error (${response.status}): ${errorText}`);
+                    }
+                    const text = await response.text();
+                    if (!text || text.trim() === '') throw new Error('Backend returned empty response');
+                    const result = JSON.parse(text);
+                    if (!result.success) throw new Error(result.error || 'Processing failed');
                     activeJobId = result.job_id;
-                    statusDiv.innerHTML = `<div class="status processing">Processing... Job ID: ${result.job_id}</div>`;
-                    
-                    // Poll for status
+                    statusDiv.innerHTML = `<div class=\"status processing\">Processing... Job ID: ${result.job_id}</div>`;
                     pollJobStatus(result.job_id);
-                } else {
-                    throw new Error(result.error || 'Processing failed');
+                } catch (err) {
+                    if (retries > 0) {
+                        statusDiv.innerHTML = `<div class=\"status queued\">Retrying... (${retries})</div>`;
+                        await new Promise(res => setTimeout(res, 1000));
+                        return tryProcess(retries - 1);
+                    }
+                    console.error('Process error:', err);
+                    statusDiv.innerHTML = `<div class=\"status failed\">✗ Error: ${err.message}</div>`;
+                    document.getElementById('processBtn').disabled = false;
                 }
-            } catch (err) {
-                console.error('Process error:', err);
-                statusDiv.innerHTML = `<div class="status failed">✗ Error: ${err.message}</div>`;
-                document.getElementById('processBtn').disabled = false;
             }
+            
+            tryProcess();
         });
         
         // Poll job status
@@ -473,21 +712,30 @@
                         clearInterval(statusPollInterval);
                         statusPollInterval = null;
                         statusDiv.innerHTML = `
-                            <div class="status completed">
-                                ✓ Processing complete!<br>
-                                <a href="${job.download_url}" class="download-link" download>📥 Download ${job.output_file}</a>
-                            </div>
+                            <div class=\"status completed\">\n                                ✓ Processing complete!<br>\n                                <a href=\"${job.download_url}\" class=\"download-link\" download>📥 Download ${job.output_file}</a> <button class=\"share-btn\" data-url=\"${job.download_url}\" data-filename=\"${job.output_file}\" style=\"margin-left:10px;\">🤝 Share to CapCut</button>\n                            </div>
                         `;
                         loadRecentJobs();
+                        // Save history
+                        saveHistoryEntry({ type: 'process', name: job.output_file, url: job.download_url });
+                        // Auto-download
+                        if (autoDownloadEnabled && job.download_url) {
+                            const a = document.createElement('a');
+                            a.href = job.download_url;
+                            a.download = job.output_file || 'video.mp4';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                        }
+                        renderHistory();
                         resetUpload();
                     } else if (job.status === 'failed') {
                         clearInterval(statusPollInterval);
                         statusPollInterval = null;
-                        statusDiv.innerHTML = `<div class="status failed">✗ Processing failed: ${job.error || 'Unknown error'}</div>`;
+                        statusDiv.innerHTML = `<div class=\"status failed\">✗ Processing failed: ${job.error || 'Unknown error'}</div>`;
                         resetUpload();
                     } else {
                         // Still processing - update status message
-                        statusDiv.innerHTML = `<div class="status processing">⏳ Processing... Job ID: ${jobId}</div>`;
+                        statusDiv.innerHTML = `<div class=\"status processing\">⏳ Processing... Job ID: ${jobId}</div>`;
                     }
                 } catch (err) {
                     console.error('Status poll error:', err);
