@@ -843,8 +843,11 @@
                     }
                     brightness /= (imageData.data.length / 4);
                     
-                    // Adaptive opacity: 10% (bright) to 20% (dark)
-                    const opacity = 0.10 + (0.10 * (1 - brightness / 255));
+                    // Adaptive opacity: 20% (bright) to 40% (dark) - INCREASED for visibility
+                    const opacity = 0.20 + (0.20 * (1 - brightness / 255));
+                    console.log(`[WATERMARK] Brand: ${brandName}, Brightness: ${brightness.toFixed(0)}, Opacity: ${(opacity*100).toFixed(0)}%`);
+                    console.log(`[WATERMARK] Watermark position: X=${watermarkX.toFixed(0)}, Y=${watermarkY.toFixed(0)}, W=${watermarkWidth.toFixed(0)}, H=${watermarkHeight.toFixed(0)}`);
+                    console.log(`[WATERMARK] Video duration: ${video.duration.toFixed(2)}s, Size: ${video.videoWidth}x${video.videoHeight}`);
                     
                     // Watermark positioning (bottom-right, 5% safe zone)
                     const safeZone = 0.05;
@@ -857,17 +860,29 @@
                     
                     // Encode using MediaRecorder
                     const stream = canvas.captureStream(30);
-                    const audioContext = new AudioContext();
-                    const audioSource = audioContext.createMediaElementSource(video);
-                    const dest = audioContext.createMediaStreamDestination();
-                    audioSource.connect(dest);
                     
-                    // Merge audio and video
-                    const audioTrack = dest.stream.getAudioTracks()[0];
-                    if (audioTrack) stream.addTrack(audioTrack);
+                    // Try to add audio (may fail on some browsers)
+                    try {
+                        const audioContext = new AudioContext();
+                        const audioSource = audioContext.createMediaElementSource(video);
+                        const dest = audioContext.createMediaStreamDestination();
+                        audioSource.connect(dest);
+                        const audioTrack = dest.stream.getAudioTracks()[0];
+                        if (audioTrack) {
+                            stream.addTrack(audioTrack);
+                            console.log('[WATERMARK] Audio track added');
+                        }
+                    } catch (audioErr) {
+                        console.warn('[WATERMARK] Audio processing failed, continuing without audio:', audioErr);
+                    }
                     
                     const chunks = [];
-                    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: 5000000 });
+                    // Use webm codec (better mobile support than vp9)
+                    const recorder = new MediaRecorder(stream, { 
+                        mimeType: 'video/webm',
+                        videoBitsPerSecond: 5000000 
+                    });
+                    console.log('[WATERMARK] MediaRecorder started with codec:', recorder.mimeType);
                     
                     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
                     recorder.onstop = () => {
@@ -879,12 +894,19 @@
                     video.currentTime = 0;
                     video.play();
                     
+                    let frameCount = 0;
                     // Render loop
                     function render() {
                         if (video.paused || video.ended) {
+                            console.log(`[WATERMARK] Rendering complete. Total frames: ${frameCount}`);
                             recorder.stop();
                             video.pause();
                             return;
+                        }
+                        
+                        frameCount++;
+                        if (frameCount === 1 || frameCount % 30 === 0) {
+                            console.log(`[WATERMARK] Frame ${frameCount}, Time: ${video.currentTime.toFixed(2)}s`);
                         }
                         
                         // Draw video frame (cropped/scaled to 9:16)
