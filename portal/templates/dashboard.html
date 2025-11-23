@@ -802,6 +802,22 @@
         async function applyWatermarkToVideo(videoFile, watermarkFileName, brandName) {
             return new Promise(async (resolve, reject) => {
                 try {
+                    // Mobile/browser detection and capability check
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    console.log(`[WATERMARK] Device: ${isMobile ? 'Mobile' : 'Desktop'}, Browser: ${navigator.userAgent.substring(0, 50)}...`);
+                    
+                    // Check MediaRecorder support
+                    if (!window.MediaRecorder) {
+                        throw new Error('❌ MediaRecorder not supported. Try Chrome/Firefox/Edge.');
+                    }
+                    
+                    // Check Canvas.captureStream support
+                    const testCanvas = document.createElement('canvas');
+                    if (!testCanvas.captureStream && !testCanvas.mozCaptureStream) {
+                        throw new Error('❌ Canvas.captureStream() not supported on this browser.');
+                    }
+                    console.log('[WATERMARK] ✓ MediaRecorder and captureStream supported');
+                    
                     // Load video
                     const video = document.createElement('video');
                     video.src = URL.createObjectURL(videoFile);
@@ -870,11 +886,12 @@
                     console.log(`[WATERMARK] Video duration: ${video.duration.toFixed(2)}s, Size: ${video.videoWidth}x${video.videoHeight}`);
                     
                     // Encode using MediaRecorder
-                    const stream = canvas.captureStream(30);
+                    const stream = canvas.captureStream ? canvas.captureStream(30) : canvas.mozCaptureStream(30);
+                    console.log(`[WATERMARK] Canvas stream created: ${stream.getVideoTracks().length} video tracks`);
                     
-                    // Try to add audio (may fail on some browsers)
+                    // Try to add audio (may fail on some browsers, especially mobile)
                     try {
-                        const audioContext = new AudioContext();
+                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                         const audioSource = audioContext.createMediaElementSource(video);
                         const dest = audioContext.createMediaStreamDestination();
                         audioSource.connect(dest);
@@ -882,18 +899,28 @@
                         if (audioTrack) {
                             stream.addTrack(audioTrack);
                             console.log('[WATERMARK] Audio track added');
+                        } else {
+                            console.warn('[WATERMARK] No audio track available');
                         }
                     } catch (audioErr) {
-                        console.warn('[WATERMARK] Audio processing failed, continuing without audio:', audioErr);
+                        console.warn('[WATERMARK] Audio processing failed, continuing without audio:', audioErr.message);
                     }
                     
                     const chunks = [];
-                    // Use webm codec (better mobile support than vp9)
-                    const recorder = new MediaRecorder(stream, { 
-                        mimeType: 'video/webm',
-                        videoBitsPerSecond: 5000000 
-                    });
-                    console.log('[WATERMARK] MediaRecorder started with codec:', recorder.mimeType);
+                    // Try different codecs for mobile compatibility
+                    let recorderOptions;
+                    if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+                        recorderOptions = { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: 5000000 };
+                    } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+                        recorderOptions = { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 5000000 };
+                    } else if (MediaRecorder.isTypeSupported('video/webm')) {
+                        recorderOptions = { mimeType: 'video/webm', videoBitsPerSecond: 5000000 };
+                    } else {
+                        recorderOptions = { videoBitsPerSecond: 5000000 };
+                    }
+                    
+                    const recorder = new MediaRecorder(stream, recorderOptions);
+                    console.log('[WATERMARK] MediaRecorder created with:', recorder.mimeType);
                     
                     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
                     recorder.onstop = () => {
