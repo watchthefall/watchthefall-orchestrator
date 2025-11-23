@@ -65,26 +65,23 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         else:
             target_h = 1920
         
-        # ULTRA-LOW MEMORY FFmpeg command for Render free tier
-        # Using MPEG4 encoder (always available, no libx264 dependency)
+        # ULTRA-SIMPLE FFmpeg command for Render free tier
+        # Stripped down to absolute minimum to avoid compatibility issues
         ffmpeg_cmd = [
             FFMPEG_BIN,
-            "-y",
-            "-threads", "1",                    # Never use more than 1 thread
-            "-hwaccel", "auto",                 # HW accel if available, fallback to CPU
-            "-analyzeduration", "1M",           # Prevent giant RAM usage during probing
-            "-probesize", "1M",
-            "-buffer_size", "1M",
-            "-max_muxing_queue_size", "256",
-            "-i", video_path,
-            "-vf", f"scale=-2:{target_h}",
-            "-c:v", "mpeg4",                    # Use mpeg4 (universally available, no x264 needed)
-            "-qscale:v", "5",                   # Quality scale for mpeg4 (2-31, lower=better)
-            "-movflags", "+faststart",          # Make MP4 playable immediately
+            "-y",                              # Overwrite output
+            "-i", video_path,                  # Input file
+            "-vf", f"scale=-2:{target_h}",     # Scale video
+            "-c:v", "mpeg4",                   # MPEG4 codec (universal)
+            "-qscale:v", "5",                  # Quality setting
+            "-an",                             # No audio (simplify for now)
             output_path
         ]
         
         print(f"[FFMPEG CMD] {' '.join(ffmpeg_cmd)}")
+        print(f"[DEBUG] Input exists: {os.path.exists(video_path)}")
+        print(f"[DEBUG] Output dir exists: {os.path.exists(os.path.dirname(output_path))}")
+        print(f"[DEBUG] FFMPEG_BIN: {FFMPEG_BIN}")
         
         log_event('info', job_id, f'Running ffmpeg (ultra-low-memory mode): {" ".join(ffmpeg_cmd[:5])}...')
         
