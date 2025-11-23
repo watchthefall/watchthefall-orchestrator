@@ -938,17 +938,22 @@
             currentModalProgress = { current: 0, total: 0, brandName: '', percent: 0 };
             updateMinimizedBar();
             
-            // Auto-download if enabled
-            if (autoDownloadEnabled) {
-                results.filter(r => !r.error).forEach(r => {
+            // Auto-download all successful videos
+            results.filter(r => !r.error).forEach((r, index) => {
+                setTimeout(() => {
                     const a = document.createElement('a');
                     a.href = r.url;
                     a.download = r.filename;
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
-                });
-            }
+                }, index * 500); // Stagger downloads by 500ms to avoid browser blocking
+            });
+            
+            // Auto-close modal after downloads start (2 seconds delay)
+            setTimeout(() => {
+                closeBrandModal();
+            }, 2000);
             
             renderHistory();
             document.getElementById('modalGenerateBtn').disabled = false;
