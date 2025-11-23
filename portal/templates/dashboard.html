@@ -675,6 +675,11 @@
             statusDiv.innerHTML = '<div class="status processing">⏳ Processing watermarks...</div>';
             document.getElementById('modalGenerateBtn').disabled = true;
             
+            // Show device info on screen
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const deviceInfo = `📱 Device: ${isMobile ? 'Mobile' : 'Desktop'}<br>🌐 Browser: ${navigator.userAgent.split(' ').slice(-2).join(' ')}`;
+            statusDiv.innerHTML = `<div class="status processing">⏳ Initializing...<br><small style="color:#888;">${deviceInfo}</small></div>`;
+            
             const results = [];
             
             for (let i = 0; i < selected.length; i++) {
@@ -695,7 +700,13 @@
                     saveHistoryEntry({ type: 'watermark', name: filename, url, size_mb: (watermarkedBlob.size/(1024*1024)).toFixed(2) });
                     
                 } catch (err) {
-                    results.push({ brandName, error: err.message });
+                    console.error(`[WATERMARK ERROR] ${brandName}:`, err);
+                    // Show error on screen with full details
+                    results.push({ 
+                        brandName, 
+                        error: `${err.message || err}`,
+                        errorDetails: `🚫 ${err.name || 'Error'}: ${err.message || err}<br><small style="color:#888;">${err.stack ? err.stack.split('\n')[0] : ''}</small>`
+                    });
                 }
             }
             
@@ -703,7 +714,7 @@
             const successCount = results.filter(r => !r.error).length;
             const items = results.map(r => {
                 if (r.error) {
-                    return `<div class="watermark-result" style="border-left-color:#ff5555;">✗ ${r.brandName}: ${r.error}</div>`;
+                    return `<div class="watermark-result" style="border-left-color:#ff5555; padding:15px;">✗ <strong>${r.brandName}</strong><br>${r.errorDetails || r.error}</div>`;
                 }
                 return `<div class="watermark-result">✓ <strong>${r.brandName}</strong><br><a href="${r.url}" download="${r.filename}" style="color:#00ff00;">📥 ${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span> <button class="share-btn" data-url="${r.url}" data-filename="${r.filename}" style="margin-left:8px;">🤝 Share</button></div>`;
             }).join('');
