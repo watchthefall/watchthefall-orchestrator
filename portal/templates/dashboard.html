@@ -907,7 +907,8 @@
                     });
                     
                     const url = URL.createObjectURL(watermarkedBlob);
-                    const filename = `${brandName}_${pendingVideoFilename.replace(/\.[^/.]+$/, '')}.mp4`;
+                    // Use .webm extension for proper file type recognition
+                    const filename = `${brandName}_${pendingVideoFilename.replace(/\.[^/.]+$/, '')}.webm`;
                     
                     results.push({ brandName, url, filename, size_mb: (watermarkedBlob.size/(1024*1024)).toFixed(2) });
                     
@@ -995,7 +996,8 @@
                     
                     const watermarkedBlob = await applyWatermarkToVideo(selectedVideoFile, watermarkFile, brandName);
                     const url = URL.createObjectURL(watermarkedBlob);
-                    const filename = `${brandName}_${selectedVideoFile.name.replace(/\.[^/.]+$/, '')}.mp4`;
+                    // Use .webm extension for proper file type recognition
+                    const filename = `${brandName}_${selectedVideoFile.name.replace(/\.[^/.]+$/, '')}.webm`;
                     
                     results.push({ brandName, url, filename, size_mb: (watermarkedBlob.size/(1024*1024)).toFixed(2) });
                     
@@ -1187,9 +1189,13 @@
                     const recorder = new MediaRecorder(stream, recorderOptions);
                     console.log('[WATERMARK] MediaRecorder created with:', recorder.mimeType);
                     
+                    // Store the actual mimeType for proper blob creation
+                    const actualMimeType = recorder.mimeType;
+                    
                     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
                     recorder.onstop = () => {
-                        const blob = new Blob(chunks, { type: 'video/mp4' });
+                        // Use actual codec type instead of forcing mp4
+                        const blob = new Blob(chunks, { type: actualMimeType || 'video/webm' });
                         if (onProgress) onProgress(100);
                         resolve(blob);
                     };
