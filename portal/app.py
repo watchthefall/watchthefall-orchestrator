@@ -7,6 +7,10 @@ import uuid
 from werkzeug.utils import secure_filename
 from functools import wraps
 import threading
+try:
+    from yt_dlp import YoutubeDL
+except ImportError:
+    YoutubeDL = None
 
 from .config import (
     SECRET_KEY, PORTAL_AUTH_KEY, UPLOAD_DIR, OUTPUT_DIR,
@@ -115,6 +119,87 @@ def upload_video():
     except Exception as e:
         log_event('error', None, f'Upload failed: {str(e)}')
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/videos/fetch', methods=['POST'])
+def fetch_videos_from_urls():
+    """Download videos from URLs (TikTok, Instagram, X) - up to 5 at a time"""
+    try:
+        if not YoutubeDL:
+            return jsonify({'success': False, 'error': 'yt-dlp not installed'}), 500
+        
+        data = request.get_json(force=True) or {}
+        urls = data.get('urls') or []
+        
+        if not isinstance(urls, list) or len(urls) == 0:
+            return jsonify({'success': False, 'error': 'Provide JSON: {"urls": ["url1", "url2", ...]}'}), 400
+        
+        if len(urls) > 5:
+            return jsonify({'success': False, 'error': 'Maximum 5 URLs at a time (Render free tier limit)'}), 400
+        
+        print(f"[FETCH] Downloading {len(urls)} videos from URLs")
+        log_event('info', None, f'Fetching {len(urls)} URLs')
+        
+        def download_one(url_input):
+            try:
+                ydl_opts = {
+                    'outtmpl': os.path.join(OUTPUT_DIR, '%(id)s.%(ext)s'),
+                    'merge_output_format': 'mp4',
+                    'format': 'mp4/best',
+                    'noplaylist': True,
+                    'quiet': True,
+                    'no_warnings': True,
+                }
+                
+                with YoutubeDL(ydl_opts) as ydl:
+                    print(f"[FETCH] Downloading: {url_input[:50]}...")
+                    info = ydl.extract_info(url_input, download=True)
+                    filename = ydl.prepare_filename(info)
+                    
+                    # Ensure .mp4 extension
+                    if not filename.endswith('.mp4'):
+                        base, _ = os.path.splitext(filename)
+                        filename = base + '.mp4'
+                    
+                    name = os.path.basename(filename)
+                    file_size_mb = os.path.getsize(filename) / (1024 * 1024) if os.path.exists(filename) else 0
+                    
+                    print(f"[FETCH] Success: {name} ({file_size_mb:.2f}MB)")
+                    return {
+                        'url': url_input,
+                        'filename': name,
+                        'download_url': f'/api/videos/download/{name}',
+                        'size_mb': round(file_size_mb, 2),
+                        'success': True
+                    }
+            except Exception as e:
+                print(f"[FETCH ERROR] {url_input}: {str(e)}")
+                return {
+                    'url': url_input,
+                    'error': str(e),
+                    'success': False
+                }
+        
+        # Download sequentially to keep memory low
+        results = []
+        for url in urls:
+            results.append(download_one(url))
+        
+        success_count = sum(1 for r in results if r.get('success'))
+        log_event('info', None, f'Fetch complete: {success_count}/{len(urls)} successful')
+        
+        return jsonify({
+            'success': True,
+            'total': len(urls),
+            'successful': success_count,
+            'results': results
+        })
+        
+    except Exception as e:
+        import traceback
+        print(f"[FETCH EXCEPTION]:")
+        traceback.print_exc()
+        log_event('error', None, f'Fetch failed: {str(e)}')
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/videos/process', methods=['POST'])
 def process_video_endpoint():

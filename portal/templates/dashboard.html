@@ -199,6 +199,19 @@
     </header>
     
     <div class="container">
+        <!-- Multi-Link Downloader Section -->
+        <div class="section">
+            <h2>🔗 Bulk Download (Paste Links)</h2>
+            <p style="color: #888; font-size: 14px; margin-bottom: 15px;">Paste up to 5 TikTok, Instagram, or X links (one per line) - videos download directly to your phone</p>
+            
+            <textarea id="linksInput" placeholder="https://tiktok.com/@user/video/123...&#10;https://instagram.com/reel/abc...&#10;https://x.com/user/status/456..." 
+                style="width:100%; min-height:120px; background:#111; border:1px solid #333; color:#ddd; padding:12px; border-radius:8px; font-size:14px; font-family:monospace; resize:vertical;"></textarea>
+            
+            <button id="fetchLinksBtn" style="width:100%; margin-top:12px; background:#00aa00;">📥 Download All Links</button>
+            
+            <div id="fetchStatus" style="margin-top:15px;"></div>
+        </div>
+        
         <!-- Upload Section -->
         <div class="section">
             <h2>📤 Upload & Process</h2>
@@ -296,6 +309,61 @@
             } catch (err) {
                 uploadText.innerHTML = `<p style="color: #ff5555;">✗ Upload failed: ${err.message}</p>`;
                 uploadZone.classList.remove('active');
+            }
+        });
+        
+        // Bulk link fetcher
+        document.getElementById('fetchLinksBtn').addEventListener('click', async () => {
+            const raw = (document.getElementById('linksInput').value || '').trim();
+            if (!raw) {
+                alert('Please paste at least one video URL');
+                return;
+            }
+            
+            const urls = raw.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 5);
+            const fetchStatus = document.getElementById('fetchStatus');
+            
+            fetchStatus.innerHTML = `<div class="status processing">⏳ Downloading ${urls.length} video${urls.length > 1 ? 's' : ''}...</div>`;
+            document.getElementById('fetchLinksBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/videos/fetch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ urls })
+                });
+                
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(`Server error (${response.status}): ${text}`);
+                }
+                
+                const result = await response.json();
+                if (!result.success) throw new Error(result.error || 'Fetch failed');
+                
+                const items = result.results.map(r => {
+                    if (r.success) {
+                        return `<li style="margin-bottom:8px;">✓ <a href="${r.download_url}" class="download-link" download style="color:#00ff00;">${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span></li>`;
+                    }
+                    return `<li style="margin-bottom:8px; color:#ff5555;">✗ ${r.url.substring(0, 50)}... — ${r.error}</li>`;
+                }).join('');
+                
+                fetchStatus.innerHTML = `
+                    <div class="status completed">
+                        ✓ Downloaded ${result.successful}/${result.total} videos:<br>
+                        <ul style="margin-top:10px; text-align:left; list-style:none; padding:0;">${items}</ul>
+                        <p style="margin-top:12px; font-size:12px; color:#888;">📱 Tap each link to save to your phone</p>
+                    </div>
+                `;
+                
+                document.getElementById('linksInput').value = '';
+                loadRecentJobs();
+                
+            } catch (err) {
+                console.error('Fetch error:', err);
+                fetchStatus.innerHTML = `<div class="status failed">✗ Error: ${err.message}</div>`;
+            } finally {
+                document.getElementById('fetchLinksBtn').disabled = false;
             }
         });
         
