@@ -900,21 +900,39 @@
                     const stream = canvas.captureStream ? canvas.captureStream(30) : canvas.mozCaptureStream(30);
                     console.log(`[WATERMARK] Canvas stream created: ${stream.getVideoTracks().length} video tracks`);
                     
-                    // Try to add audio (may fail on some browsers, especially mobile)
+                    // BETTER AUDIO APPROACH: Capture from original video file
+                    // Don't use createMediaElementSource as it breaks video playback
+                    let audioTracks = [];
                     try {
-                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                        const audioSource = audioContext.createMediaElementSource(video);
-                        const dest = audioContext.createMediaStreamDestination();
-                        audioSource.connect(dest);
-                        const audioTrack = dest.stream.getAudioTracks()[0];
-                        if (audioTrack) {
-                            stream.addTrack(audioTrack);
-                            console.log('[WATERMARK] Audio track added');
+                        // Create a separate video element just for audio capture
+                        const audioVideo = document.createElement('video');
+                        audioVideo.src = URL.createObjectURL(videoFile);
+                        audioVideo.muted = false; // Keep audio enabled
+                        
+                        // Wait for it to load
+                        await new Promise((res, rej) => {
+                            audioVideo.onloadedmetadata = res;
+                            audioVideo.onerror = rej;
+                        });
+                        
+                        // Try to capture media stream from video (works on modern browsers)
+                        if (audioVideo.captureStream) {
+                            const audioStream = audioVideo.captureStream();
+                            audioTracks = audioStream.getAudioTracks();
+                            if (audioTracks.length > 0) {
+                                audioTracks.forEach(track => stream.addTrack(track));
+                                console.log(`[WATERMARK] ✓ Added ${audioTracks.length} audio track(s) from video`);
+                                // Play the audio video in sync
+                                audioVideo.currentTime = 0;
+                                audioVideo.play();
+                            } else {
+                                console.warn('[WATERMARK] Video has no audio tracks');
+                            }
                         } else {
-                            console.warn('[WATERMARK] No audio track available');
+                            console.warn('[WATERMARK] video.captureStream() not available, video will have no audio');
                         }
                     } catch (audioErr) {
-                        console.warn('[WATERMARK] Audio processing failed, continuing without audio:', audioErr.message);
+                        console.warn('[WATERMARK] Audio capture failed:', audioErr.message);
                     }
                     
                     const chunks = [];
