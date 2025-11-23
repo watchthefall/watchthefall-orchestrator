@@ -550,6 +550,7 @@
         // ========== PHASE B: CLIENT-SIDE WATERMARK SYSTEM ==========
         let selectedVideoFile = null;
         let brandWatermarks = {};
+        let brandsLoaded = false;
         let pendingVideoBlob = null;
         let pendingVideoFilename = null;
         
@@ -564,6 +565,12 @@
         
         async function openBrandModalForUrl(videoUrl, filename) {
             try {
+                // Wait for brands to load first
+                if (!brandsLoaded) {
+                    alert('Loading brands... please wait a moment and try again.');
+                    return;
+                }
+                
                 // Fetch video as blob
                 document.getElementById('modalVideoName').textContent = `🎬 Loading: ${filename}...`;
                 document.getElementById('brandModal').classList.add('active');
@@ -615,6 +622,9 @@
                     </label>
                 `).join('');
                 
+                console.log(`[BRANDS] Loaded ${Object.keys(brands).length} brands into modal grid`);
+                brandsLoaded = true;
+                
                 // Enable/disable button based on selection (main section)
                 document.querySelectorAll('.brand-check').forEach(cb => {
                     cb.addEventListener('change', () => {
@@ -640,6 +650,10 @@
                         }
                     });
                 });
+            })
+            .catch(err => {
+                console.error('[BRANDS] Failed to load brands.json:', err);
+                alert('Failed to load brand list. Please refresh the page.');
             });
         
         // Modal Generate button handler
