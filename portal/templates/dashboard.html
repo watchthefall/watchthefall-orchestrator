@@ -342,32 +342,6 @@
             
             <div id="watermarkStatus"></div>
         </div>
-        
-        <div class="grid">
-            <!-- Recent Jobs -->
-            <div class="section">
-                <h2>📊 Recent Jobs</h2>
-                <div id="recentJobs">
-                    <p style="color: #666;">No jobs yet</p>
-                </div>
-            </div>
-            
-            <!-- System Logs -->
-            <div class="section">
-                <h2>📜 System Logs</h2>
-                <div id="systemLogs" style="max-height: 400px; overflow-y: auto;">
-                    <p style="color: #666;">Loading logs...</p>
-                </div>
-            </div>
-            
-            <!-- History -->
-            <div class="section">
-                <h2>🕘 History</h2>
-                <div id="historyList">
-                    <p style="color: #666;">No history yet</p>
-                </div>
-            </div>
-        </div>
     </div>
     
     <!-- Brand Selector Modal -->
@@ -637,6 +611,29 @@
             const result = presets[preset];
             result.reason = reason;
             return result;
+        }
+        
+        // Codec detection - find best supported codec for device (fixes laptop compatibility)
+        function getSupportedCodec() {
+            // Test codecs in order of preference (best quality first)
+            const codecs = [
+                'video/webm;codecs=vp9,opus',     // VP9 - best quality
+                'video/webm;codecs=vp8,opus',     // VP8 - wider support
+                'video/webm;codecs=vp9',          // VP9 without audio codec
+                'video/webm;codecs=vp8',          // VP8 without audio codec
+                'video/webm'                       // Generic fallback
+            ];
+            
+            for (const codec of codecs) {
+                if (MediaRecorder.isTypeSupported(codec)) {
+                    console.log(`[CODEC] Using: ${codec}`);
+                    return codec;
+                }
+            }
+            
+            // Ultimate fallback - try any WebM
+            console.warn('[CODEC] No preferred codec supported, using generic video/webm');
+            return 'video/webm';
         }
         
         // Brand modal functions
@@ -980,30 +977,17 @@
             currentModalProgress = { current: 0, total: 0, brandName: '', percent: 0 };
             updateMinimizedBar();
             
-            // Auto-download all successful videos by fetching from server
+            // Auto-download all successful videos - direct server download (efficient)
             results.filter(r => !r.error).forEach((r, index) => {
-                setTimeout(async () => {
-                    try {
-                        // Fetch the actual MP4 file from server
-                        const response = await fetch(r.url);
-                        const blob = await response.blob();
-                        const url = URL.createObjectURL(blob);
-                        
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = r.filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        
-                        // Clean up blob URL after a delay
-                        setTimeout(() => URL.revokeObjectURL(url), 1000);
-                    } catch (err) {
-                        console.error(`[DOWNLOAD ERROR] ${r.filename}:`, err);
-                        // Fallback to direct link
-                        window.open(r.url, '_blank');
-                    }
-                }, index * 1000); // 1 second stagger for downloads
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = r.url;  // Direct server URL
+                    a.download = r.filename;
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => document.body.removeChild(a), 100);
+                }, index * 800);  // Stagger downloads
             });
             
             // Auto-close modal after downloads start (2 seconds delay)
@@ -1227,20 +1211,15 @@
                     }
                     
                     const chunks = [];
-                    // Try different codecs for mobile compatibility with preset bitrate
-                    let recorderOptions;
-                    if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
-                        recorderOptions = { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: preset.bitrate };
-                    } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
-                        recorderOptions = { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: preset.bitrate };
-                    } else if (MediaRecorder.isTypeSupported('video/webm')) {
-                        recorderOptions = { mimeType: 'video/webm', videoBitsPerSecond: preset.bitrate };
-                    } else {
-                        recorderOptions = { videoBitsPerSecond: preset.bitrate };
-                    }
+                    // Use codec detection for best compatibility
+                    const supportedCodec = getSupportedCodec();
+                    const recorderOptions = { 
+                        mimeType: supportedCodec, 
+                        videoBitsPerSecond: preset.bitrate 
+                    };
                     
                     const recorder = new MediaRecorder(stream, recorderOptions);
-                    console.log('[WATERMARK] MediaRecorder created with:', recorder.mimeType);
+                    console.log('[WATERMARK] MediaRecorder created with:', recorder.mimeType, `(${(preset.bitrate/1000000).toFixed(1)}Mbps)`);
                     
                     // Store the actual mimeType for proper blob creation
                     const actualMimeType = recorder.mimeType;

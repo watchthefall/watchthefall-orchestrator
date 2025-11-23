@@ -5,8 +5,6 @@ from flask import Flask, request, jsonify, render_template, send_from_directory
 import os
 import uuid
 from werkzeug.utils import secure_filename
-from functools import wraps
-import threading
 import subprocess
 import tempfile
 try:
@@ -15,17 +13,13 @@ except ImportError:
     YoutubeDL = None
 
 from .config import (
-    SECRET_KEY, PORTAL_AUTH_KEY, UPLOAD_DIR, OUTPUT_DIR,
-    ALLOWED_EXTENSIONS, MAX_UPLOAD_SIZE, BRANDS_DIR
+    SECRET_KEY, PORTAL_AUTH_KEY, OUTPUT_DIR,
+    MAX_UPLOAD_SIZE, BRANDS_DIR
 )
 from .database import (
-    create_job, get_job, get_recent_jobs, get_recent_logs,
+    get_recent_logs,
     log_event
 )
-from .processor import process_video
-import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from app.brand_loader import get_brands
 
 app = Flask(__name__, 
             template_folder='templates',
@@ -33,20 +27,6 @@ app = Flask(__name__,
             static_url_path='/portal/static')
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE
-
-def require_auth(f):
-    """Authentication decorator"""
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth_key = request.headers.get('WTF_PORTAL_KEY')
-        if auth_key != PORTAL_AUTH_KEY:
-            return jsonify({'error': 'Unauthorized'}), 401
-        return f(*args, **kwargs)
-    return decorated
-
-def allowed_file(filename):
-    """Check if file extension is allowed"""
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # ============================================================================
 # FRONTEND ROUTES
@@ -77,51 +57,7 @@ def test_page():
 # API: VIDEO PROCESSING
 # ============================================================================
 
-@app.route('/api/videos/upload', methods=['POST'])
-def upload_video():
-    """Upload video file"""
-    try:
-        if 'video' not in request.files:
-            return jsonify({'error': 'No video file provided'}), 400
-        
-        file = request.files['video']
-        
-        if file.filename == '':
-            return jsonify({'error': 'Empty filename'}), 400
-        
-        if not allowed_file(file.filename):
-            return jsonify({'error': 'Invalid file type. Allowed: mp4, mov, avi'}), 400
-        
-        # Save file
-        filename = secure_filename(file.filename)
-        unique_filename = f"{uuid.uuid4().hex}_{filename}"
-        filepath = os.path.join(UPLOAD_DIR, unique_filename)
-        file.save(filepath)
-        
-        # Check file size and warn if too large for Render free tier
-        file_size_mb = os.path.getsize(filepath) / (1024 * 1024)
-        size_warning = None
-        if file_size_mb > 25:
-            size_warning = f"Warning: File is {file_size_mb:.1f}MB. Render free tier may fail on files >25MB. Consider using a shorter clip."
-            print(f"[UPLOAD WARNING] {size_warning}")
-        
-        log_event('info', None, f'File uploaded: {filename} ({file_size_mb:.2f}MB)')
-        
-        response = {
-            'success': True,
-            'filename': unique_filename,
-            'message': 'Video uploaded successfully',
-            'size_mb': round(file_size_mb, 2)
-        }
-        
-        if size_warning:
-            response['warning'] = size_warning
-        
-        return jsonify(response)
-        
-    except Exception as e:
-        log_event('error', None, f'Upload failed: {str(e)}')
-        return jsonify({'error': str(e)}), 500
+# Upload endpoint removed - using client-side device upload with blob URLs
 
 @app.route('/api/videos/fetch', methods=['POST'])
 def fetch_videos_from_urls():
@@ -204,98 +140,9 @@ def fetch_videos_from_urls():
         log_event('error', None, f'Fetch failed: {str(e)}')
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/videos/process', methods=['POST'])
-def process_video_endpoint():
-    """Process video with template - async processing"""
-    job_id = None
-    try:
-        data = request.json
-        
-        filename = data.get('filename')
-        template = data.get('template', 'ScotlandWTF')
-        aspect_ratio = data.get('aspect_ratio', '9:16')
-        
-        if not filename:
-            return jsonify({'success': False, 'error': 'No filename provided'}), 400
-        
-        video_path = os.path.join(UPLOAD_DIR, filename)
-        
-        if not os.path.exists(video_path):
-            return jsonify({'success': False, 'error': 'Video file not found'}), 404
-        
-        # Create job
-        job_id = uuid.uuid4().hex[:12]
-        create_job(job_id, filename, template, aspect_ratio)
-        
-        print(f"[PROCESS QUEUED] Job ID: {job_id}, Template: {template}, Aspect: {aspect_ratio}")
-        log_event('info', job_id, f'Job queued for processing')
-        
-        # Process in background thread to avoid blocking the API response
-        def process_async():
-            try:
-                print(f"[ASYNC WORKER] Starting job {job_id}")
-                output_file = process_video(job_id, video_path, template, aspect_ratio)
-                if output_file:
-                    print(f"[ASYNC WORKER] Job {job_id} completed: {output_file}")
-                else:
-                    print(f"[ASYNC WORKER] Job {job_id} failed: no output")
-            except Exception as e:
-                import traceback
-                print(f"[ASYNC WORKER ERROR] Job {job_id}:")
-                traceback.print_exc()
-        
-        # Start background processing
-        thread = threading.Thread(target=process_async, daemon=True)
-        thread.start()
-        
-        # Return immediately with job ID
-        return jsonify({
-            'success': True,
-            'job_id': job_id,
-            'message': 'Processing started in background',
-            'status': 'processing',
-            'status_url': f'/api/videos/status/{job_id}'
-        })
-        
-    except Exception as e:
-        import traceback
-        print(f"[ENDPOINT EXCEPTION] Process endpoint error:")
-        traceback.print_exc()
-        log_event('error', job_id, f'Process request failed: {str(e)}')
-        return jsonify({
-            'success': False,
-            'error': str(e),
-            'job_id': job_id
-        }), 500
+# Process endpoint removed - using client-side Canvas watermarking only
 
-@app.route('/api/videos/status/<job_id>', methods=['GET'])
-def get_job_status(job_id):
-    """Get job status"""
-    try:
-        job = get_job(job_id)
-        
-        if not job:
-            return jsonify({'error': 'Job not found'}), 404
-        
-        response = {
-            'job_id': job['job_id'],
-            'status': job['status'],
-            'template': job['template'],
-            'aspect_ratio': job['aspect_ratio'],
-            'created_at': job['created_at']
-        }
-        
-        if job['status'] == 'completed' and job['output_path']:
-            response['download_url'] = f'/api/videos/download/{job["output_path"]}'
-            response['output_file'] = job['output_path']
-        
-        if job['status'] == 'failed' and job['error_message']:
-            response['error'] = job['error_message']
-        
-        return jsonify(response)
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# Status endpoint removed - no server-side job queue
 
 @app.route('/api/videos/download/<filename>', methods=['GET'])
 def download_video(filename):
@@ -330,35 +177,12 @@ def download_video(filename):
         traceback.print_exc()
         return jsonify({'error': 'File not found', 'details': str(e)}), 404
 
-@app.route('/api/videos/recent', methods=['GET'])
-def get_recent_videos():
-    """Get recent jobs"""
-    try:
-        limit = request.args.get('limit', 20, type=int)
-        jobs = get_recent_jobs(limit)
-        return jsonify({'jobs': jobs})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# Recent videos endpoint removed - using localStorage history only
 
 # ============================================================================
-# API: TEMPLATES & BRANDS
+# API: BRANDS (Static JSON)
 # ============================================================================
-
-@app.route('/api/templates', methods=['GET'])
-def get_templates():
-    """Get available templates/brands"""
-    try:
-        brands = get_brands()
-        templates = [
-            {
-                'name': b.get('name'),
-                'display_name': b.get('display_name', b.get('name'))
-            }
-            for b in brands
-        ]
-        return jsonify({'templates': templates})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# Templates endpoint removed - frontend loads brands.json directly
 
 # ============================================================================
 # API: SYSTEM & LOGS
@@ -374,21 +198,7 @@ def get_logs():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/system/queue', methods=['GET'])
-def get_queue_status():
-    """Get queue status"""
-    try:
-        jobs = get_recent_jobs(50)
-        queued = [j for j in jobs if j['status'] == 'queued']
-        processing = [j for j in jobs if j['status'] == 'processing']
-        
-        return jsonify({
-            'queued': len(queued),
-            'processing': len(processing),
-            'jobs': queued + processing
-        })
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# Queue endpoint removed - no server-side job queue
 
 # ============================================================================
 # API: WATERMARK CONVERSION (WebM to MP4)
@@ -494,34 +304,7 @@ def convert_watermark():
         log_event('error', None, f'Conversion exception: {str(e)}')
         return jsonify({'error': str(e)}), 500
 
-# ============================================================================
-# API: STUB ENDPOINTS (Future Features)
-# ============================================================================
-
-@app.route('/api/videos/post', methods=['POST'])
-def auto_post_video():
-    """Auto-post to social media (stub)"""
-    return jsonify({'message': 'Feature coming soon', 'status': 'stub'}), 501
-
-@app.route('/api/store/sync', methods=['POST'])
-def sync_store():
-    """Sync with store (stub)"""
-    return jsonify({'message': 'Feature coming soon', 'status': 'stub'}), 501
-
-@app.route('/api/store/list', methods=['GET'])
-def list_store_products():
-    """List store products (stub)"""
-    return jsonify({'message': 'Feature coming soon', 'status': 'stub'}), 501
-
-@app.route('/api/agent/ping', methods=['POST'])
-def agent_ping():
-    """Agent heartbeat (stub)"""
-    return jsonify({'message': 'Agent system ready', 'status': 'stub'}), 200
-
-@app.route('/api/hook/repurpose', methods=['POST'])
-def repurpose_hook():
-    """Content repurposing hook (stub)"""
-    return jsonify({'message': 'Feature coming soon', 'status': 'stub'}), 501
+# Stub endpoints removed - focus on core watermarking functionality
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
