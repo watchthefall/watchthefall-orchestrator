@@ -1460,56 +1460,6 @@
                 document.getElementById('fetchLinksBtn').disabled = false;
             }
         });
-        
-        // Load recent jobs
-        function loadRecentJobs() {
-            fetch('/api/videos/recent?limit=10')
-                .then(r => r.json())
-                .then(data => {
-                    const container = document.getElementById('recentJobs');
-                    if (data.jobs.length === 0) {
-                        container.innerHTML = '<p style="color: #666;">No jobs yet</p>';
-                        return;
-                    }
-                    
-                    container.innerHTML = data.jobs.map(job => `
-                        <div class="job-item ${job.status}">
-                            <strong>${job.template}</strong> 
-                            <span class="status ${job.status}" style="display: inline-block; padding: 2px 8px; font-size: 11px; margin-left: 10px;">${job.status}</span>
-                            <div class="job-meta">
-                                ${job.aspect_ratio} • ${new Date(job.created_at).toLocaleString()}
-                                ${job.status === 'completed' ? `<br><a href="/api/videos/download/${job.output_path}" class="download-link">Download</a>` : ''}
-                            </div>
-                        </div>
-                    `).join('');
-                });
-        }
-        
-        // Load system logs
-        function loadSystemLogs() {
-            fetch('/api/system/logs?limit=20')
-                .then(r => r.json())
-                .then(data => {
-                    const container = document.getElementById('systemLogs');
-                    if (data.logs.length === 0) {
-                        container.innerHTML = '<p style="color: #666;">No logs yet</p>';
-                        return;
-                    }
-                    
-                    container.innerHTML = data.logs.map(log => `
-                        <div class="log-entry ${log.level}">
-                            <span style="color: #666;">[${new Date(log.timestamp).toLocaleTimeString()}]</span>
-                            ${log.message}
-                        </div>
-                    `).join('');
-                });
-        }
-        
-        // Auto-refresh
-        loadRecentJobs();
-        loadSystemLogs();
-        setInterval(loadRecentJobs, 5000);
-        setInterval(loadSystemLogs, 10000);
     </script>
 </body>
 </html>
