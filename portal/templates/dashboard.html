@@ -302,8 +302,8 @@
     <div class="container">
         <!-- Multi-Link Downloader Section -->
         <div class="section">
-            <h2>🔗 Bulk Download (Paste Links)</h2>
-            <p style="color: #888; font-size: 14px; margin-bottom: 15px;">Paste up to 5 TikTok, Instagram, or X links (one per line) - videos download directly to your phone</p>
+            <h2>🔗 Bulk Download & Upload</h2>
+            <p style="color: #888; font-size: 14px; margin-bottom: 15px;">Paste up to 5 TikTok, Instagram, or X links (one per line) OR upload from your device</p>
             
             <textarea id="linksInput" placeholder="https://tiktok.com/@user/video/123...&#10;https://instagram.com/reel/abc...&#10;https://x.com/user/status/456..." 
                 style="width:100%; min-height:120px; background:#111; border:1px solid #333; color:#ddd; padding:12px; border-radius:8px; font-size:14px; font-family:monospace; resize:vertical;"></textarea>
@@ -311,11 +311,15 @@
             <div style="display:flex; gap:10px; margin-top:12px;">
                 <button id="fetchLinksBtn" style="flex:1; background:#00aa00;">📥 Download All Links</button>
                 <button id="pasteClipboardBtn" style="flex:1; background:#0066ff;">📋 Paste from Clipboard</button>
+                <button id="uploadFromDeviceBtn" style="flex:1; background:#ff6600;">📱 Upload from Device</button>
                 <button id="resetLinksBtn" style="flex:1; background:#444;">♻ Reset</button>
             </div>
             <label style="display:flex; align-items:center; gap:8px; margin-top:10px; font-size:13px; color:#aaa;">
                 <input type="checkbox" id="autoDownloadToggle"> Auto-download when ready
             </label>
+            
+            <!-- Hidden file input for device upload -->
+            <input type="file" id="deviceVideoInput" accept="video/mp4,video/quicktime,video/webm" style="display:none;">
             
             <div id="fetchStatus" style="margin-top:15px;"></div>
         </div>
@@ -337,37 +341,6 @@
             <button id="applyWatermarksBtn" style="width:100%; margin-top:20px; background:#00aa00;" disabled>⚡ Generate Watermarked Videos</button>
             
             <div id="watermarkStatus"></div>
-        </div>
-        
-        <!-- Upload Section -->
-        <div class="section">
-            <h2>📤 Upload & Process</h2>
-            
-            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-                <div id="uploadText">
-                    <p style="font-size: 18px; margin-bottom: 10px;">📁 Click or drag video here</p>
-                    <p style="color: #888; font-size: 14px;">Supported: MP4, MOV, AVI (max 500MB)</p>
-                </div>
-            </div>
-            <input type="file" id="fileInput" accept="video/mp4,video/quicktime,video/x-msvideo">
-            
-            <div style="margin-top: 20px;">
-                <label style="display: block; margin-bottom: 8px; color: #aaa; font-size: 14px;">Template</label>
-                <select id="templateSelect">
-                    <option value="">Loading templates...</option>
-                </select>
-                
-                <label style="display: block; margin-bottom: 8px; margin-top: 15px; color: #aaa; font-size: 14px;">Aspect Ratio</label>
-                <select id="aspectRatioSelect">
-                    <option value="9:16">9:16 (TikTok/Reels)</option>
-                    <option value="1:1">1:1 (Square)</option>
-                    <option value="16:9">16:9 (YouTube)</option>
-                </select>
-                
-                <button id="processBtn" style="width: 100%; margin-top: 20px;" disabled>Process Video</button>
-            </div>
-            
-            <div id="statusMessage" style="margin-top: 15px;"></div>
         </div>
         
         <div class="grid">
@@ -489,6 +462,36 @@
                     alert('Clipboard read failed');
                 }
             }
+            
+            // Upload from device button
+            if (e.target && e.target.id === 'uploadFromDeviceBtn') {
+                document.getElementById('deviceVideoInput').click();
+            }
+        });
+        
+        // Handle device video upload
+        document.getElementById('deviceVideoInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const statusDiv = document.getElementById('fetchStatus');
+            statusDiv.innerHTML = `<div class="status processing">⏳ Uploading ${file.name}...</div>`;
+            
+            // Create a blob URL and immediately open the brand modal
+            const blob = file;
+            const url = URL.createObjectURL(blob);
+            const filename = file.name;
+            
+            // Store for watermarking
+            statusDiv.innerHTML = `<div class="status completed">✓ Uploaded: ${filename} (${(file.size/(1024*1024)).toFixed(2)}MB)<br><a href="#" onclick="openBrandModalForUrl('${url}', '${filename}'); return false;" style="color:#0f0;">🎨 Click to add watermarks</a></div>`;
+            
+            // Auto-open brand modal
+            setTimeout(() => {
+                openBrandModalForUrl(url, filename);
+            }, 500);
+            
+            // Clear input
+            e.target.value = '';
         });
         
         // Helpers
