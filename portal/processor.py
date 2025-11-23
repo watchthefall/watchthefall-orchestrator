@@ -70,15 +70,14 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
             target_h = 1920
         
         # ULTRA-SIMPLE FFmpeg command for Render free tier
-        # Stripped down to absolute minimum to avoid compatibility issues
+        # NO SCALING - just direct copy to save memory
+        # This is the absolute minimum FFmpeg can do
         ffmpeg_cmd = [
             FFMPEG_BIN,
             "-y",                              # Overwrite output
             "-i", video_path,                  # Input file
-            "-vf", f"scale=-2:{target_h}",     # Scale video
-            "-c:v", "mpeg4",                   # MPEG4 codec (universal)
-            "-qscale:v", "5",                  # Quality setting
-            "-an",                             # No audio (simplify for now)
+            "-c", "copy",                      # Copy streams (no re-encoding!)
+            "-movflags", "faststart",          # Web-optimized
             output_path
         ]
         
