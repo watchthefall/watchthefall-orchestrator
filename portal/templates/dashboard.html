@@ -633,6 +633,60 @@
         let currentModalProgress = { current: 0, total: 0, brandName: '', percent: 0 };
         let isModalMinimized = false;
         
+        // ========== TSS / BROWSER EXTENSION DETECTION ==========
+        // Detect Trend Micro, HP Wolf, Microsoft Defender extensions that block uploads
+        function detectSecurityExtensionInterference() {
+            const warnings = [];
+            
+            // Check for TSS injection
+            if (window.document.querySelector('script[src*="injection-tss"]') || 
+                window.document.querySelector('script[src*="tss-mv3"]')) {
+                warnings.push('⚠️ Trend Micro / HP Wolf Security detected - may block uploads');
+            }
+            
+            // Check for runtime errors (TSS creates these)
+            const originalError = console.error;
+            let runtimeErrorDetected = false;
+            console.error = function(...args) {
+                if (args.some(a => String(a).includes('runtime.lastError') || String(a).includes('Receiving end does not exist'))) {
+                    runtimeErrorDetected = true;
+                }
+                originalError.apply(console, args);
+            };
+            
+            // Check for excessive URL.createObjectURL calls being intercepted
+            if (performance && performance.getEntriesByType) {
+                const resources = performance.getEntriesByType('resource');
+                const tssResources = resources.filter(r => r.name.includes('injection-tss') || r.name.includes('tss-mv3'));
+                if (tssResources.length > 0) {
+                    warnings.push('⚠️ Security extension detected interfering with MediaRecorder');
+                }
+            }
+            
+            return warnings;
+        }
+        
+        // Show warning banner if interference detected
+        function showExtensionWarning() {
+            const warnings = detectSecurityExtensionInterference();
+            if (warnings.length === 0) return;
+            
+            const banner = document.createElement('div');
+            banner.id = 'extensionWarning';
+            banner.style.cssText = 'position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:10000; background:#ff6600; color:#000; padding:16px 24px; border-radius:8px; box-shadow:0 4px 12px rgba(255,102,0,0.5); max-width:90%; font-weight:600; text-align:center; animation:slideDown 0.3s ease-out;';
+            banner.innerHTML = `
+                <div style="margin-bottom:8px;">${warnings.join('<br>')}</div>
+                <div style="font-size:12px; font-weight:normal; color:#1a1a1a;">✅ Fix: Disable browser security extensions OR use Incognito mode</div>
+                <button onclick="this.parentElement.remove()" style="margin-top:8px; background:#000; color:#0f0; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:600;">Got it</button>
+            `;
+            document.body.appendChild(banner);
+            
+            console.warn('[TSS DETECTION]', warnings.join(', '));
+        }
+        
+        // Run detection after page load
+        setTimeout(showExtensionWarning, 2000);
+        
         // Quality preset detection
         function getQualityPreset() {
             const selected = document.getElementById('qualitySelect')?.value;
@@ -1028,7 +1082,25 @@
                         }
                     };
                     
-                    xhr.onerror = () => reject(new Error('Network error during upload'));
+                    xhr.onerror = () => {
+                        // Upload failed - likely blocked by security extension
+                        console.error('[UPLOAD BLOCKED] Network error during upload - security extension may be interfering');
+                        
+                        // Offer direct WebM download as fallback
+                        const webmUrl = URL.createObjectURL(watermarkedBlob);
+                        statusDiv.innerHTML = `
+                            <div class="status" style="border-left-color:#ff6600;">
+                                ⚠️ Upload blocked (security extension interference)<br>
+                                <small style="color:#888; display:block; margin:8px 0;">Your browser extension blocked the upload. Download the watermarked WebM instead:</small>
+                                <a href="${webmUrl}" download="${webmFilename}" style="display:inline-block; margin-top:8px; padding:10px 18px; background:#0f0; color:#000; border-radius:6px; font-weight:600; text-decoration:none; cursor:pointer;">
+                                    💾 Download ${brandName} WebM (works offline)
+                                </a>
+                                <div style="font-size:11px; color:#666; margin-top:8px;">Tip: Disable Trend Micro/HP Wolf extension or use Incognito mode</div>
+                            </div>
+                        `;
+                        
+                        reject(new Error('Network error during upload (security extension blocked)'));
+                    };
                     xhr.send(formData);
                 });
             }
