@@ -402,7 +402,10 @@
         <div class="brand-modal-content">
             <div class="brand-modal-header">
                 <h3 style="color:#00ff00; margin:0;">🎨 Select Brands for Watermarking</h3>
-                <button class="brand-modal-close" onclick="closeBrandModal()">×</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="brand-modal-minimize" onclick="minimizeBrandModal()" title="Minimize" style="background:#555; color:#fff; border:none; width:32px; height:32px; border-radius:4px; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center;">–</button>
+                    <button class="brand-modal-close" onclick="closeBrandModal()">×</button>
+                </div>
             </div>
             <div id="modalVideoName" style="color:#aaa; font-size:13px; margin-bottom:15px;"></div>
             
@@ -444,6 +447,9 @@
             <div id="modalStatus" style="margin-top:15px;"></div>
         </div>
     </div>
+    
+    <!-- Minimized Modal Bar Container (bottom of screen) -->
+    <div id="minimizedModalsContainer" style="position:fixed; bottom:0; left:0; right:0; z-index:9999; pointer-events:none; padding:8px; display:flex; flex-direction:column; gap:8px;"></div>
     
     <script>
         let uploadedFilename = null;
@@ -581,6 +587,8 @@
         let brandsLoaded = false;
         let pendingVideoBlob = null;
         let pendingVideoFilename = null;
+        let currentModalProgress = { current: 0, total: 0, brandName: '', percent: 0 };
+        let isModalMinimized = false;
         
         // Quality preset detection
         function getQualityPreset() {
@@ -654,8 +662,66 @@
                 preview.load();
             }
             
+            // Remove minimized bar if exists
+            const minimizedBar = document.getElementById('minimizedModalBar');
+            if (minimizedBar) minimizedBar.remove();
+            isModalMinimized = false;
+            
             pendingVideoBlob = null;
             pendingVideoFilename = null;
+        }
+        
+        function minimizeBrandModal() {
+            const modal = document.getElementById('brandModal');
+            const container = document.getElementById('minimizedModalsContainer');
+            
+            // Hide modal
+            modal.classList.remove('active');
+            isModalMinimized = true;
+            
+            // Create minimized bar if it doesn't exist
+            let minimizedBar = document.getElementById('minimizedModalBar');
+            if (!minimizedBar) {
+                minimizedBar = document.createElement('div');
+                minimizedBar.id = 'minimizedModalBar';
+                minimizedBar.style.cssText = 'background:#1a1a1a; border:2px solid #0f0; border-radius:8px; padding:12px; cursor:pointer; pointer-events:auto; box-shadow:0 -2px 10px rgba(0,255,0,0.3);';
+                minimizedBar.onclick = maximizeBrandModal;
+                container.appendChild(minimizedBar);
+            }
+            
+            updateMinimizedBar();
+        }
+        
+        function maximizeBrandModal() {
+            const modal = document.getElementById('brandModal');
+            isModalMinimized = false;
+            modal.classList.add('active');
+        }
+        
+        function updateMinimizedBar() {
+            const minimizedBar = document.getElementById('minimizedModalBar');
+            if (!minimizedBar || !isModalMinimized) return;
+            
+            const { current, total, brandName, percent } = currentModalProgress;
+            
+            let statusText = `🎬 ${pendingVideoFilename || 'Video'}`;
+            if (total > 0) {
+                statusText = `⏳ ${current}/${total}: ${brandName} - ${percent}%`;
+            }
+            
+            minimizedBar.innerHTML = `
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                    <div style="flex:1; min-width:0;">
+                        <div style="color:#0f0; font-weight:bold; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${statusText}</div>
+                        ${total > 0 ? `
+                            <div style="background:#333; border-radius:4px; overflow:hidden; height:6px; margin-top:4px;">
+                                <div style="background:#0f0; height:100%; width:${percent}%; transition:width 0.3s;"></div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div style="color:#888; font-size:11px;">👆 Tap to open</div>
+                </div>
+            `;
         }
         
         async function openBrandModalForUrl(videoUrl, filename) {
@@ -808,6 +874,9 @@
                 const brandName = selected[i].value;
                 const watermarkFile = selected[i].getAttribute('data-file');
                 
+                // Update progress state
+                currentModalProgress = { current: i + 1, total: selected.length, brandName, percent: 0 };
+                
                 try {
                     // Progress bar
                     const progressHTML = `
@@ -820,6 +889,7 @@
                         </div>
                     `;
                     statusDiv.innerHTML = progressHTML;
+                    updateMinimizedBar();
                     
                     const videoFile = new File([pendingVideoBlob], pendingVideoFilename, { type: pendingVideoBlob.type });
                     const watermarkedBlob = await applyWatermarkToVideo(videoFile, watermarkFile, brandName, (progress) => {
@@ -828,6 +898,10 @@
                         const text = document.getElementById(`progressText${i}`);
                         if (bar) bar.style.width = `${progress}%`;
                         if (text) text.textContent = `${progress}% complete`;
+                        
+                        // Update minimized bar
+                        currentModalProgress.percent = progress;
+                        updateMinimizedBar();
                     });
                     
                     const url = URL.createObjectURL(watermarkedBlob);
@@ -859,6 +933,10 @@
             }).join('');
             
             statusDiv.innerHTML = `<div class="status completed">✓ Generated ${successCount}/${results.length} watermarked videos</div>${items}`;
+            
+            // Reset progress and update minimized bar
+            currentModalProgress = { current: 0, total: 0, brandName: '', percent: 0 };
+            updateMinimizedBar();
             
             // Auto-download if enabled
             if (autoDownloadEnabled) {
