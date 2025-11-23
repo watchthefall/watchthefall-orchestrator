@@ -6,6 +6,7 @@ import os
 import uuid
 from werkzeug.utils import secure_filename
 from functools import wraps
+import threading
 
 from .config import (
     SECRET_KEY, PORTAL_AUTH_KEY, UPLOAD_DIR, OUTPUT_DIR,
@@ -104,7 +105,7 @@ def upload_video():
 
 @app.route('/api/videos/process', methods=['POST'])
 def process_video_endpoint():
-    """Process video with template"""
+    """Process video with template - async processing"""
     job_id = None
     try:
         data = request.json
@@ -125,41 +126,35 @@ def process_video_endpoint():
         job_id = uuid.uuid4().hex[:12]
         create_job(job_id, filename, template, aspect_ratio)
         
-        print(f"[PROCESS STARTED] Job ID: {job_id}, Template: {template}, Aspect: {aspect_ratio}")
+        print(f"[PROCESS QUEUED] Job ID: {job_id}, Template: {template}, Aspect: {aspect_ratio}")
+        log_event('info', job_id, f'Job queued for processing')
         
-        # Process immediately (in production, this would be queued)
-        try:
-            output_file = process_video(job_id, video_path, template, aspect_ratio)
-            
-            # Guard clause: check if output_file is valid
-            if not output_file or output_file is None:
-                print(f"[PROCESS ERROR] Job {job_id}: process_video returned None or empty")
-                log_event('error', job_id, 'Processing returned no output file')
-                return jsonify({
-                    'success': False,
-                    'error': 'Video processing failed: no output file generated',
-                    'job_id': job_id
-                }), 500
-            
-            print(f"[PROCESS COMPLETED] Job ID: {job_id}, Output: {output_file}")
-            
-            return jsonify({
-                'success': True,
-                'job_id': job_id,
-                'message': 'Processing completed',
-                'output_file': output_file,
-                'status_url': f'/api/videos/status/{job_id}'
-            })
-        except Exception as proc_error:
-            import traceback
-            print(f"[PROCESS EXCEPTION] Job {job_id}:")
-            traceback.print_exc()
-            log_event('error', job_id, f'Processing failed: {str(proc_error)}')
-            return jsonify({
-                'success': False,
-                'error': str(proc_error),
-                'job_id': job_id
-            }), 500
+        # Process in background thread to avoid blocking the API response
+        def process_async():
+            try:
+                print(f"[ASYNC WORKER] Starting job {job_id}")
+                output_file = process_video(job_id, video_path, template, aspect_ratio)
+                if output_file:
+                    print(f"[ASYNC WORKER] Job {job_id} completed: {output_file}")
+                else:
+                    print(f"[ASYNC WORKER] Job {job_id} failed: no output")
+            except Exception as e:
+                import traceback
+                print(f"[ASYNC WORKER ERROR] Job {job_id}:")
+                traceback.print_exc()
+        
+        # Start background processing
+        thread = threading.Thread(target=process_async, daemon=True)
+        thread.start()
+        
+        # Return immediately with job ID
+        return jsonify({
+            'success': True,
+            'job_id': job_id,
+            'message': 'Processing started in background',
+            'status': 'processing',
+            'status_url': f'/api/videos/status/{job_id}'
+        })
         
     except Exception as e:
         import traceback
