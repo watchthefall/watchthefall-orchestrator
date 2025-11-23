@@ -199,6 +199,47 @@
                 font-size: 20px;
             }
         }
+        
+        /* Brand watermark styles */
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .brand-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #222;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        .brand-checkbox:hover {
+            background: #2a2a2a;
+            border-color: #00ff00;
+        }
+        .brand-checkbox input[type="checkbox"] {
+            cursor: pointer;
+        }
+        .brand-checkbox input[type="checkbox"]:checked + span {
+            color: #00ff00;
+            font-weight: 600;
+        }
+        #watermarkStatus {
+            margin-top: 15px;
+        }
+        .watermark-result {
+            background: #222;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 3px solid #00ff00;
+        }
     </style>
 </head>
 <body>
@@ -228,6 +269,25 @@
             </label>
             
             <div id="fetchStatus" style="margin-top:15px;"></div>
+        </div>
+        
+        <!-- Brand Watermark Section -->
+        <div class="section">
+            <h2>🎨 Brand Watermark (Client-Side)</h2>
+            <p style="color: #888; font-size: 14px; margin-bottom: 15px;">Select video from downloads or upload new • Choose brands • Get watermarked 9:16 versions instantly</p>
+            
+            <input type="file" id="watermarkVideoInput" accept="video/mp4,video/quicktime" style="display:none;">
+            <button id="selectVideoBtn" style="width:100%; background:#0066ff; margin-bottom:15px;">📂 Select Video File</button>
+            <div id="selectedVideoName" style="color:#aaa; font-size:13px; margin-bottom:15px;"></div>
+            
+            <label style="display:block; margin-bottom:8px; color:#aaa; font-size:14px; font-weight:600;">Select Brands (up to 10):</label>
+            <div class="brand-grid" id="brandGrid">
+                <!-- Brands loaded dynamically -->
+            </div>
+            
+            <button id="applyWatermarksBtn" style="width:100%; margin-top:20px; background:#00aa00;" disabled>⚡ Generate Watermarked Videos</button>
+            
+            <div id="watermarkStatus"></div>
         </div>
         
         <!-- Upload Section -->
@@ -417,6 +477,231 @@
                     `<option value="${t.name}">${t.display_name}</option>`
                 ).join('');
             });
+        
+        // ========== PHASE B: CLIENT-SIDE WATERMARK SYSTEM ==========
+        let selectedVideoFile = null;
+        let brandWatermarks = {};
+        
+        // Load brand watermarks config
+        fetch('/portal/static/watermarks/brands.json')
+            .then(r => r.json())
+            .then(brands => {
+                brandWatermarks = brands;
+                const grid = document.getElementById('brandGrid');
+                grid.innerHTML = Object.keys(brands).map((brandName, idx) => `
+                    <label class="brand-checkbox">
+                        <input type="checkbox" class="brand-check" value="${brandName}" data-file="${brands[brandName]}">
+                        <span>${brandName}</span>
+                    </label>
+                `).join('');
+                
+                // Enable/disable button based on selection
+                document.querySelectorAll('.brand-check').forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        const selected = document.querySelectorAll('.brand-check:checked').length;
+                        const applyBtn = document.getElementById('applyWatermarksBtn');
+                        applyBtn.disabled = !(selectedVideoFile && selected > 0 && selected <= 10);
+                        if (selected > 10) {
+                            alert('Maximum 10 brands at a time');
+                            cb.checked = false;
+                        }
+                    });
+                });
+            });
+        
+        // Select video file
+        document.getElementById('selectVideoBtn').addEventListener('click', () => {
+            document.getElementById('watermarkVideoInput').click();
+        });
+        
+        document.getElementById('watermarkVideoInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            selectedVideoFile = file;
+            document.getElementById('selectedVideoName').textContent = `✓ Selected: ${file.name} (${(file.size/(1024*1024)).toFixed(2)}MB)`;
+            const selected = document.querySelectorAll('.brand-check:checked').length;
+            document.getElementById('applyWatermarksBtn').disabled = !(selected > 0 && selected <= 10);
+        });
+        
+        // Apply watermarks (Canvas-based with adaptive opacity 10-20%)
+        document.getElementById('applyWatermarksBtn').addEventListener('click', async () => {
+            const selected = Array.from(document.querySelectorAll('.brand-check:checked'));
+            if (!selectedVideoFile || !selected.length) return;
+            
+            const statusDiv = document.getElementById('watermarkStatus');
+            statusDiv.innerHTML = '<div class="status processing">⏳ Processing watermarks...</div>';
+            document.getElementById('applyWatermarksBtn').disabled = true;
+            
+            const results = [];
+            
+            for (let i = 0; i < selected.length; i++) {
+                const brandName = selected[i].value;
+                const watermarkFile = selected[i].getAttribute('data-file');
+                
+                try {
+                    statusDiv.innerHTML = `<div class="status processing">⏳ Processing ${i+1}/${selected.length}: ${brandName}...</div>`;
+                    
+                    const watermarkedBlob = await applyWatermarkToVideo(selectedVideoFile, watermarkFile, brandName);
+                    const url = URL.createObjectURL(watermarkedBlob);
+                    const filename = `${brandName}_${selectedVideoFile.name.replace(/\.[^/.]+$/, '')}.mp4`;
+                    
+                    results.push({ brandName, url, filename, size_mb: (watermarkedBlob.size/(1024*1024)).toFixed(2) });
+                    
+                    // Save to history
+                    saveHistoryEntry({ type: 'watermark', name: filename, url, size_mb: (watermarkedBlob.size/(1024*1024)).toFixed(2) });
+                    
+                } catch (err) {
+                    results.push({ brandName, error: err.message });
+                }
+            }
+            
+            // Show results
+            const successCount = results.filter(r => !r.error).length;
+            const items = results.map(r => {
+                if (r.error) {
+                    return `<div class="watermark-result" style="border-left-color:#ff5555;">✗ ${r.brandName}: ${r.error}</div>`;
+                }
+                return `<div class="watermark-result">✓ <strong>${r.brandName}</strong><br><a href="${r.url}" download="${r.filename}" class="download-link">📥 Download ${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span> <button class="share-btn" data-url="${r.url}" data-filename="${r.filename}" style="margin-left:8px;">🤝 Share</button></div>`;
+            }).join('');
+            
+            statusDiv.innerHTML = `<div class="status completed">✓ Generated ${successCount}/${results.length} watermarked videos</div>${items}`;
+            
+            // Auto-download if enabled
+            if (autoDownloadEnabled) {
+                results.filter(r => !r.error).forEach(r => {
+                    const a = document.createElement('a');
+                    a.href = r.url;
+                    a.download = r.filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                });
+            }
+            
+            document.getElementById('applyWatermarksBtn').disabled = false;
+        });
+        
+        // Canvas-based watermark application with adaptive opacity (10-20%)
+        async function applyWatermarkToVideo(videoFile, watermarkFileName, brandName) {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    // Load video
+                    const video = document.createElement('video');
+                    video.src = URL.createObjectURL(videoFile);
+                    video.muted = true;
+                    video.playsInline = true;
+                    
+                    await new Promise((res, rej) => {
+                        video.onloadedmetadata = res;
+                        video.onerror = rej;
+                    });
+                    
+                    // Load watermark
+                    const watermark = new Image();
+                    watermark.src = `/portal/static/watermarks/${watermarkFileName}`;
+                    await new Promise((res, rej) => {
+                        watermark.onload = res;
+                        watermark.onerror = rej;
+                    });
+                    
+                    // Force 9:16 aspect ratio
+                    const targetWidth = 1080;
+                    const targetHeight = 1920;
+                    
+                    // Canvas setup
+                    const canvas = document.createElement('canvas');
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Calculate video brightness for adaptive opacity
+                    video.currentTime = video.duration / 2; // Sample middle frame
+                    await new Promise(res => { video.onseeked = res; });
+                    
+                    ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+                    const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
+                    let brightness = 0;
+                    for (let i = 0; i < imageData.data.length; i += 4) {
+                        brightness += (imageData.data[i] + imageData.data[i+1] + imageData.data[i+2]) / 3;
+                    }
+                    brightness /= (imageData.data.length / 4);
+                    
+                    // Adaptive opacity: 10% (bright) to 20% (dark)
+                    const opacity = 0.10 + (0.10 * (1 - brightness / 255));
+                    
+                    // Watermark positioning (bottom-right, 5% safe zone)
+                    const safeZone = 0.05;
+                    const watermarkMaxWidth = targetWidth * 0.3; // 30% of width
+                    const watermarkScale = watermarkMaxWidth / watermark.width;
+                    const watermarkWidth = watermark.width * watermarkScale;
+                    const watermarkHeight = watermark.height * watermarkScale;
+                    const watermarkX = targetWidth - watermarkWidth - (targetWidth * safeZone);
+                    const watermarkY = targetHeight - watermarkHeight - (targetHeight * safeZone);
+                    
+                    // Encode using MediaRecorder
+                    const stream = canvas.captureStream(30);
+                    const audioContext = new AudioContext();
+                    const audioSource = audioContext.createMediaElementSource(video);
+                    const dest = audioContext.createMediaStreamDestination();
+                    audioSource.connect(dest);
+                    
+                    // Merge audio and video
+                    const audioTrack = dest.stream.getAudioTracks()[0];
+                    if (audioTrack) stream.addTrack(audioTrack);
+                    
+                    const chunks = [];
+                    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: 5000000 });
+                    
+                    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+                    recorder.onstop = () => {
+                        const blob = new Blob(chunks, { type: 'video/mp4' });
+                        resolve(blob);
+                    };
+                    
+                    recorder.start();
+                    video.currentTime = 0;
+                    video.play();
+                    
+                    // Render loop
+                    function render() {
+                        if (video.paused || video.ended) {
+                            recorder.stop();
+                            video.pause();
+                            return;
+                        }
+                        
+                        // Draw video frame (cropped/scaled to 9:16)
+                        const srcAspect = video.videoWidth / video.videoHeight;
+                        const targetAspect = targetWidth / targetHeight;
+                        let sx = 0, sy = 0, sw = video.videoWidth, sh = video.videoHeight;
+                        
+                        if (srcAspect > targetAspect) {
+                            // Video wider: crop width
+                            sw = video.videoHeight * targetAspect;
+                            sx = (video.videoWidth - sw) / 2;
+                        } else {
+                            // Video taller: crop height
+                            sh = video.videoWidth / targetAspect;
+                            sy = (video.videoHeight - sh) / 2;
+                        }
+                        
+                        ctx.drawImage(video, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
+                        
+                        // Draw watermark with adaptive opacity
+                        ctx.globalAlpha = opacity;
+                        ctx.drawImage(watermark, watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+                        ctx.globalAlpha = 1.0;
+                        
+                        requestAnimationFrame(render);
+                    }
+                    render();
+                    
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+        // ========== END PHASE B ==========
         
         // File upload
         document.getElementById('fileInput').addEventListener('change', async (e) => {
