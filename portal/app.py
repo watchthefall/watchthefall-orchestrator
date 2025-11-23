@@ -298,6 +298,16 @@ def get_job_status(job_id):
 def download_video(filename):
     """Download processed video"""
     try:
+        filepath = os.path.join(OUTPUT_DIR, filename)
+        
+        # Check if file exists
+        if not os.path.exists(filepath):
+            print(f"[DOWNLOAD ERROR] File not found: {filepath}")
+            return jsonify({'error': 'File not found', 'path': filepath}), 404
+        
+        file_size = os.path.getsize(filepath)
+        print(f"[DOWNLOAD] Serving file: {filename} ({file_size} bytes)")
+        
         # Send file with proper headers for downloads folder
         response = send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
         
@@ -307,10 +317,15 @@ def download_video(filename):
         # Mobile-friendly headers
         response.headers['Content-Type'] = 'video/mp4'
         response.headers['Cache-Control'] = 'no-cache'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
         
+        print(f"[DOWNLOAD] Headers set for {filename}")
         return response
     except Exception as e:
-        return jsonify({'error': 'File not found'}), 404
+        print(f"[DOWNLOAD EXCEPTION] {filename}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': 'File not found', 'details': str(e)}), 404
 
 @app.route('/api/videos/recent', methods=['GET'])
 def get_recent_videos():
