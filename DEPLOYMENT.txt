@@ -69,6 +69,24 @@ portal/
 
 ### Deployment Steps
 
+#### Render Deployment (Recommended)
+1. **Build Command**:
+   ```bash
+   ./render-build.sh && pip install -r requirements.txt
+   ```
+
+2. **Start Command**:
+   ```bash
+   gunicorn run_portal:app --bind 0.0.0.0:10000
+   ```
+
+3. **Environment Variables**:
+   - `WTF_PORTAL_KEY`: Your secret authentication key
+   - `WTF_SECRET_KEY`: Flask session secret
+   - `FFMPEG_PATH`: /usr/bin/ffmpeg (auto-installed by render-build.sh)
+
+4. The `render-build.sh` script automatically installs FFmpeg during deployment
+
 #### Option 1: Manual Upload (FTP/SFTP)
 1. Upload entire `portal/` directory to server
 2. Upload `run_portal.py` to server root

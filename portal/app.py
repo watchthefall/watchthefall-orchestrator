@@ -125,16 +125,28 @@ def process_video_endpoint():
         create_job(job_id, filename, template, aspect_ratio)
         
         # Process immediately (in production, this would be queued)
-        output_file = process_video(job_id, video_path, template, aspect_ratio)
-        
-        return jsonify({
-            'success': True,
-            'job_id': job_id,
-            'message': 'Processing started',
-            'status_url': f'/api/videos/status/{job_id}'
-        })
+        try:
+            output_file = process_video(job_id, video_path, template, aspect_ratio)
+            
+            return jsonify({
+                'success': True,
+                'job_id': job_id,
+                'message': 'Processing started',
+                'status_url': f'/api/videos/status/{job_id}'
+            })
+        except Exception as proc_error:
+            import traceback
+            traceback.print_exc()
+            log_event('error', job_id, f'Processing failed: {str(proc_error)}')
+            return jsonify({
+                'success': False,
+                'error': str(proc_error),
+                'job_id': job_id
+            }), 500
         
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         log_event('error', None, f'Process request failed: {str(e)}')
         return jsonify({'error': str(e)}), 500
 
