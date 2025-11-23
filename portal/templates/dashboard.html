@@ -968,56 +968,18 @@
                 if (r.error) {
                     return `<div class="watermark-result" style="border-left-color:#ff5555; padding:15px;">✗ <strong>${r.brandName}</strong><br>${r.errorDetails || r.error}</div>`;
                 }
-                return `<div class="watermark-result">✓ <strong>${r.brandName}</strong><br><a href="${r.url}" download="${r.filename}" style="color:#00ff00;">📥 ${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span> <button class="share-btn" data-url="${r.url}" data-filename="${r.filename}" style="margin-left:8px;">🤝 Share</button></div>`;
+                return `<div class="watermark-result">✓ <strong>${r.brandName}</strong> (${r.size_mb}MB)<br><a href="${r.url}" download="${r.filename}" style="display:inline-block; margin-top:8px; padding:8px 16px; background:#00aa00; color:#000; text-decoration:none; border-radius:6px; font-weight:600;">📥 Download ${r.filename}</a></div>`;
             }).join('');
             
-            statusDiv.innerHTML = `<div class="status completed">✓ Generated ${successCount}/${results.length} watermarked videos<br><small style="color:#888; margin-top:5px; display:block;">📥 Downloading ${successCount} file${successCount > 1 ? 's' : ''}...</small></div>${items}`;
+            statusDiv.innerHTML = `<div class="status completed">✓ Generated ${successCount}/${results.length} watermarked videos<br><small style="color:#0f0; margin-top:8px; display:block; font-weight:600;">👇 Click each link below to download:</small></div>${items}`;
             
             // Reset progress and update minimized bar
             currentModalProgress = { current: 0, total: 0, brandName: '', percent: 0 };
             updateMinimizedBar();
             
-            // Auto-download all successful videos - works on all browsers
-            console.log(`[DOWNLOAD] Starting auto-download for ${results.filter(r => !r.error).length} videos...`);
-            results.filter(r => !r.error).forEach((r, index) => {
-                setTimeout(async () => {
-                    try {
-                        console.log(`[DOWNLOAD] Downloading ${r.filename} from ${r.url}`);
-                        
-                        // Fetch the file as blob first (more reliable cross-browser)
-                        const response = await fetch(r.url);
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                        
-                        const blob = await response.blob();
-                        const blobUrl = URL.createObjectURL(blob);
-                        
-                        // Create and trigger download
-                        const a = document.createElement('a');
-                        a.href = blobUrl;
-                        a.download = r.filename;
-                        a.style.display = 'none';
-                        document.body.appendChild(a);
-                        a.click();
-                        
-                        // Cleanup
-                        setTimeout(() => {
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(blobUrl);
-                        }, 100);
-                        
-                        console.log(`[DOWNLOAD] ✓ ${r.filename} download triggered`);
-                    } catch (err) {
-                        console.error(`[DOWNLOAD ERROR] ${r.filename}:`, err);
-                        // Fallback: open in new tab
-                        window.open(r.url, '_blank');
-                    }
-                }, index * 1000);  // 1 second stagger for reliable downloads
-            });
-            
-            // Auto-close modal after downloads start (3 seconds delay to show download status)
-            setTimeout(() => {
-                closeBrandModal();
-            }, 3000);
+            // Don't auto-download or auto-close - let user click download buttons manually
+            // Auto-download disabled for PC compatibility - use manual download links
+            console.log(`[DOWNLOAD] ${successCount} videos ready. User can click download links.`);
             
             renderHistory();
             document.getElementById('modalGenerateBtn').disabled = false;
