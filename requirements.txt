@@ -3,3 +3,5 @@ yt-dlp==2024.10.22
 PyYAML==6.0.2
 Pillow==10.0.0
 numpy==1.24.3
+gunicorn
+uvicorn[standard]
