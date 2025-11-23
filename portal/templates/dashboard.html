@@ -356,7 +356,7 @@
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/portal/static/sw.js').catch(() => {});
-        🤝 Share
+        }
         
         // Auto-download toggle
         let autoDownloadEnabled = false;
@@ -365,9 +365,9 @@
             if (toggle) {
                 toggle.addEventListener('change', (e) => {
                     autoDownloadEnabled = !!e.target.checked;
-                🤝 Share
-            🤝 Share
-        🤝 Share
+                }
+            }
+        }
         
         // Paste-All button
         document.addEventListener('click', async (e) => {
@@ -379,27 +379,27 @@
                     if (!urls.length) {
                         alert('No URLs found in clipboard');
                         return;
-                    🤝 Share
+                    }
                     document.getElementById('linksInput').value = urls.join('\n');
                     document.getElementById('fetchStatus').innerHTML = '<div class="status queued">📋 Pasted URLs from clipboard.</div>';
                 } catch (err) {
                     alert('Clipboard read failed');
-                🤝 Share
-            🤝 Share
-        🤝 Share
+                }
+            }
+        }
         
         // Helpers
         function extractURLs(text) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return (text.match(urlRegex) || []).map(u => u.trim());
-        🤝 Share
+        }
         
         async function shareVideo(downloadUrl, filename) {
             try {
                 if (!navigator.share) {
                     alert('Sharing not supported on this browser');
                     return;
-                🤝 Share
+                }
                 const res = await fetch(downloadUrl);
                 const blob = await res.blob();
                 const file = new File([blob], filename || 'video.mp4', { type: 'video/mp4' });
@@ -408,11 +408,11 @@
                 } else {
                     // Fallback: share URL
                     await navigator.share({ title: filename || 'Video', url: downloadUrl });
-                🤝 Share
+                }
             } catch (e) {
                 alert('Share failed: ' + e.message);
-            🤝 Share
-        🤝 Share
+            }
+        }
         
         // Delegate click for share buttons and copy-all-links
         document.addEventListener('click', async (e) => {
@@ -420,12 +420,12 @@
                 const url = e.target.getAttribute('data-url');
                 const name = e.target.getAttribute('data-filename') || 'video.mp4';
                 await shareVideo(url, name);
-            🤝 Share
+            }
             if (e.target && e.target.id === 'copyAllLinksBtn') {
                 const links = [];
                 document.querySelectorAll('.download-link').forEach(a => {
                     if (a.href) links.push(a.href);
-                🤝 Share
+                }
                 if (links.length) {
                     try {
                         await navigator.clipboard.writeText(links.join('\n'));
@@ -433,12 +433,12 @@
                         setTimeout(() => { e.target.textContent = '📋 Copy All Download Links'; }, 2000);
                     } catch (err) {
                         alert('Copy failed: ' + err.message);
-                    🤝 Share
+                    }
                 } else {
                     alert('No download links found');
-                🤝 Share
-            🤝 Share
-        🤝 Share
+                }
+            }
+        }
         
         function saveHistoryEntry(entry) {
             const key = 'wtf_history';
@@ -448,7 +448,7 @@
             hist = hist.slice(0,20);
             localStorage.setItem(key, JSON.stringify(hist));
             renderHistory();
-        🤝 Share
+        }
         function renderHistory() {
             const key = 'wtf_history';
             let hist = [];
@@ -458,7 +458,7 @@
             if (!hist.length) {
                 container.innerHTML = '<p style="color:#666;">No history yet</p>';
                 return;
-            🤝 Share
+            }
             container.innerHTML = hist.map(h => `
                 <div class="job-item">
                     <strong>${h.name || h.filename || 'Video'}</strong>
@@ -466,7 +466,7 @@
                     ${h.url ? `<br><a href="${h.url}" class="download-link" download="${h.name || 'video.mp4'}">📥 Download</a> <button class="share-btn" data-url="${h.url}" data-filename="${h.name || 'video.mp4'}" style="margin-left:8px;">🤝 Share</button>` : ''}</div>
                 </div>
             `).join('');
-        🤝 Share
+        }
         
         // Load templates
         fetch('/api/templates')
@@ -476,7 +476,7 @@
                 select.innerHTML = data.templates.map(t => 
                     `<option value="${t.name}">${t.display_name}</option>`
                 ).join('');
-            🤝 Share
+            }
         
         // ========== PHASE B: CLIENT-SIDE WATERMARK SYSTEM ==========
         let selectedVideoFile = null;
@@ -504,15 +504,15 @@
                         if (selected > 10) {
                             alert('Maximum 10 brands at a time');
                             cb.checked = false;
-                        🤝 Share
-                    🤝 Share
-                🤝 Share
-            🤝 Share
+                        }
+                    }
+                }
+            }
         
         // Select video file
         document.getElementById('selectVideoBtn').addEventListener('click', () => {
             document.getElementById('watermarkVideoInput').click();
-        🤝 Share
+        }
         
         document.getElementById('watermarkVideoInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -521,7 +521,7 @@
             document.getElementById('selectedVideoName').textContent = `✓ Selected: ${file.name} (${(file.size/(1024*1024)).toFixed(2)}MB)`;
             const selected = document.querySelectorAll('.brand-check:checked').length;
             document.getElementById('applyWatermarksBtn').disabled = !(selected > 0 && selected <= 10);
-        🤝 Share
+        }
         
         // Apply watermarks (Canvas-based with adaptive opacity 10-20%)
         document.getElementById('applyWatermarksBtn').addEventListener('click', async () => {
@@ -552,15 +552,15 @@
                     
                 } catch (err) {
                     results.push({ brandName, error: err.message });
-                🤝 Share
-            🤝 Share
+                }
+            }
             
             // Show results
             const successCount = results.filter(r => !r.error).length;
             const items = results.map(r => {
                 if (r.error) {
                     return `<div class="watermark-result" style="border-left-color:#ff5555;">✗ ${r.brandName}: ${r.error}</div>`;
-                🤝 Share
+                }
                 return `<div class="watermark-result">✓ <strong>${r.brandName}</strong><br><a href="${r.url}" download="${r.filename}" class="download-link">📥 ${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span> <button class="share-btn" data-url="${r.url}" data-filename="${r.filename}" style="margin-left:8px;">🤝 Share</button></div>`;
             }).join('');
             
@@ -575,11 +575,11 @@
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
-                🤝 Share
-            🤝 Share
+                }
+            }
             
             document.getElementById('applyWatermarksBtn').disabled = false;
-        🤝 Share
+        }
         
         // Canvas-based watermark application with adaptive opacity (10-20%)
         async function applyWatermarkToVideo(videoFile, watermarkFileName, brandName) {
@@ -594,7 +594,7 @@
                     await new Promise((res, rej) => {
                         video.onloadedmetadata = res;
                         video.onerror = rej;
-                    🤝 Share
+                    }
                     
                     // Load watermark
                     const watermark = new Image();
@@ -602,7 +602,7 @@
                     await new Promise((res, rej) => {
                         watermark.onload = res;
                         watermark.onerror = rej;
-                    🤝 Share
+                    }
                     
                     // Force 9:16 aspect ratio
                     const targetWidth = 1080;
@@ -623,7 +623,7 @@
                     let brightness = 0;
                     for (let i = 0; i < imageData.data.length; i += 4) {
                         brightness += (imageData.data[i] + imageData.data[i+1] + imageData.data[i+2]) / 3;
-                    🤝 Share
+                    }
                     brightness /= (imageData.data.length / 4);
                     
                     // Adaptive opacity: 10% (bright) to 20% (dark)
@@ -656,7 +656,7 @@
                     recorder.onstop = () => {
                         const blob = new Blob(chunks, { type: 'video/mp4' });
                         resolve(blob);
-                    🤝 Share
+                    }
                     
                     recorder.start();
                     video.currentTime = 0;
@@ -668,7 +668,7 @@
                             recorder.stop();
                             video.pause();
                             return;
-                        🤝 Share
+                        }
                         
                         // Draw video frame (cropped/scaled to 9:16)
                         const srcAspect = video.videoWidth / video.videoHeight;
@@ -683,7 +683,7 @@
                             // Video taller: crop height
                             sh = video.videoWidth / targetAspect;
                             sy = (video.videoHeight - sh) / 2;
-                        🤝 Share
+                        }
                         
                         ctx.drawImage(video, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
                         
@@ -693,14 +693,14 @@
                         ctx.globalAlpha = 1.0;
                         
                         requestAnimationFrame(render);
-                    🤝 Share
+                    }
                     render();
                     
                 } catch (err) {
                     reject(err);
-                🤝 Share
-            🤝 Share
-        🤝 Share
+                }
+            }
+        }
         // ========== END PHASE B ==========
         
         // File upload
@@ -721,7 +721,7 @@
                 const response = await fetch('/api/videos/upload', {
                     method: 'POST',
                     body: formData
-                🤝 Share
+                }
                 
                 const result = await response.json();
                 
@@ -731,12 +731,12 @@
                     document.getElementById('processBtn').disabled = false;
                 } else {
                     throw new Error(result.error);
-                🤝 Share
+                }
             } catch (err) {
                 uploadText.innerHTML = `<p style="color: #ff5555;">✗ Upload failed: ${err.message}</p>`;
                 uploadZone.classList.remove('active');
-            🤝 Share
-        🤝 Share
+            }
+        }
         
         // Helpers (fetch batch + paste/drag + reset)
         async function fetchBatchUrls(targetUrls) {
@@ -744,13 +744,13 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ urls: targetUrls })
-            🤝 Share
+            }
             if (!response.ok) {
                 const text = await response.text();
                 throw new Error(`Server error (${response.status}): ${text}`);
-            🤝 Share
+            }
             return await response.json();
-        🤝 Share
+        }
         function autoDownloadFile(url, filename) {
             const a = document.createElement('a');
             a.href = url;
@@ -758,7 +758,7 @@
             document.body.appendChild(a);
             a.click();
             a.remove();
-        🤝 Share
+        }
         (function(){
             const linksInput = document.getElementById('linksInput');
             const fetchStatus = document.getElementById('fetchStatus');
@@ -767,8 +767,8 @@
                 resetBtn.addEventListener('click', ()=>{
                     if (linksInput) linksInput.value = '';
                     if (fetchStatus) fetchStatus.innerHTML = '';
-                🤝 Share
-            🤝 Share
+                }
+            }
             if (linksInput) {
                 // Paste-to-start
                 linksInput.addEventListener('paste', async (e) => {
@@ -788,17 +788,17 @@
                                 renderHistory();
                             } else {
                                 fetchStatus.innerHTML = `<div class=\"status failed\">✗ Error: ${r && r.error ? r.error : 'Download failed'}</div>`;
-                            🤝 Share
+                            }
                         } catch (err) {
                             fetchStatus.innerHTML = `<div class=\"status failed\">✗ Error: ${err.message}</div>`;
                         } finally {
                             linksInput.value = '';
-                        🤝 Share
+                        }
                     } else {
                         linksInput.value = urls.join('\n');
                         fetchStatus.innerHTML = `<div class=\"status queued\">📋 ${urls.length} URLs pasted. Tap \"Download All Links\".</div>`;
-                    🤝 Share
-                🤝 Share
+                    }
+                }
                 // Drag & drop URLs
                 linksInput.addEventListener('dragover', (e)=>{ e.preventDefault(); linksInput.style.borderColor = '#00ff00'; });
                 linksInput.addEventListener('dragleave', ()=>{ linksInput.style.borderColor = '#333'; });
@@ -819,16 +819,16 @@
                                 renderHistory();
                             } else {
                                 fetchStatus.innerHTML = `<div class=\"status failed\">✗ Error: ${r && r.error ? r.error : 'Download failed'}</div>`;
-                            🤝 Share
+                            }
                         } catch (err) {
                             fetchStatus.innerHTML = `<div class=\"status failed\">✗ Error: ${err.message}</div>`;
-                        🤝 Share
+                        }
                     } else {
                         linksInput.value = urls.join('\n');
                         fetchStatus.innerHTML = `<div class=\"status queued\">📋 ${urls.length} URLs dropped. Tap \"Download All Links\".</div>`;
-                    🤝 Share
-                🤝 Share
-            🤝 Share
+                    }
+                }
+            }
         })();
 
         // Bulk link fetcher
@@ -837,7 +837,7 @@
             if (!raw) {
                 alert('Please paste at least one video URL');
                 return;
-            🤝 Share
+            }
             
             const urls = raw.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 5);
             const fetchStatus = document.getElementById('fetchStatus');
@@ -850,13 +850,13 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ urls: targetUrls })
-                🤝 Share
+                }
                 if (!response.ok) {
                     const text = await response.text();
                     throw new Error(`Server error (${response.status}): ${text}`);
-                🤝 Share
+                }
                 return await response.json();
-            🤝 Share
+            }
             
             try {
                 let result = await fetchBatch(urls);
@@ -871,18 +871,18 @@
                         if (retry.success) {
                             // Merge: replace failures with retry successes
                             finalResults = finalResults.map(r => r.success ? r : (retry.results.find(rr => rr.url === r.url) || r));
-                        🤝 Share
+                        }
                     } catch (e) {
                         // ignore retry errors
-                    🤝 Share
-                🤝 Share
+                    }
+                }
                 
                 const items = finalResults.map(r => {
                     if (r.success) {
                         // Save to history
                         saveHistoryEntry({ type: 'link', name: r.filename, url: r.download_url, size_mb: r.size_mb });
                         return `<li style="margin-bottom:8px;">✓ <a href="${r.download_url}" class="download-link" download="${r.filename}" style="color:#00ff00;">📥 ${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span> <button class="share-btn" data-url="${r.download_url}" data-filename="${r.filename}" style="margin-left:8px;">🤝 Share</button></li>`;
-                    🤝 Share
+                    }
                     return `<li style="margin-bottom:8px; color:#ff5555;">✗ ${r.url.substring(0, 50)}... — ${r.error}</li>`;
                 }).join('');
                 
@@ -893,7 +893,7 @@
                         <p style="margin-top:12px; font-size:12px; color:#888;">📱 Tap each link to save to your phone</p>
                         <button id="copyAllLinksBtn" style="margin-top:10px; width:100%; background:#0066ff;">📋 Copy All Download Links</button>
                     </div>
-                🤝 Share
+                }
                 
                 // Auto-download
                 if (autoDownloadEnabled) {
@@ -904,8 +904,8 @@
                         document.body.appendChild(a);
                         a.click();
                         a.remove();
-                    🤝 Share
-                🤝 Share
+                    }
+                }
                 
                 document.getElementById('linksInput').value = '';
                 loadRecentJobs();
@@ -916,8 +916,8 @@
                 fetchStatus.innerHTML = `<div class="status failed">✗ Error: ${err.message}</div>`;
             } finally {
                 document.getElementById('fetchLinksBtn').disabled = false;
-            🤝 Share
-        🤝 Share
+            }
+        }
         
         // Process video
         document.getElementById('processBtn').addEventListener('click', async () => {
@@ -927,7 +927,7 @@
             if (statusPollInterval) {
                 clearInterval(statusPollInterval);
                 statusPollInterval = null;
-            🤝 Share
+            }
             
             const template = document.getElementById('templateSelect').value;
             const aspectRatio = document.getElementById('aspectRatioSelect').value;
@@ -945,12 +945,12 @@
                             filename: uploadedFilename,
                             template: template,
                             aspect_ratio: aspectRatio
-                        🤝 Share
-                    🤝 Share
+                        }
+                    }
                     if (!response.ok) {
                         const errorText = await response.text();
                         throw new Error(`Server error (${response.status}): ${errorText}`);
-                    🤝 Share
+                    }
                     const text = await response.text();
                     if (!text || text.trim() === '') throw new Error('Backend returned empty response');
                     const result = JSON.parse(text);
@@ -963,29 +963,29 @@
                         statusDiv.innerHTML = `<div class=\"status queued\">Retrying... (${retries})</div>`;
                         await new Promise(res => setTimeout(res, 1000));
                         return tryProcess(retries - 1);
-                    🤝 Share
+                    }
                     console.error('Process error:', err);
                     statusDiv.innerHTML = `<div class=\"status failed\">✗ Error: ${err.message}</div>`;
                     document.getElementById('processBtn').disabled = false;
-                🤝 Share
-            🤝 Share
+                }
+            }
             
             tryProcess();
-        🤝 Share
+        }
         
         // Poll job status
         function pollJobStatus(jobId) {
             // Clear any existing interval
             if (statusPollInterval) {
                 clearInterval(statusPollInterval);
-            🤝 Share
+            }
             
             statusPollInterval = setInterval(async () => {
                 // Only poll if this is still the active job
                 if (activeJobId !== jobId) {
                     clearInterval(statusPollInterval);
                     return;
-                🤝 Share
+                }
                 
                 try {
                     const response = await fetch(`/api/videos/status/${jobId}`);
@@ -998,7 +998,7 @@
                         statusPollInterval = null;
                         statusDiv.innerHTML = `
                             <div class=\"status completed\">\n                                ✓ Processing complete!<br>\n                                <a href=\"${job.download_url}\" class=\"download-link\" download=\"${job.output_file}\">📥 Download ${job.output_file}</a> <button class=\"share-btn\" data-url=\"${job.download_url}\" data-filename=\"${job.output_file}\" style=\"margin-left:10px;\">🤝 Share</button>\n                            </div>
-                        🤝 Share
+                        }
                         loadRecentJobs();
                         // Save history
                         saveHistoryEntry({ type: 'process', name: job.output_file, url: job.download_url });
@@ -1010,7 +1010,7 @@
                             document.body.appendChild(a);
                             a.click();
                             a.remove();
-                        🤝 Share
+                        }
                         renderHistory();
                         resetUpload();
                     } else if (job.status === 'failed') {
@@ -1021,14 +1021,14 @@
                     } else {
                         // Still processing - update status message
                         statusDiv.innerHTML = `<div class=\"status processing\">⏳ Processing... Job ID: ${jobId}</div>`;
-                    🤝 Share
+                    }
                 } catch (err) {
                     console.error('Status poll error:', err);
                     clearInterval(statusPollInterval);
                     statusPollInterval = null;
-                🤝 Share
+                }
             }, 2000);
-        🤝 Share
+        }
         
         // Reset upload
         function resetUpload() {
@@ -1038,10 +1038,10 @@
             document.getElementById('uploadText').innerHTML = `
                 <p style="font-size: 18px; margin-bottom: 10px;">📁 Click or drag video here</p>
                 <p style="color: #888; font-size: 14px;">Supported: MP4, MOV, AVI (max 500MB)</p>
-            🤝 Share
+            }
             document.getElementById('uploadZone').classList.remove('active');
             document.getElementById('fileInput').value = '';
-        🤝 Share
+        }
         
         // Load recent jobs
         function loadRecentJobs() {
@@ -1052,7 +1052,7 @@
                     if (data.jobs.length === 0) {
                         container.innerHTML = '<p style="color: #666;">No jobs yet</p>';
                         return;
-                    🤝 Share
+                    }
                     
                     container.innerHTML = data.jobs.map(job => `
                         <div class="job-item ${job.status}">
@@ -1064,8 +1064,8 @@
                             </div>
                         </div>
                     `).join('');
-                🤝 Share
-        🤝 Share
+                }
+        }
         
         // Load system logs
         function loadSystemLogs() {
@@ -1076,7 +1076,7 @@
                     if (data.logs.length === 0) {
                         container.innerHTML = '<p style="color: #666;">No logs yet</p>';
                         return;
-                    🤝 Share
+                    }
                     
                     container.innerHTML = data.logs.map(log => `
                         <div class="log-entry ${log.level}">
@@ -1084,8 +1084,8 @@
                             ${log.message}
                         </div>
                     `).join('');
-                🤝 Share
-        🤝 Share
+                }
+        }
         
         // Auto-refresh
         loadRecentJobs();
