@@ -429,12 +429,12 @@
             <div style="margin-bottom:15px; padding:10px; background:rgba(0,255,0,0.05); border:1px solid #333; border-radius:6px;">
                 <label style="color:#aaa; font-size:13px; display:block; margin-bottom:6px;">⚡ Quality Preset:</label>
                 <select id="qualitySelect" style="width:100%; padding:6px; background:#1a1a1a; color:#0f0; border:1px solid #333; border-radius:4px;">
-                    <option value="auto" selected>Auto (Network & Device)</option>
-                    <option value="fast">Fast (720p, 24fps, ~3Mbps)</option>
+                    <option value="fast" selected>Fast (720p, 24fps, ~3Mbps) - Recommended for mobile</option>
                     <option value="balanced">Balanced (1080p, 27fps, ~4Mbps)</option>
                     <option value="high">High (1080p, 30fps, ~5Mbps)</option>
+                    <option value="auto">Auto (Network & Device)</option>
                 </select>
-                <div id="qualityInfo" style="color:#666; font-size:11px; margin-top:4px;">📊 Detecting...</div>
+                <div id="qualityInfo" style="color:#666; font-size:11px; margin-top:4px;">📊 Fast preset selected (smoother playback)</div>
             </div>
             
             <div class="brand-grid" id="modalBrandGrid">
@@ -739,7 +739,9 @@
                 // Detect quality preset and show info
                 const preset = getQualityPreset();
                 const qualityInfoDiv = document.getElementById('qualityInfo');
-                if (preset.reason) {
+                const selectedValue = document.getElementById('qualitySelect')?.value;
+                
+                if (selectedValue === 'auto' && preset.reason) {
                     qualityInfoDiv.textContent = `📊 Auto: ${preset.name} (${preset.width}x${preset.height}, ${preset.fps}fps) - ${preset.reason}`;
                 } else {
                     qualityInfoDiv.textContent = `📊 ${preset.name}: ${preset.width}x${preset.height}, ${preset.fps}fps, ~${(preset.bitrate/1000000).toFixed(1)}Mbps`;
@@ -1548,7 +1550,11 @@
                         clearInterval(statusPollInterval);
                         statusPollInterval = null;
                         statusDiv.innerHTML = `
-                            <div class=\"status completed\">\n                                ✓ Processing complete!<br>\n                                <a href=\"${job.download_url}\" class=\"download-link\" download=\"${job.output_file}\">📥 Download ${job.output_file}</a> <button class=\"share-btn\" data-url=\"${job.download_url}\" data-filename=\"${job.output_file}\" style=\"margin-left:10px;\">🤝 Share</button>\n                            </div>
+                            <div class="status completed">
+                                ✓ Processing complete!<br>
+                                <a href="${job.download_url}" class="download-link" download="${job.output_file}">📥 Download ${job.output_file}</a> <button class="share-btn" data-url="${job.download_url}" data-filename="${job.output_file}" style="margin-left:10px;">🤝 Share</button>
+                                <button onclick="openBrandModalForUrl('${job.download_url}', '${job.output_file}')" style="margin-left:10px; background:#00aa00; color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">🎨 Add Watermarks</button>
+                            </div>
                         `;
                         loadRecentJobs();
                         // Save history
