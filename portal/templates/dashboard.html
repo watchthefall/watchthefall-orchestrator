@@ -407,7 +407,7 @@
             <div id="modalVideoName" style="color:#aaa; font-size:13px; margin-bottom:15px;"></div>
             <p style="color:#888; font-size:14px; margin-bottom:15px;">Choose up to 10 brands to watermark this video. Each will be downloaded separately.</p>
             <div class="brand-grid" id="modalBrandGrid">
-                <!-- Brands loaded dynamically -->
+                <p style="color:#666;">Loading brands...</p>
             </div>
             <div style="margin-top:20px; display:flex; gap:10px;">
                 <button id="modalGenerateBtn" style="flex:1; background:#00aa00;" disabled>⚡ Generate Watermarked Videos</button>
@@ -565,6 +565,10 @@
         
         async function openBrandModalForUrl(videoUrl, filename) {
             try {
+                console.log('[MODAL] Opening brand modal for:', filename);
+                console.log('[MODAL] Brands loaded:', brandsLoaded);
+                console.log('[MODAL] Brand count:', Object.keys(brandWatermarks).length);
+                
                 // Wait for brands to load first
                 if (!brandsLoaded) {
                     alert('Loading brands... please wait a moment and try again.');
@@ -575,6 +579,11 @@
                 document.getElementById('modalVideoName').textContent = `🎬 Loading: ${filename}...`;
                 document.getElementById('brandModal').classList.add('active');
                 
+                // Debug: Check if grid has content
+                const gridHTML = document.getElementById('modalBrandGrid').innerHTML;
+                console.log('[MODAL] Grid HTML length:', gridHTML.length);
+                console.log('[MODAL] Grid first 200 chars:', gridHTML.substring(0, 200));
+                
                 const response = await fetch(videoUrl);
                 if (!response.ok) throw new Error('Failed to load video');
                 
@@ -583,6 +592,7 @@
                 
                 document.getElementById('modalVideoName').textContent = `🎬 ${filename} (${(pendingVideoBlob.size/(1024*1024)).toFixed(2)}MB)`;
             } catch (err) {
+                console.error('[MODAL] Error:', err);
                 alert('Failed to load video: ' + err.message);
                 closeBrandModal();
             }
