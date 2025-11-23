@@ -213,7 +213,17 @@ def get_job_status(job_id):
 def download_video(filename):
     """Download processed video"""
     try:
-        return send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
+        # Send file with proper headers for downloads folder
+        response = send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
+        
+        # Add Content-Disposition header to suggest Downloads folder
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        # Mobile-friendly headers
+        response.headers['Content-Type'] = 'video/mp4'
+        response.headers['Cache-Control'] = 'no-cache'
+        
+        return response
     except Exception as e:
         return jsonify({'error': 'File not found'}), 404
 
