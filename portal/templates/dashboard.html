@@ -852,16 +852,15 @@
                     // Adaptive opacity: 15% (bright) to 25% (dark) - subtle but visible
                     const opacity = 0.15 + (0.10 * (1 - brightness / 255));
                     
-                    // Watermark positioning - FULL COVERAGE centered on video
-                    const safeZone = 0.0; // No safe zone for full coverage
-                    // Scale watermark to cover most of the video while maintaining aspect ratio
-                    const watermarkScale = Math.min(
-                        (targetWidth * 0.9) / watermark.width,  // 90% of video width
-                        (targetHeight * 0.9) / watermark.height // 90% of video height
+                    // Watermark positioning - FULL SCREEN COVERAGE (edge to edge)
+                    // Scale watermark to fill entire video frame while maintaining aspect ratio
+                    const watermarkScale = Math.max(
+                        targetWidth / watermark.width,   // Fill width
+                        targetHeight / watermark.height  // Fill height
                     );
                     const watermarkWidth = watermark.width * watermarkScale;
                     const watermarkHeight = watermark.height * watermarkScale;
-                    // Center the watermark
+                    // Center the watermark (it will overflow edges if aspect doesn't match)
                     const watermarkX = (targetWidth - watermarkWidth) / 2;
                     const watermarkY = (targetHeight - watermarkHeight) / 2;
                     
