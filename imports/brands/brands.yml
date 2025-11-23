@@ -1,0 +1,254 @@
+# WatchTheFall Brand Network - Clean Rebuild
+# Single source of truth: wtf_orchestrator folder
+# Universal template shared across all brands
+# No glitch overlays - posters moved to assets/posters/
+
+ScotlandWTF:
+  display_name: ScotlandWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/scotland-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/scotland_watermark.png
+  options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+EnglandWTF:
+  display_name: EnglandWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/england-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/England_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+WalesWTF:
+  display_name: WalesWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/wales-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/wales_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+NorthernIrelandWTF:
+  display_name: NorthernIrelandWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/northern-ireland-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Northernireland_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+BritainWTF:
+  display_name: BritainWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/britain-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Britain_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+IrelandWTF:
+  display_name: IrelandWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/ireland-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/ireland_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+EuropeWTF:
+  display_name: EuropeWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/europe-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/europe_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+FranceWTF:
+  display_name: FranceWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/france-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/France_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+GermanyWTF:
+  display_name: GermanyWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/germany-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/germany_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+PolandWTF:
+  display_name: PolandWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/poland-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/poland_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+ItalyWTF:
+  display_name: ItalyWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/italy-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Italy_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+SpainWTF:
+  display_name: SpainWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/spain-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Spain_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+NetherlandsWTF:
+  display_name: NetherlandsWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/netherlands-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Netherlands_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+SwedenWTF:
+  display_name: SwedenWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/sweden-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/sweden_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+USAmericaWTF:
+  display_name: USAmericaWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/usa-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Usa_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+CanadaWTF:
+  display_name: CanadaWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/canada-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Canada_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+AustraliaWTF:
+  display_name: AustraliaWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/australia-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Australia_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+AIWTF:
+  display_name: AIWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/ai-tech-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Ai_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+AITechWTF:
+  display_name: AITechWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/ai-tech-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Aitech_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+C0medyWTF:
+  display_name: C0medyWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/c0medy-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Comedy_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+DarkHumourWTF:
+  display_name: DarkHumourWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/dark-humour-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/darkhumour_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+GadgetsWTF:
+  display_name: GadgetsWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/gadgets-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/gadgets_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+ConceptsWTF:
+  display_name: ConceptsWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/concepts-wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/Concepts_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+WatchTheFallWTF:
+  display_name: WatchTheFallWTF
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/watchthefall_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25
+
+WatchThefall:
+  display_name: WatchThefall.wtf
+  assets:
+    template: wtf_orchestrator/template.png
+    logo: wtf_orchestrator/logos/wtf-logo.png
+    watermark: wtf_orchestrator/watermarks/watchthefall_watermark.png
+    options:
+    watermark_position: bottom-right
+    watermark_scale: 0.25

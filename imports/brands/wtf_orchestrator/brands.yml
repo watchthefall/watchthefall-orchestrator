@@ -1,0 +1,422 @@
+# Brand Configuration
+# Each brand defines its identity, assets, and default posting behavior
+
+brands:
+  ScotlandWTF:
+    display_name: "Scotland Watch The Fall"
+    slug: "scotland"
+    logo: "scotland-wtf-logo.png"
+    watermark_key: "scotland"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🏴󠁧󠁢󠁳󠁣󠁴󠁿"
+    default_hashtags:
+      - "#ScotlandWTF"
+      - "#WatchTheFall"
+      - "#Scotland"
+      - "#ScottishNews"
+      - "#Alba"
+      - "#ScotlandNews"
+    posting_cadence_hours: 6
+    languages: ["en", "gd"]  # English, Scottish Gaelic
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  EnglandWTF:
+    display_name: "England Watch The Fall"
+    slug: "england"
+    logo: "england-wtf-logo.png"
+    watermark_key: "england"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🏴󠁧󠁢󠁥󠁮󠁧󠁿"
+    default_hashtags:
+      - "#EnglandWTF"
+      - "#WatchTheFall"
+      - "#England"
+      - "#EnglishNews"
+      - "#UK"
+    posting_cadence_hours: 6
+    languages: ["en"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  WalesWTF:
+    display_name: "Wales Watch The Fall"
+    slug: "wales"
+    logo: "wales-wtf-logo.png"
+    watermark_key: "wales"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🏴󠁧󠁢󠁷󠁬󠁳󠁿"
+    default_hashtags:
+      - "#WalesWTF"
+      - "#WatchTheFall"
+      - "#Wales"
+      - "#Cymru"
+      - "#WelshNews"
+    posting_cadence_hours: 6
+    languages: ["en", "cy"]  # English, Welsh
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  NorthernIrelandWTF:
+    display_name: "Northern Ireland Watch The Fall"
+    slug: "northernireland"
+    logo: "northern-ireland-wtf-logo.png"
+    watermark_key: "northernireland"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf"
+    default_hashtags:
+      - "#NorthernIrelandWTF"
+      - "#WatchTheFall"
+      - "#NorthernIreland"
+      - "#NINews"
+      - "#Ulster"
+    posting_cadence_hours: 6
+    languages: ["en", "ga"]  # English, Irish
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  IrelandWTF:
+    display_name: "Ireland Watch The Fall"
+    slug: "ireland"
+    logo: "ireland-wtf-logo.png"
+    watermark_key: "ireland"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇮🇪"
+    default_hashtags:
+      - "#IrelandWTF"
+      - "#WatchTheFall"
+      - "#Ireland"
+      - "#Eire"
+      - "#IrishNews"
+    posting_cadence_hours: 6
+    languages: ["en", "ga"]  # English, Irish
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  BritainWTF:
+    display_name: "Britain Watch The Fall"
+    slug: "britain"
+    logo: "britain-wtf-logo.png"
+    watermark_key: "britain"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇬🇧"
+    default_hashtags:
+      - "#BritainWTF"
+      - "#WatchTheFall"
+      - "#Britain"
+      - "#UK"
+      - "#UKNews"
+    posting_cadence_hours: 6
+    languages: ["en"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  EuropeWTF:
+    display_name: "Europe Watch The Fall"
+    slug: "europe"
+    logo: "europe-wtf-logo.png"
+    watermark_key: "europe"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇪🇺"
+    default_hashtags:
+      - "#EuropeWTF"
+      - "#WatchTheFall"
+      - "#Europe"
+      - "#EU"
+      - "#EuropeNews"
+    posting_cadence_hours: 8
+    languages: ["en"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  FranceWTF:
+    display_name: "France Watch The Fall"
+    slug: "france"
+    logo: "france-wtf-logo.png"
+    watermark_key: "france"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇫🇷"
+    default_hashtags:
+      - "#FranceWTF"
+      - "#WatchTheFall"
+      - "#France"
+      - "#ActuFrance"
+    posting_cadence_hours: 8
+    languages: ["en", "fr"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  GermanyWTF:
+    display_name: "Germany Watch The Fall"
+    slug: "germany"
+    logo: "germany-wtf-logo.png"
+    watermark_key: "germany"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇩🇪"
+    default_hashtags:
+      - "#GermanyWTF"
+      - "#WatchTheFall"
+      - "#Germany"
+      - "#Deutschland"
+    posting_cadence_hours: 8
+    languages: ["en", "de"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  ItalyWTF:
+    display_name: "Italy Watch The Fall"
+    slug: "italy"
+    logo: "italy-wtf-logo.png"
+    watermark_key: "italy"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇮🇹"
+    default_hashtags:
+      - "#ItalyWTF"
+      - "#WatchTheFall"
+      - "#Italy"
+      - "#Italia"
+    posting_cadence_hours: 8
+    languages: ["en", "it"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  SpainWTF:
+    display_name: "Spain Watch The Fall"
+    slug: "spain"
+    logo: "spain-wtf-logo.png"
+    watermark_key: "spain"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇪🇸"
+    default_hashtags:
+      - "#SpainWTF"
+      - "#WatchTheFall"
+      - "#Spain"
+      - "#España"
+    posting_cadence_hours: 8
+    languages: ["en", "es"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  NetherlandsWTF:
+    display_name: "Netherlands Watch The Fall"
+    slug: "netherlands"
+    logo: "netherlands-wtf-logo.png"
+    watermark_key: "netherlands"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇳🇱"
+    default_hashtags:
+      - "#NetherlandsWTF"
+      - "#WatchTheFall"
+      - "#Netherlands"
+      - "#Nederland"
+    posting_cadence_hours: 8
+    languages: ["en", "nl"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  PolandWTF:
+    display_name: "Poland Watch The Fall"
+    slug: "poland"
+    logo: "poland-wtf-logo.png"
+    watermark_key: "poland"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇵🇱"
+    default_hashtags:
+      - "#PolandWTF"
+      - "#WatchTheFall"
+      - "#Poland"
+      - "#Polska"
+    posting_cadence_hours: 8
+    languages: ["en", "pl"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  SwedenWTF:
+    display_name: "Sweden Watch The Fall"
+    slug: "sweden"
+    logo: "sweden-wtf-logo.png"
+    watermark_key: "sweden"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇸🇪"
+    default_hashtags:
+      - "#SwedenWTF"
+      - "#WatchTheFall"
+      - "#Sweden"
+      - "#Sverige"
+    posting_cadence_hours: 8
+    languages: ["en", "sv"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  TheWestWTF:
+    display_name: "The West Watch The Fall"
+    slug: "thewest"
+    logo: "the-west-wtf.png"
+    watermark_key: "thewest"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🌍"
+    default_hashtags:
+      - "#TheWestWTF"
+      - "#WatchTheFall"
+      - "#TheWest"
+      - "#WesternCivilization"
+    posting_cadence_hours: 8
+    languages: ["en"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  USAWTF:
+    display_name: "USA Watch The Fall"
+    slug: "usa"
+    logo: "usa-wtf-logo.png"
+    watermark_key: "usa"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇺🇸"
+    default_hashtags:
+      - "#USAWTF"
+      - "#WatchTheFall"
+      - "#USA"
+      - "#America"
+      - "#USNews"
+    posting_cadence_hours: 6
+    languages: ["en"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  CanadaWTF:
+    display_name: "Canada Watch The Fall"
+    slug: "canada"
+    logo: "canada-wtf-logo.png"
+    watermark_key: "canada"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇨🇦"
+    default_hashtags:
+      - "#CanadaWTF"
+      - "#WatchTheFall"
+      - "#Canada"
+      - "#CanadaNews"
+    posting_cadence_hours: 6
+    languages: ["en", "fr"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  AustraliaWTF:
+    display_name: "Australia Watch The Fall"
+    slug: "australia"
+    logo: "australia-wtf-logo.png"
+    watermark_key: "australia"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🇦🇺"
+    default_hashtags:
+      - "#AustraliaWTF"
+      - "#WatchTheFall"
+      - "#Australia"
+      - "#AussieNews"
+    posting_cadence_hours: 6
+    languages: ["en"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  AIWTF:
+    display_name: "AI Watch The Fall"
+    slug: "ai"
+    logo: "ai-wtf-logo.webp"
+    watermark_key: "ai"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🤖"
+    default_hashtags:
+      - "#AIWTF"
+      - "#WatchTheFall"
+      - "#AI"
+      - "#ArtificialIntelligence"
+      - "#AINews"
+      - "#MachineLearning"
+    posting_cadence_hours: 4
+    languages: ["en"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  AiTechWTF:
+    display_name: "AI Tech Watch The Fall"
+    slug: "aitech"
+    logo: "ai-tech-wtf-logo.png"
+    watermark_key: "ai_tech"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🤖⚙️"
+    default_hashtags:
+      - "#AiTechWTF"
+      - "#WatchTheFall"
+      - "#AITech"
+      - "#TechNews"
+      - "#Innovation"
+    posting_cadence_hours: 4
+    languages: ["en"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  GadgetsWTF:
+    display_name: "Gadgets Watch The Fall"
+    slug: "gadgets"
+    logo: "gadgets-wtf-logo.png"
+    watermark_key: "gadgets"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 📱"
+    default_hashtags:
+      - "#GadgetsWTF"
+      - "#WatchTheFall"
+      - "#Gadgets"
+      - "#Tech"
+      - "#Technology"
+      - "#TechReview"
+    posting_cadence_hours: 4
+    languages: ["en"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  ComedyWTF:
+    display_name: "Comedy Watch The Fall"
+    slug: "comedy"
+    logo: "c0medy-wtf-logo.png"
+    watermark_key: "comedy"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 😂"
+    default_hashtags:
+      - "#ComedyWTF"
+      - "#WatchTheFall"
+      - "#Comedy"
+      - "#Funny"
+      - "#Humor"
+      - "#Memes"
+    posting_cadence_hours: 3
+    languages: ["en"]
+    watermark_opacity: 0.50
+    watermark_position: "top-center"
+
+  DarkHumourWTF:
+    display_name: "Dark Humour Watch The Fall"
+    slug: "darkhumour"
+    logo: "dark-humour-wtf-logo.png"
+    watermark_key: "darkhumour"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 🖤"
+    default_hashtags:
+      - "#DarkHumourWTF"
+      - "#WatchTheFall"
+      - "#DarkHumour"
+      - "#DarkComedy"
+      - "#BlackHumor"
+    posting_cadence_hours: 4
+    languages: ["en"]
+    watermark_opacity: 0.50
+    watermark_position: "top-center"
+
+  ConceptsWTF:
+    display_name: "Concepts Watch The Fall"
+    slug: "concepts"
+    logo: "concepts-wtf-logo.png"
+    watermark_key: "concepts"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf 💡"
+    default_hashtags:
+      - "#ConceptsWTF"
+      - "#WatchTheFall"
+      - "#Concepts"
+      - "#Ideas"
+      - "#Philosophy"
+      - "#Thinking"
+    posting_cadence_hours: 6
+    languages: ["en"]
+    watermark_opacity: 0.55
+    watermark_position: "top-center"
+
+  WatchTheFall:
+    display_name: "Watch The Fall"
+    slug: "watchthefall"
+    logo: "wtf-logo.png"
+    watermark_key: "watchthefall"
+    default_caption_postfix: "WATCH THE FALL — @WatchTheFall.wtf"
+    default_hashtags:
+      - "#WatchTheFall"
+      - "#WTF"
+      - "#IndependentMedia"
+      - "#Truth"
+    posting_cadence_hours: 6
+    languages: ["en"]
+    watermark_opacity: 0.60
+    watermark_position: "top-center"

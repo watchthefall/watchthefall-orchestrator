@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WTF Crop Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        #cropContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #videoCanvas {
+            position: absolute;
+            max-width: 100%;
+            max-height: 100%;
+            touch-action: none;
+        }
+        
+        #cropFrame {
+            position: absolute;
+            border: 3px solid #00ff00;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        #controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            z-index: 100;
+        }
+        
+        .aspectRatios {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+        
+        .aspectBtn {
+            padding: 10px 20px;
+            background: #333;
+            border: 2px solid #666;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .aspectBtn.active {
+            background: #00ff00;
+            color: #000;
+            border-color: #00ff00;
+        }
+        
+        .confirmBtn {
+            width: 100%;
+            padding: 15px;
+            background: #00ff00;
+            border: none;
+            color: #000;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        #info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        Pinch to zoom • Drag to move<br>
+        <span id="scaleInfo">Scale: 1.0x</span>
+    </div>
+    
+    <div id="cropContainer">
+        <video id="videoCanvas" muted playsinline loop></video>
+        <div id="cropFrame"></div>
+    </div>
+    
+    <div id="controls">
+        <div class="aspectRatios">
+            <button class="aspectBtn active" data-ratio="9:16">9:16 (Reels)</button>
+            <button class="aspectBtn" data-ratio="1:1">1:1 (Square)</button>
+            <button class="aspectBtn" data-ratio="4:5">4:5 (Portrait)</button>
+            <button class="aspectBtn" data-ratio="16:9">16:9 (Landscape)</button>
+        </div>
+        <button class="confirmBtn" onclick="confirmCrop()">Confirm Crop</button>
+    </div>
+    
+    <script>
+        // Mobile crop editor with pinch-to-zoom and drag support
+        const video = document.getElementById('videoCanvas');
+        const cropFrame = document.getElementById('cropFrame');
+        const scaleInfo = document.getElementById('scaleInfo');
+        
+        let currentAspectRatio = '9:16';
+        let scale = 1.0;
+        let posX = 0;
+        let posY = 0;
+        
+        let initialDistance = 0;
+        let initialScale = 1;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+        
+        // Load video (in production, this would be the downloaded video)
+        video.src = '/api/current_video';
+        video.play().catch(() => {});
+        
+        // Update crop frame based on aspect ratio
+        function updateCropFrame() {
+            const container = document.getElementById('cropContainer');
+            const containerW = container.clientWidth;
+            const containerH = container.clientHeight;
+            
+            const [w, h] = currentAspectRatio.split(':').map(Number);
+            const aspectRatio = w / h;
+            
+            let cropW, cropH;
+            
+            if (containerW / containerH > aspectRatio) {
+                cropH = containerH * 0.8;
+                cropW = cropH * aspectRatio;
+            } else {
+                cropW = containerW * 0.8;
+                cropH = cropW / aspectRatio;
+            }
+            
+            cropFrame.style.width = cropW + 'px';
+            cropFrame.style.height = cropH + 'px';
+            cropFrame.style.left = (containerW - cropW) / 2 + 'px';
+            cropFrame.style.top = (containerH - cropH) / 2 + 'px';
+        }
+        
+        // Aspect ratio buttons
+        document.querySelectorAll('.aspectBtn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.aspectBtn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentAspectRatio = btn.dataset.ratio;
+                updateCropFrame();
+            });
+        });
+        
+        // Touch gestures
+        const container = document.getElementById('cropContainer');
+        
+        function getDistance(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                // Pinch start
+                initialDistance = getDistance(e.touches);
+                initialScale = scale;
+            } else if (e.touches.length === 1) {
+                // Drag start
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+            }
+        });
+        
+        container.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            if (e.touches.length === 2) {
+                // Pinch zoom
+                const currentDistance = getDistance(e.touches);
+                scale = initialScale * (currentDistance / initialDistance);
+                scale = Math.max(1, Math.min(5, scale)); // Clamp 1-5x
+                
+                video.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+                scaleInfo.textContent = `Scale: ${scale.toFixed(1)}x`;
+                
+            } else if (e.touches.length === 1) {
+                // Drag
+                const dx = e.touches[0].clientX - lastTouchX;
+                const dy = e.touches[0].clientY - lastTouchY;
+                
+                posX += dx;
+                posY += dy;
+                
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+                
+                video.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+            }
+        });
+        
+        // Confirm crop
+        function confirmCrop() {
+            const cropData = {
+                aspectRatio: currentAspectRatio,
+                scale: scale,
+                posX: posX,
+                posY: posY,
+                timestamp: Date.now()
+            };
+            
+            // Send to server
+            fetch('/api/crop/confirm', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(cropData)
+            }).then(() => {
+                alert('Crop confirmed! Proceeding to logo editor...');
+                window.location.href = '/logo-editor';
+            });
+        }
+        
+        // Initialize
+        video.addEventListener('loadedmetadata', updateCropFrame);
+        window.addEventListener('resize', updateCropFrame);
+        updateCropFrame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WatchTheFall Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: #111;
+            padding: 20px;
+            border-bottom: 2px solid #00ff00;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #00ff00;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .section {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+        
+        .section h2 {
+            color: #00ff00;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .upload-zone {
+            border: 2px dashed #444;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-zone:hover {
+            border-color: #00ff00;
+            background: #1f1f1f;
+        }
+        
+        .upload-zone.active {
+            border-color: #00ff00;
+            background: #1f3f1f;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: #222;
+            border: 1px solid #444;
+            color: #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #00cc00;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        
+        .status.queued { background: #333; color: #aaa; }
+        .status.processing { background: #1a3a4a; color: #5bc0de; }
+        .status.completed { background: #1a3a1a; color: #00ff00; }
+        .status.failed { background: #3a1a1a; color: #ff5555; }
+        
+        .job-item {
+            background: #222;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid #444;
+        }
+        
+        .job-item.completed { border-left-color: #00ff00; }
+        .job-item.processing { border-left-color: #5bc0de; }
+        .job-item.failed { border-left-color: #ff5555; }
+        
+        .job-meta {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .log-entry {
+            padding: 8px 12px;
+            background: #1a1a1a;
+            border-left: 2px solid #444;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .log-entry.error { border-left-color: #ff5555; color: #ffaaaa; }
+        .log-entry.info { border-left-color: #5bc0de; }
+        
+        .download-link {
+            color: #00ff00;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .download-link:hover {
+            text-decoration: underline;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>⚡ WatchTheFall Portal</h1>
+            <div class="subtitle">Video Processing & Automation Control Panel</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Upload Section -->
+        <div class="section">
+            <h2>📤 Upload & Process</h2>
+            
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                <div id="uploadText">
+                    <p style="font-size: 18px; margin-bottom: 10px;">📁 Click or drag video here</p>
+                    <p style="color: #888; font-size: 14px;">Supported: MP4, MOV, AVI (max 500MB)</p>
+                </div>
+            </div>
+            <input type="file" id="fileInput" accept="video/mp4,video/quicktime,video/x-msvideo">
+            
+            <div style="margin-top: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #aaa; font-size: 14px;">Template</label>
+                <select id="templateSelect">
+                    <option value="">Loading templates...</option>
+                </select>
+                
+                <label style="display: block; margin-bottom: 8px; margin-top: 15px; color: #aaa; font-size: 14px;">Aspect Ratio</label>
+                <select id="aspectRatioSelect">
+                    <option value="9:16">9:16 (TikTok/Reels)</option>
+                    <option value="1:1">1:1 (Square)</option>
+                    <option value="16:9">16:9 (YouTube)</option>
+                </select>
+                
+                <button id="processBtn" style="width: 100%; margin-top: 20px;" disabled>Process Video</button>
+            </div>
+            
+            <div id="statusMessage" style="margin-top: 15px;"></div>
+        </div>
+        
+        <div class="grid">
+            <!-- Recent Jobs -->
+            <div class="section">
+                <h2>📊 Recent Jobs</h2>
+                <div id="recentJobs">
+                    <p style="color: #666;">No jobs yet</p>
+                </div>
+            </div>
+            
+            <!-- System Logs -->
+            <div class="section">
+                <h2>📜 System Logs</h2>
+                <div id="systemLogs" style="max-height: 400px; overflow-y: auto;">
+                    <p style="color: #666;">Loading logs...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let uploadedFilename = null;
+        
+        // Load templates
+        fetch('/api/templates')
+            .then(r => r.json())
+            .then(data => {
+                const select = document.getElementById('templateSelect');
+                select.innerHTML = data.templates.map(t => 
+                    `<option value="${t.name}">${t.display_name}</option>`
+                ).join('');
+            });
+        
+        // File upload
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const uploadZone = document.getElementById('uploadZone');
+            const uploadText = document.getElementById('uploadText');
+            
+            uploadText.innerHTML = '<p>⏳ Uploading...</p>';
+            uploadZone.classList.add('active');
+            
+            const formData = new FormData();
+            formData.append('video', file);
+            
+            try {
+                const response = await fetch('/api/videos/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    uploadedFilename = result.filename;
+                    uploadText.innerHTML = `<p style="color: #00ff00;">✓ ${file.name}</p><p style="font-size: 12px; color: #888; margin-top: 5px;">Ready to process</p>`;
+                    document.getElementById('processBtn').disabled = false;
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                uploadText.innerHTML = `<p style="color: #ff5555;">✗ Upload failed: ${err.message}</p>`;
+                uploadZone.classList.remove('active');
+            }
+        });
+        
+        // Process video
+        document.getElementById('processBtn').addEventListener('click', async () => {
+            if (!uploadedFilename) return;
+            
+            const template = document.getElementById('templateSelect').value;
+            const aspectRatio = document.getElementById('aspectRatioSelect').value;
+            const statusDiv = document.getElementById('statusMessage');
+            
+            statusDiv.innerHTML = '<div class="status processing">⏳ Processing video...</div>';
+            document.getElementById('processBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/videos/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filename: uploadedFilename,
+                        template: template,
+                        aspect_ratio: aspectRatio
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusDiv.innerHTML = `<div class="status processing">Processing... Job ID: ${result.job_id}</div>`;
+                    
+                    // Poll for status
+                    pollJobStatus(result.job_id);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                statusDiv.innerHTML = `<div class="status failed">✗ Error: ${err.message}</div>`;
+                document.getElementById('processBtn').disabled = false;
+            }
+        });
+        
+        // Poll job status
+        function pollJobStatus(jobId) {
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/videos/status/${jobId}`);
+                    const job = await response.json();
+                    
+                    const statusDiv = document.getElementById('statusMessage');
+                    
+                    if (job.status === 'completed') {
+                        clearInterval(interval);
+                        statusDiv.innerHTML = `
+                            <div class="status completed">
+                                ✓ Processing complete!<br>
+                                <a href="${job.download_url}" class="download-link">📥 Download ${job.output_file}</a>
+                            </div>
+                        `;
+                        loadRecentJobs();
+                        resetUpload();
+                    } else if (job.status === 'failed') {
+                        clearInterval(interval);
+                        statusDiv.innerHTML = `<div class="status failed">✗ Processing failed: ${job.error || 'Unknown error'}</div>`;
+                        resetUpload();
+                    }
+                } catch (err) {
+                    clearInterval(interval);
+                }
+            }, 2000);
+        }
+        
+        // Reset upload
+        function resetUpload() {
+            uploadedFilename = null;
+            document.getElementById('uploadText').innerHTML = `
+                <p style="font-size: 18px; margin-bottom: 10px;">📁 Click or drag video here</p>
+                <p style="color: #888; font-size: 14px;">Supported: MP4, MOV, AVI (max 500MB)</p>
+            `;
+            document.getElementById('uploadZone').classList.remove('active');
+            document.getElementById('fileInput').value = '';
+        }
+        
+        // Load recent jobs
+        function loadRecentJobs() {
+            fetch('/api/videos/recent?limit=10')
+                .then(r => r.json())
+                .then(data => {
+                    const container = document.getElementById('recentJobs');
+                    if (data.jobs.length === 0) {
+                        container.innerHTML = '<p style="color: #666;">No jobs yet</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = data.jobs.map(job => `
+                        <div class="job-item ${job.status}">
+                            <strong>${job.template}</strong> 
+                            <span class="status ${job.status}" style="display: inline-block; padding: 2px 8px; font-size: 11px; margin-left: 10px;">${job.status}</span>
+                            <div class="job-meta">
+                                ${job.aspect_ratio} • ${new Date(job.created_at).toLocaleString()}
+                                ${job.status === 'completed' ? `<br><a href="/api/videos/download/${job.output_path}" class="download-link">Download</a>` : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                });
+        }
+        
+        // Load system logs
+        function loadSystemLogs() {
+            fetch('/api/system/logs?limit=20')
+                .then(r => r.json())
+                .then(data => {
+                    const container = document.getElementById('systemLogs');
+                    if (data.logs.length === 0) {
+                        container.innerHTML = '<p style="color: #666;">No logs yet</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = data.logs.map(log => `
+                        <div class="log-entry ${log.level}">
+                            <span style="color: #666;">[${new Date(log.timestamp).toLocaleTimeString()}]</span>
+                            ${log.message}
+                        </div>
+                    `).join('');
+                });
+        }
+        
+        // Auto-refresh
+        loadRecentJobs();
+        loadSystemLogs();
+        setInterval(loadRecentJobs, 5000);
+        setInterval(loadSystemLogs, 10000);
+    </script>
+</body>
+</html>

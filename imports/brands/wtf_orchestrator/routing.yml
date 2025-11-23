@@ -1,0 +1,234 @@
+# Routing Configuration
+# Define which platforms are enabled for each brand
+
+# Format:
+# BrandName:
+#   platforms: [list of enabled platform keys]
+#   priority: [ordered list for auto-selection]
+
+ScotlandWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+EnglandWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+WalesWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+NorthernIrelandWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+IrelandWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+BritainWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+EuropeWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+FranceWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+GermanyWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+ItalyWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+SpainWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+NetherlandsWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+PolandWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+SwedenWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+TheWestWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+USAWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+CanadaWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+AustraliaWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+AIWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - youtube
+    - x_twitter
+    - linkedin
+  priority: [youtube_shorts, tiktok, instagram_reels, x_twitter]
+
+AiTechWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - youtube
+    - x_twitter
+    - linkedin
+  priority: [youtube_shorts, tiktok, instagram_reels, x_twitter]
+
+GadgetsWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - youtube
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+ComedyWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+DarkHumourWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts]
+
+ConceptsWTF:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - youtube
+    - x_twitter
+  priority: [youtube_shorts, tiktok, instagram_reels]
+
+WatchTheFall:
+  platforms:
+    - tiktok
+    - instagram_reels
+    - youtube_shorts
+    - youtube
+    - facebook
+    - x_twitter
+  priority: [tiktok, instagram_reels, youtube_shorts, youtube]

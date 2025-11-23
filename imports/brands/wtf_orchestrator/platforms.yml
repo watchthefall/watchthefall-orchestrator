@@ -1,0 +1,266 @@
+# Platform Configuration
+# Define capabilities, constraints, and formatting rules for each social platform
+
+platforms:
+  tiktok:
+    display_name: "TikTok"
+    aspect_ratios:
+      - "9:16"  # Vertical (preferred)
+      - "1:1"   # Square
+    preferred_orientation: "vertical"
+    video_specs:
+      max_duration_seconds: 600  # 10 minutes (extended)
+      min_duration_seconds: 1
+      max_file_size_mb: 287
+      supported_formats: ["mp4", "mov", "webm"]
+      recommended_resolution:
+        vertical: "1080x1920"
+        square: "1080x1080"
+      min_resolution:
+        vertical: "720x1280"
+        square: "640x640"
+    text_constraints:
+      title_max_length: 150
+      description_max_length: 2200
+      hashtag_max_count: 30
+      hashtag_in_caption: true
+    filename_pattern: "{date}_{brand}_tiktok_{slug}_{hash}.mp4"
+    watermark_safe_zone: "top-80px"
+    enabled: true
+
+  instagram_reels:
+    display_name: "Instagram Reels"
+    aspect_ratios:
+      - "9:16"  # Vertical (preferred)
+      - "1:1"   # Square
+      - "4:5"   # Portrait
+    preferred_orientation: "vertical"
+    video_specs:
+      max_duration_seconds: 90
+      min_duration_seconds: 1
+      max_file_size_mb: 1000
+      supported_formats: ["mp4", "mov"]
+      recommended_resolution:
+        vertical: "1080x1920"
+        square: "1080x1080"
+        portrait: "1080x1350"
+      min_resolution:
+        vertical: "720x1280"
+        square: "600x600"
+        portrait: "600x750"
+    text_constraints:
+      title_max_length: 0  # No separate title
+      description_max_length: 2200
+      hashtag_max_count: 30
+      hashtag_in_caption: true
+    filename_pattern: "{date}_{brand}_igreels_{slug}_{hash}.mp4"
+    watermark_safe_zone: "top-100px-bottom-200px"
+    enabled: true
+
+  instagram_feed:
+    display_name: "Instagram Feed"
+    aspect_ratios:
+      - "1:1"   # Square (preferred)
+      - "4:5"   # Portrait
+      - "16:9"  # Landscape
+    preferred_orientation: "square"
+    video_specs:
+      max_duration_seconds: 60
+      min_duration_seconds: 3
+      max_file_size_mb: 1000
+      supported_formats: ["mp4", "mov"]
+      recommended_resolution:
+        square: "1080x1080"
+        portrait: "1080x1350"
+        landscape: "1920x1080"
+      min_resolution:
+        square: "600x600"
+        portrait: "600x750"
+        landscape: "600x337"
+    text_constraints:
+      title_max_length: 0
+      description_max_length: 2200
+      hashtag_max_count: 30
+      hashtag_in_caption: true
+    filename_pattern: "{date}_{brand}_igfeed_{slug}_{hash}.mp4"
+    watermark_safe_zone: "center"
+    enabled: true
+
+  youtube_shorts:
+    display_name: "YouTube Shorts"
+    aspect_ratios:
+      - "9:16"  # Vertical only
+    preferred_orientation: "vertical"
+    video_specs:
+      max_duration_seconds: 60
+      min_duration_seconds: 1
+      max_file_size_mb: 256
+      supported_formats: ["mp4", "mov", "webm"]
+      recommended_resolution:
+        vertical: "1080x1920"
+      min_resolution:
+        vertical: "720x1280"
+    text_constraints:
+      title_max_length: 100
+      description_max_length: 5000
+      hashtag_max_count: 15
+      hashtag_in_caption: true
+    filename_pattern: "{date}_{brand}_ytshorts_{slug}_{hash}.mp4"
+    watermark_safe_zone: "top-120px-bottom-180px"
+    enabled: true
+
+  youtube:
+    display_name: "YouTube"
+    aspect_ratios:
+      - "16:9"  # Landscape (preferred)
+      - "9:16"  # Vertical
+      - "1:1"   # Square
+    preferred_orientation: "landscape"
+    video_specs:
+      max_duration_seconds: 43200  # 12 hours
+      min_duration_seconds: 1
+      max_file_size_mb: 256000  # 256 GB
+      supported_formats: ["mp4", "mov", "avi", "wmv", "flv", "webm"]
+      recommended_resolution:
+        landscape: "1920x1080"
+        vertical: "1080x1920"
+        square: "1080x1080"
+      min_resolution:
+        landscape: "1280x720"
+        vertical: "720x1280"
+        square: "640x640"
+    text_constraints:
+      title_max_length: 100
+      description_max_length: 5000
+      hashtag_max_count: 15
+      hashtag_in_caption: true
+    filename_pattern: "{date}_{brand}_youtube_{slug}_{hash}.mp4"
+    watermark_safe_zone: "bottom-right"
+    enabled: true
+
+  facebook:
+    display_name: "Facebook"
+    aspect_ratios:
+      - "16:9"  # Landscape (preferred)
+      - "9:16"  # Vertical
+      - "1:1"   # Square
+      - "4:5"   # Portrait
+    preferred_orientation: "landscape"
+    video_specs:
+      max_duration_seconds: 7200  # 2 hours
+      min_duration_seconds: 1
+      max_file_size_mb: 10000  # 10 GB
+      supported_formats: ["mp4", "mov"]
+      recommended_resolution:
+        landscape: "1920x1080"
+        vertical: "1080x1920"
+        square: "1080x1080"
+        portrait: "1080x1350"
+      min_resolution:
+        landscape: "1280x720"
+        vertical: "720x1280"
+        square: "600x600"
+        portrait: "600x750"
+    text_constraints:
+      title_max_length: 0
+      description_max_length: 63206
+      hashtag_max_count: 30
+      hashtag_in_caption: true
+    filename_pattern: "{date}_{brand}_facebook_{slug}_{hash}.mp4"
+    watermark_safe_zone: "top-center"
+    enabled: true
+
+  x_twitter:
+    display_name: "X (Twitter)"
+    aspect_ratios:
+      - "16:9"  # Landscape (preferred)
+      - "9:16"  # Vertical
+      - "1:1"   # Square
+    preferred_orientation: "landscape"
+    video_specs:
+      max_duration_seconds: 140
+      min_duration_seconds: 0.5
+      max_file_size_mb: 512
+      supported_formats: ["mp4", "mov"]
+      recommended_resolution:
+        landscape: "1920x1080"
+        vertical: "1080x1920"
+        square: "1080x1080"
+      min_resolution:
+        landscape: "1280x720"
+        vertical: "720x1280"
+        square: "640x640"
+    text_constraints:
+      title_max_length: 280  # Tweet as title
+      description_max_length: 0
+      hashtag_max_count: 10
+      hashtag_in_caption: true
+    filename_pattern: "{date}_{brand}_x_{slug}_{hash}.mp4"
+    watermark_safe_zone: "top-center"
+    enabled: true
+
+  linkedin:
+    display_name: "LinkedIn"
+    aspect_ratios:
+      - "16:9"  # Landscape (preferred)
+      - "1:1"   # Square
+      - "9:16"  # Vertical
+    preferred_orientation: "landscape"
+    video_specs:
+      max_duration_seconds: 600  # 10 minutes
+      min_duration_seconds: 3
+      max_file_size_mb: 5000
+      supported_formats: ["mp4", "mov", "avi"]
+      recommended_resolution:
+        landscape: "1920x1080"
+        square: "1080x1080"
+        vertical: "1080x1920"
+      min_resolution:
+        landscape: "1280x720"
+        square: "600x600"
+        vertical: "720x1280"
+    text_constraints:
+      title_max_length: 200
+      description_max_length: 3000
+      hashtag_max_count: 10
+      hashtag_in_caption: true
+    filename_pattern: "{date}_{brand}_linkedin_{slug}_{hash}.mp4"
+    watermark_safe_zone: "bottom-right"
+    enabled: false  # Disabled by default
+
+  reddit:
+    display_name: "Reddit"
+    aspect_ratios:
+      - "16:9"  # Landscape
+      - "9:16"  # Vertical
+      - "1:1"   # Square
+    preferred_orientation: "landscape"
+    video_specs:
+      max_duration_seconds: 900  # 15 minutes
+      min_duration_seconds: 1
+      max_file_size_mb: 1000
+      supported_formats: ["mp4", "mov", "gif"]
+      recommended_resolution:
+        landscape: "1920x1080"
+        vertical: "1080x1920"
+        square: "1080x1080"
+      min_resolution:
+        landscape: "1280x720"
+        vertical: "720x1280"
+        square: "640x640"
+    text_constraints:
+      title_max_length: 300
+      description_max_length: 40000
+      hashtag_max_count: 0  # Reddit doesn't use hashtags
+      hashtag_in_caption: false
+    filename_pattern: "{date}_{brand}_reddit_{slug}_{hash}.mp4"
+    watermark_safe_zone: "top-center"
+    enabled: false  # Disabled by default
+
+# Global defaults
+defaults:
+  fallback_orientation: "vertical"
+  watermark_quality_priority: ["high", "medium", "standard", "low"]
+  thumbnail_count: 3
+  thumbnail_times: [0.1, 0.5, 0.9]  # Extract at 10%, 50%, 90% of duration
+  safe_zone_padding_px: 80

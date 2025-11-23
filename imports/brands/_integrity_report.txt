@@ -1,0 +1,1943 @@
+[ASSET_IMPORT_SUMMARY]
+Brand: wtf_orchestrator
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_orchestrator
+  template found: no
+  watermark found: yes
+  logo found: yes
+  glitch overlays: 8
+  manifests present: brands.yml, manifest.yml, orientation.yml, platforms.yml, routing.yml, watermark.yml
+  missing recommended: template.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png
+
+Brand: markdown_it
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\.venv\Lib\site-packages\markdown_it
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\markdown_it
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: logos
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\assets\Logos
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\logos
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: logos---copy
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\assets\Logos - Copy
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\logos---copy
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: france_poster_1_files
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\assets\posters\france_poster_1_files
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\france_poster_1_files
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: resized_watermarks
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\assets\resized_watermarks
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\resized_watermarks
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: watermarks_backup
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\assets\watermarks_backup
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\watermarks_backup
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: watermarks_landscape
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\assets\watermarks_landscape
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\watermarks_landscape
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: watermarks_square
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\assets\watermarks_square
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\watermarks_square
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: watermarks_vertical
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\assets\watermarks_vertical
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\watermarks_vertical
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: watermarks_vertical_hd
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\assets\watermarks_vertical_hd
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\watermarks_vertical_hd
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: landscape
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\branding\watermarks\landscape
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\landscape
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: square
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\branding\watermarks\square
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\square
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: vertical
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\branding\watermarks\vertical
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\vertical
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: vertical_hd
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\branding\watermarks\vertical_hd
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\vertical_hd
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: wtf_mobile_editor
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_mobile_editor
+  template found: no
+  watermark found: yes
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png
+
+Brand: wtf_mobile_editor-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\.vs\wtf_mobile_editor
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_mobile_editor-2
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\arm64-v8a\CMakeFiles\appmodules.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\arm64-v8a\CMakeFiles\appmodules.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-2
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-3
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\arm64-v8a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-3
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\arm64-v8a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-4
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-5
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\arm64-v8a\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-5
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-6
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\arm64-v8a\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-6
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-7
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\armeabi-v7a\CMakeFiles\appmodules.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-7
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-8
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\armeabi-v7a\CMakeFiles\appmodules.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-8
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-9
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\armeabi-v7a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-9
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-10
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\armeabi-v7a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-10
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-11
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\armeabi-v7a\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-11
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-12
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\armeabi-v7a\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-12
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-13
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86\CMakeFiles\appmodules.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-13
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-14
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86\CMakeFiles\appmodules.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-14
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-15
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-15
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-16
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-16
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-17
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-17
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-18
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-18
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-19
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86_64\CMakeFiles\appmodules.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-19
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-20
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86_64\CMakeFiles\appmodules.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-20
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-21
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86_64\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-21
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-22
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86_64\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-22
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-23
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86_64\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-23
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-24
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\2w6d162m\x86_64\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-24
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_orchestrator-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\6g4l412s\arm64-v8a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_orchestrator-2
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_mobile_editor-3
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\6g4l412s\arm64-v8a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_mobile_editor-3
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_orchestrator-3
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\6g4l412s\arm64-v8a\safeareacontext_autolinked_build\CMakeFiles\react_codegen_safeareacontext.dir\C_\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_orchestrator-3
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_mobile_editor-4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\6g4l412s\arm64-v8a\safeareacontext_autolinked_build\CMakeFiles\react_codegen_safeareacontext.dir\C_\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_mobile_editor-4
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_orchestrator-4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\6g4l412s\armeabi-v7a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_orchestrator-4
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_mobile_editor-5
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\6g4l412s\armeabi-v7a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_mobile_editor-5
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_orchestrator-5
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\6g4l412s\armeabi-v7a\safeareacontext_autolinked_build\CMakeFiles\react_codegen_safeareacontext.dir\C_\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_orchestrator-5
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_mobile_editor-6
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\6g4l412s\armeabi-v7a\safeareacontext_autolinked_build\CMakeFiles\react_codegen_safeareacontext.dir\C_\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_mobile_editor-6
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_orchestrator-6
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\6g4l412s\x86_64\safeareacontext_autolinked_build\CMakeFiles\react_codegen_safeareacontext.dir\C_\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_orchestrator-6
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_mobile_editor-7
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\Debug\6g4l412s\x86_64\safeareacontext_autolinked_build\CMakeFiles\react_codegen_safeareacontext.dir\C_\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_mobile_editor-7
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-25
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3m563v4k\arm64-v8a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-25
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-26
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3m563v4k\arm64-v8a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-26
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-27
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3m563v4k\arm64-v8a\safeareacontext_autolinked_build\CMakeFiles\react_codegen_safeareacontext.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-27
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-28
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3m563v4k\arm64-v8a\safeareacontext_autolinked_build\CMakeFiles\react_codegen_safeareacontext.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-28
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-29
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\arm64-v8a\CMakeFiles\appmodules.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-29
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-30
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\arm64-v8a\CMakeFiles\appmodules.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-30
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-31
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\arm64-v8a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-31
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-32
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\arm64-v8a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-32
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-33
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\arm64-v8a\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-33
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-34
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\arm64-v8a\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-34
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-35
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\armeabi-v7a\CMakeFiles\appmodules.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-35
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-36
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\armeabi-v7a\CMakeFiles\appmodules.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-36
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-37
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\armeabi-v7a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-37
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-38
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\armeabi-v7a\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-38
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-39
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\armeabi-v7a\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-39
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-40
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\armeabi-v7a\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-40
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-41
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86\CMakeFiles\appmodules.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-41
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-42
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86\CMakeFiles\appmodules.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-42
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-43
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-43
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-44
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-44
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-45
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-45
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-46
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-46
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-47
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86_64\CMakeFiles\appmodules.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-47
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-48
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86_64\CMakeFiles\appmodules.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-48
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-49
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86_64\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-49
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-50
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86_64\rnscreens_autolinked_build\CMakeFiles\react_codegen_rnscreens.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-50
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-51
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86_64\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-51
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf-52
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\.cxx\RelWithDebInfo\3o4j5d12\x86_64\rnsvg_autolinked_build\CMakeFiles\react_codegen_rnsvg.dir\C_\wtf\wtf
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf-52
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: drawable-hdpi-v4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\build\intermediates\packaged_res\debug\packageDebugResources\drawable-hdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-hdpi-v4
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-mdpi-v4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\build\intermediates\packaged_res\debug\packageDebugResources\drawable-mdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-mdpi-v4
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xhdpi-v4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\build\intermediates\packaged_res\debug\packageDebugResources\drawable-xhdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xhdpi-v4
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xxhdpi-v4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\build\intermediates\packaged_res\debug\packageDebugResources\drawable-xxhdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xxhdpi-v4
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xxxhdpi-v4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\build\intermediates\packaged_res\debug\packageDebugResources\drawable-xxxhdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xxxhdpi-v4
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-hdpi-v4-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\build\intermediates\packaged_res\release\packageReleaseResources\drawable-hdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-hdpi-v4-2
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-mdpi-v4-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\build\intermediates\packaged_res\release\packageReleaseResources\drawable-mdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-mdpi-v4-2
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xhdpi-v4-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\build\intermediates\packaged_res\release\packageReleaseResources\drawable-xhdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xhdpi-v4-2
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xxhdpi-v4-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\build\intermediates\packaged_res\release\packageReleaseResources\drawable-xxhdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xxhdpi-v4-2
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xxxhdpi-v4-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\build\intermediates\packaged_res\release\packageReleaseResources\drawable-xxxhdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xxxhdpi-v4-2
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-hdpi
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\src\main\res\drawable-hdpi
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-hdpi
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-mdpi
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\src\main\res\drawable-mdpi
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-mdpi
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xhdpi
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\src\main\res\drawable-xhdpi
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xhdpi
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xxhdpi
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\src\main\res\drawable-xxhdpi
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xxhdpi
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xxxhdpi
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\android\app\src\main\res\drawable-xxxhdpi
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xxxhdpi
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: logos-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\assets\Logos
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\logos-2
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: resized_watermarks-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\assets\resized_watermarks
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\resized_watermarks-2
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: watermarks_backup-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\assets\watermarks_backup
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\watermarks_backup-2
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: watermarks_landscape-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\assets\watermarks_landscape
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\watermarks_landscape-2
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: watermarks_square-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\assets\watermarks_square
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\watermarks_square-2
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: watermarks_vertical-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\assets\watermarks_vertical
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\watermarks_vertical-2
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: watermarks_vertical_hd-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\assets\watermarks_vertical_hd
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\watermarks_vertical_hd-2
+  template found: no
+  watermark found: yes
+  logo found: no
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml, watermark.yml
+  missing recommended: template.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, logo.png
+
+Brand: hammerjs
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\@egjs\hammerjs
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\hammerjs
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: assets
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\@jest\reporters\assets
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\assets
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: assets-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\@shopify\react-native-skia\src\skia\__tests__\assets
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\assets-2
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: path
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\@shopify\react-native-skia\src\__tests__\snapshots\path
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\path
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: workflows
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\@ungap\structured-clone\.github\workflows
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\workflows
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: lib
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\@xmldom\xmldom\lib
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\lib
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: async-limiter
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\async-limiter
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\async-limiter
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: workflows-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\babel-preset-current-node-syntax\.github\workflows
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\workflows-2
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: workflows-3
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\chrome-launcher\.github\workflows
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\workflows-3
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: workflows-4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\chromium-edge-launcher\.github\workflows
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\workflows-4
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: debug
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\compression\node_modules\debug
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\debug
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: concat-map
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\concat-map
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\concat-map
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: debug-2
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\connect\node_modules\debug
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\debug-2
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: dotenv-expand
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\dotenv-expand
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\dotenv-expand
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: exit
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\exit
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\exit
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: drawable-hdpi-v4-3
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\expo\android\build\intermediates\merged_res\release\mergeReleaseResources\drawable-hdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-hdpi-v4-3
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-ldpi-v4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\expo\android\build\intermediates\merged_res\release\mergeReleaseResources\drawable-ldpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-ldpi-v4
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-mdpi-v4-3
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\expo\android\build\intermediates\merged_res\release\mergeReleaseResources\drawable-mdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-mdpi-v4-3
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xhdpi-v4-3
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\expo\android\build\intermediates\merged_res\release\mergeReleaseResources\drawable-xhdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xhdpi-v4-3
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xxhdpi-v4-3
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\expo\android\build\intermediates\merged_res\release\mergeReleaseResources\drawable-xxhdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xxhdpi-v4-3
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: drawable-xxxhdpi-v4-3
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\expo\android\build\intermediates\merged_res\release\mergeReleaseResources\drawable-xxxhdpi-v4
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\drawable-xxxhdpi-v4-3
+  template found: no
+  watermark found: no
+  logo found: yes
+  glitch overlays: 0
+  manifests present: manifest.yml, orientation.yml
+  missing recommended: template.png, watermark.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png
+
+Brand: fast-json-stable-stringify
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\fast-json-stable-stringify
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\fast-json-stable-stringify
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: debug-3
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\finalhandler\node_modules\debug
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\debug-3
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: workflows-5
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\getenv\.github\workflows
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\workflows-5
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: is-arrayish
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\is-arrayish
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\is-arrayish
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: debug-4
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\lighthouse-logger\node_modules\debug
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\debug-4
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: makeerror
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\makeerror
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\makeerror
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: workflows-6
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\plist\.github\workflows
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\workflows-6
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: proxy-from-env
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\proxy-from-env
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\proxy-from-env
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: qrcode-terminal
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\qrcode-terminal
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\qrcode-terminal
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: require-directory
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\require-directory
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\require-directory
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: requireg
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\requireg
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\requireg
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: resolve
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\requireg\node_modules\resolve
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\resolve
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: debug-5
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\send\node_modules\debug
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\debug-5
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: debug-6
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\serve-static\node_modules\debug
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\debug-6
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: stream-buffers
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\stream-buffers
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\stream-buffers
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: walker
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\walker
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\walker
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: xmlbuilder
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_mobile_editor\node_modules\xml2js\node_modules\xmlbuilder
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\xmlbuilder
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: orientation.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_orchestrator-7
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_orchestrator
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_orchestrator-7
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: brands.yml, orientation.yml, platforms.yml, routing.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: wtf_orchestrator-8
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_orchestrator\wtf_orchestrator
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\wtf_orchestrator-8
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: brands.yml, orientation.yml, platforms.yml, routing.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+
+Brand: config
+  Source: C:\Users\Jamie\OneDrive\Desktop\WTF_Orchestrator\wtf_orchestrator\wtf_orchestrator\config
+  Destination: C:\Users\Jamie\OneDrive\Desktop\watchthefall_orchestrator_v2\imports\brands\config
+  template found: no
+  watermark found: no
+  logo found: no
+  glitch overlays: 0
+  manifests present: brands.yml, orientation.yml, platforms.yml, routing.yml
+  missing recommended: template.png, watermark.png, logo.png
+  suspicious files: none
+  errors: none
+  ⚠ WARNING: Missing template.png, watermark.png, logo.png
+  ⚠ NEEDS REVIEW: No assets found
+[/ASSET_IMPORT_SUMMARY]

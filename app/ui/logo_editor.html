@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WTF Logo Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        #editorContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #videoPreview {
+            position: absolute;
+            max-width: 100%;
+            max-height: 100%;
+            pointer-events: none;
+        }
+        
+        #logoElement {
+            position: absolute;
+            touch-action: none;
+            cursor: move;
+            z-index: 10;
+        }
+        
+        .safeZone {
+            position: absolute;
+            border: 1px dashed rgba(255, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        #controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            z-index: 100;
+        }
+        
+        .confirmBtn {
+            width: 100%;
+            padding: 15px;
+            background: #00ff00;
+            border: none;
+            color: #000;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        #info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        Pinch logo to resize • Drag to position<br>
+        <span id="logoInfo">Size: 15%</span>
+    </div>
+    
+    <div id="editorContainer">
+        <video id="videoPreview" muted playsinline loop></video>
+        <img id="logoElement" src="/api/logo/preview" alt="Logo">
+        <div class="safeZone" id="safeZone"></div>
+    </div>
+    
+    <div id="controls">
+        <button class="confirmBtn" onclick="confirmLogo()">Confirm Logo Position</button>
+    </div>
+    
+    <script>
+        // Logo editor with pinch-to-resize and drag support
+        const video = document.getElementById('videoPreview');
+        const logo = document.getElementById('logoElement');
+        const safeZone = document.getElementById('safeZone');
+        const logoInfo = document.getElementById('logoInfo');
+        
+        const SAFE_ZONE_PERCENT = 0.05;
+        
+        let logoScale = 0.15;
+        let logoX = 0;
+        let logoY = 0;
+        
+        let initialDistance = 0;
+        let initialLogoScale = 0.15;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+        
+        // Load video
+        video.src = '/api/cropped_video';
+        video.play().catch(() => {});
+        
+        // Initialize logo position
+        function initializeLogo() {
+            const container = document.getElementById('editorContainer');
+            const containerW = container.clientWidth;
+            const containerH = container.clientHeight;
+            
+            // Calculate safe zone
+            const safeMargin = containerW * SAFE_ZONE_PERCENT;
+            safeZone.style.left = safeMargin + 'px';
+            safeZone.style.top = safeMargin + 'px';
+            safeZone.style.width = (containerW - 2 * safeMargin) + 'px';
+            safeZone.style.height = (containerH - 2 * safeMargin) + 'px';
+            
+            // Position logo top-left in safe zone
+            logoX = safeMargin;
+            logoY = safeMargin;
+            
+            updateLogo();
+        }
+        
+        function updateLogo() {
+            const container = document.getElementById('editorContainer');
+            const containerW = container.clientWidth;
+            
+            const logoSize = containerW * logoScale;
+            logo.style.width = logoSize + 'px';
+            logo.style.height = logoSize + 'px';
+            logo.style.left = logoX + 'px';
+            logo.style.top = logoY + 'px';
+            
+            logoInfo.textContent = `Size: ${Math.round(logoScale * 100)}%`;
+        }
+        
+        function enforceSafeZones() {
+            const container = document.getElementById('editorContainer');
+            const containerW = container.clientWidth;
+            const containerH = container.clientHeight;
+            
+            const safeMargin = containerW * SAFE_ZONE_PERCENT;
+            const logoSize = containerW * logoScale;
+            
+            logoX = Math.max(safeMargin, Math.min(logoX, containerW - safeMargin - logoSize));
+            logoY = Math.max(safeMargin, Math.min(logoY, containerH - safeMargin - logoSize));
+        }
+        
+        // Touch gestures on logo
+        function getDistance(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        logo.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 2) {
+                // Pinch start
+                initialDistance = getDistance(e.touches);
+                initialLogoScale = logoScale;
+            } else if (e.touches.length === 1) {
+                // Drag start
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+            }
+        });
+        
+        logo.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            if (e.touches.length === 2) {
+                // Pinch resize
+                const currentDistance = getDistance(e.touches);
+                logoScale = initialLogoScale * (currentDistance / initialDistance);
+                logoScale = Math.max(0.1, Math.min(0.3, logoScale)); // Clamp 10-30%
+                
+            } else if (e.touches.length === 1) {
+                // Drag
+                const dx = e.touches[0].clientX - lastTouchX;
+                const dy = e.touches[0].clientY - lastTouchY;
+                
+                logoX += dx;
+                logoY += dy;
+                
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+            }
+            
+            enforceSafeZones();
+            updateLogo();
+        });
+        
+        // Confirm logo position
+        function confirmLogo() {
+            const container = document.getElementById('editorContainer');
+            const containerW = container.clientWidth;
+            
+            const logoData = {
+                x: logoX,
+                y: logoY,
+                scale: logoScale,
+                width: containerW * logoScale,
+                height: containerW * logoScale,
+                timestamp: Date.now()
+            };
+            
+            // Send to server
+            fetch('/api/logo/confirm', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(logoData)
+            }).then(() => {
+                alert('Logo confirmed! Proceeding to export...');
+                window.location.href = '/export';
+            });
+        }
+        
+        // Initialize
+        video.addEventListener('loadedmetadata', initializeLogo);
+        window.addEventListener('resize', () => {
+            initializeLogo();
+            updateLogo();
+        });
+        initializeLogo();
+    </script>
+</body>
+</html>

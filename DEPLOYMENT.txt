@@ -1,0 +1,196 @@
+# WatchTheFall Portal - Deployment Guide
+
+## ✅ PORTAL IS RUNNING LOCALLY
+
+**Access the portal:**
+- Dashboard: http://localhost:5000/portal/
+- Test endpoint: http://localhost:5000/portal/test
+
+## 📦 What Was Built
+
+### Backend (Flask API)
+- **Upload endpoint**: `/api/videos/upload` - Upload MP4/MOV/AVI files
+- **Process endpoint**: `/api/videos/process` - Apply WTF templates
+- **Status endpoint**: `/api/videos/status/<job_id>` - Check job status
+- **Download endpoint**: `/api/videos/download/<filename>` - Download processed videos
+- **Templates endpoint**: `/api/templates` - List available brands (25 templates)
+- **Logs endpoint**: `/api/system/logs` - System event logs
+- **Queue endpoint**: `/api/system/queue` - Job queue status
+
+### Stub Endpoints (Future Features)
+- `/api/videos/post` - Auto-post to social media
+- `/api/store/sync` - Store synchronization
+- `/api/store/list` - List store products
+- `/api/agent/ping` - Agent system heartbeat
+- `/api/hook/repurpose` - Content repurposing
+
+### Frontend Dashboard
+- Mobile-first responsive design
+- Noir aesthetic (dark theme)
+- Upload zone with drag-and-drop
+- Template selector (25 WTF brands)
+- Aspect ratio selector (9:16, 1:1, 16:9)
+- Real-time job status
+- Recent jobs viewer
+- System logs viewer
+- Auto-refresh
+
+### Database (SQLite)
+- Jobs tracking
+- Event logging
+- Processing queue
+- Store sync metadata (stub)
+
+### File Structure
+```
+portal/
+├── app.py              - Flask application
+├── config.py           - Configuration
+├── database.py         - Database models
+├── processor.py        - Video processing engine
+├── __init__.py         - Package init
+├── templates/
+│   └── dashboard.html  - Main UI
+├── db/
+│   └── portal.db       - SQLite database
+├── uploads/            - Uploaded videos
+├── outputs/            - Processed videos
+├── logs/               - System logs
+└── temp/               - Temporary files
+```
+
+## 🚀 Deployment to watchthefall.com/portal
+
+### Requirements on Production Server
+1. Python 3.8+
+2. FFmpeg installed and in PATH
+3. Write permissions to /tmp or temp directory
+4. At least 2GB free disk space
+
+### Deployment Steps
+
+#### Option 1: Manual Upload (FTP/SFTP)
+1. Upload entire `portal/` directory to server
+2. Upload `run_portal.py` to server root
+3. Install requirements: `pip install -r requirements.txt`
+4. Set environment variables:
+   ```bash
+   export WTF_PORTAL_KEY="your-secret-key-here"
+   export FFMPEG_PATH="/usr/bin/ffmpeg"  # if not in PATH
+   ```
+5. Run with production WSGI server:
+   ```bash
+   gunicorn -w 4 -b 0.0.0.0:5000 portal.app:app
+   ```
+
+#### Option 2: With Web Server (Nginx/Apache)
+Configure reverse proxy to route `/portal` to Flask app:
+
+**Nginx example:**
+```nginx
+location /portal {
+    proxy_pass http://localhost:5000/portal;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+}
+
+location /api {
+    proxy_pass http://localhost:5000/api;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+}
+```
+
+#### Option 3: Using systemd (Linux)
+Create `/etc/systemd/system/wtf-portal.service`:
+```ini
+[Unit]
+Description=WatchTheFall Portal
+After=network.target
+
+[Service]
+User=www-data
+WorkingDirectory=/path/to/watchthefall_orchestrator_v2
+Environment="WTF_PORTAL_KEY=your-secret-key"
+ExecStart=/usr/bin/gunicorn -w 4 -b 127.0.0.1:5000 portal.app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then:
+```bash
+sudo systemctl enable wtf-portal
+sudo systemctl start wtf-portal
+```
+
+### Production Checklist
+- [ ] Change `WTF_PORTAL_KEY` from default
+- [ ] Set `WTF_SECRET_KEY` for Flask sessions
+- [ ] Configure max upload size in web server
+- [ ] Set up log rotation for `portal/logs/`
+- [ ] Configure automatic temp file cleanup
+- [ ] Test FFmpeg is accessible
+- [ ] Verify write permissions on upload/output directories
+- [ ] Set up SSL/HTTPS
+- [ ] Configure firewall rules
+- [ ] Set up monitoring/alerts
+
+### Security Notes
+- Authentication currently uses shared key: `WTF_PORTAL_KEY`
+- Update this in production via environment variable
+- Consider upgrading to JWT authentication later
+- Restrict upload file types and sizes
+- Sanitize all user inputs
+- Rate limit API endpoints
+
+### Testing Deployment
+Once deployed, test with:
+```bash
+curl https://watchthefall.com/portal/test
+```
+
+Expected response:
+```json
+{
+  "status": "online",
+  "message": "WatchTheFall Portal is running",
+  "endpoints": [...]
+}
+```
+
+## 📊 Current Status
+
+✅ Portal running locally at http://localhost:5000/portal/
+✅ All API endpoints functional
+✅ Database initialized
+✅ 25 brand templates loaded
+✅ Video processing engine ready
+✅ Frontend dashboard operational
+✅ Logging system active
+✅ Queue system implemented
+✅ Stub endpoints for future features
+
+## 🎯 Next Steps
+
+1. **Test the portal locally**
+   - Upload a test video
+   - Process with different templates
+   - Verify download works
+   
+2. **Deploy to production**
+   - Follow deployment steps above
+   - Configure production settings
+   - Test remote access
+
+3. **Future enhancements** (stubs already in place)
+   - Social media auto-posting
+   - Store synchronization
+   - Agent automation system
+   - Scheduling system
+   - Live log streaming
+
+---
+
+**Portal online and ready for deployment to https://watchthefall.com/portal/**
