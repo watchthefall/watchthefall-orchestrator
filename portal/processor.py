@@ -59,6 +59,7 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
             target_h = 1920
         
         # ULTRA-LOW MEMORY FFmpeg command for Render free tier
+        # Using MPEG4 encoder (always available, no libx264 dependency)
         ffmpeg_cmd = [
             FFMPEG_BIN,
             "-y",
@@ -70,8 +71,8 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
             "-max_muxing_queue_size", "256",
             "-i", video_path,
             "-vf", f"scale=-2:{target_h}",
-            "-preset", "superfast",             # Fastest encoding
-            "-crf", "28",                       # Lower quality but MUCH lower RAM
+            "-c:v", "mpeg4",                    # Use mpeg4 (universally available, no x264 needed)
+            "-qscale:v", "5",                   # Quality scale for mpeg4 (2-31, lower=better)
             "-movflags", "+faststart",          # Make MP4 playable immediately
             output_path
         ]
