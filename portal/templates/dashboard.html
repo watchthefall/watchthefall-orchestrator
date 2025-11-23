@@ -371,7 +371,16 @@
             </div>
             
             <p style="color:#888; font-size:14px; margin-bottom:15px;">Choose up to 10 brands to watermark this video. Each will be downloaded separately.</p>
-            <p style="color:#ff6600; font-size:13px; margin-bottom:15px; font-weight:600;">⚠️ Server Limit: Process 1-2 brands at a time to avoid crashes (Render free tier has limited memory)</p>
+            <p style="color:#0f0; font-size:13px; margin-bottom:15px; font-weight:600;">✅ Smart Processing: Server handles one conversion at a time to ensure stability</p>
+            
+            <!-- Auto Download Toggle -->
+            <div style="margin-bottom:15px; padding:10px; background:rgba(0,255,0,0.05); border:1px solid #333; border-radius:6px;">
+                <label style="color:#aaa; font-size:13px; display:flex; align-items:center; cursor:pointer;">
+                    <input type="checkbox" id="autoDownloadToggleModal" style="margin-right:8px;">
+                    <span>📥 Auto-download videos when ready (may be blocked by browser)</span>
+                </label>
+                <div style="color:#666; font-size:11px; margin-top:4px;">💡 Tip: Manual download buttons shown for all videos</div>
+            </div>
             
             <!-- Quality Preset Selector -->
             <div style="margin-bottom:15px; padding:10px; background:rgba(0,255,0,0.05); border:1px solid #333; border-radius:6px;">
@@ -490,6 +499,74 @@
                 }
             } catch (e) {
                 alert('Share failed: ' + e.message);
+            }
+        }
+        
+        // Download video with fetch-to-blob for reliability (cross-browser compatible)
+        async function downloadVideo(url, filename, buttonIndex) {
+            const button = document.getElementById(`dlBtn${buttonIndex}`);
+            const originalText = button ? button.innerHTML : '';
+            
+            try {
+                if (button) {
+                    button.disabled = true;
+                    button.innerHTML = '⏳ Downloading...';
+                    button.style.background = '#666';
+                }
+                
+                console.log('[DOWNLOAD] Fetching blob for:', filename);
+                
+                // Fetch the video as a blob
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const blob = await response.blob();
+                console.log('[DOWNLOAD] Blob fetched:', blob.size, 'bytes');
+                
+                // Create a temporary blob URL
+                const blobUrl = URL.createObjectURL(blob);
+                
+                // Create download link and trigger it
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(blobUrl);
+                }, 100);
+                
+                if (button) {
+                    button.innerHTML = '✓ Downloaded!';
+                    button.style.background = '#0a0';
+                    setTimeout(() => {
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                        button.style.background = '#00aa00';
+                    }, 2000);
+                }
+                
+                console.log('[DOWNLOAD] Download triggered for:', filename);
+                
+            } catch (err) {
+                console.error('[DOWNLOAD ERROR]:', err);
+                
+                if (button) {
+                    button.innerHTML = '❌ Failed - Try Again';
+                    button.style.background = '#a00';
+                    setTimeout(() => {
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                        button.style.background = '#00aa00';
+                    }, 3000);
+                }
+                
+                // Fallback: try direct link open
+                console.log('[DOWNLOAD] Fetch failed, trying direct link...');
+                window.open(url, '_blank');
             }
         }
         
@@ -845,38 +922,133 @@
                 alert('Failed to load brand list. Please refresh the page.');
             });
         
-        // Modal Generate button handler
+        // Modal Generate button handler - sequential processing with retry logic
         document.getElementById('modalGenerateBtn').addEventListener('click', async () => {
             const selected = Array.from(document.querySelectorAll('.modal-brand-check:checked'));
             if (!pendingVideoBlob || !selected.length) return;
             
             const statusDiv = document.getElementById('modalStatus');
             const preset = getQualityPreset();
+            const autoDownload = document.getElementById('autoDownloadToggleModal')?.checked || false;
             
-            // Show initial status with quality info
+            // Show initial status
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const deviceInfo = `📱 Device: ${isMobile ? 'Mobile' : 'Desktop'}<br>🌐 Browser: ${navigator.userAgent.split(' ').slice(-2).join(' ')}<br>⚡ Quality: ${preset.name} (${preset.width}x${preset.height}, ${preset.fps}fps)`;
-            statusDiv.innerHTML = `<div class="status processing">⏳ Initializing...<br><small style="color:#888;">${deviceInfo}</small></div>`;
+            statusDiv.innerHTML = `<div class="status processing">⏳ Initializing processing...<br><small style="color:#888;">⚡ Quality: ${preset.name} (${preset.width}x${preset.height}, ${preset.fps}fps) | ${selected.length} brands selected</small></div>`;
             document.getElementById('modalGenerateBtn').disabled = true;
             
             const results = [];
+            const totalBrands = selected.length;
             
-            for (let i = 0; i < selected.length; i++) {
+            // Helper: Upload and convert with async job polling (non-blocking)
+            async function uploadAndConvert(watermarkedBlob, brandName, index, retryCount = 0) {
+                const webmFilename = `${brandName}_${pendingVideoFilename.replace(/\.[^/.]+$/, '')}.webm`;
+                const formData = new FormData();
+                formData.append('video', watermarkedBlob, webmFilename);
+                
+                const xhr = new XMLHttpRequest();
+                
+                // Upload progress tracking
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        const uploadBar = document.getElementById(`uploadBar${index}`);
+                        const uploadText = document.getElementById(`uploadText${index}`);
+                        if (uploadBar) uploadBar.style.width = `${percent}%`;
+                        if (uploadText) uploadText.textContent = `Stage 2/4: Uploading ${percent}%`;
+                    }
+                });
+                
+                return new Promise(async (resolve, reject) => {
+                    xhr.open('POST', '/api/videos/convert-watermark');
+                    
+                    xhr.onload = async () => {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                // Job queued - start polling for status
+                                const jobId = response.job_id;
+                                console.log(`[CONVERT] Job ${jobId.substr(0,8)} queued for ${brandName}`);
+                                
+                                statusDiv.innerHTML = `<div class="status processing">⚙️ Converting ${index + 1}/${totalBrands}: <strong>${brandName}</strong>...<br><small style="color:#888;">Stage 3/4: FFmpeg processing (this may take a minute)...</small></div>`;
+                                
+                                // Poll job status until complete
+                                const pollInterval = 2000; // 2 seconds
+                                const maxPolls = 90; // 3 minutes max (90 * 2s = 180s)
+                                let pollCount = 0;
+                                
+                                const pollStatus = async () => {
+                                    try {
+                                        const statusResp = await fetch(`/api/videos/convert-status/${jobId}`);
+                                        const statusData = await statusResp.json();
+                                        
+                                        if (statusData.status === 'completed') {
+                                            // Success!
+                                            console.log(`[CONVERT] Job ${jobId.substr(0,8)} completed: ${statusData.filename}`);
+                                            statusDiv.innerHTML = `<div class="status processing">✅ Converted ${index + 1}/${totalBrands}: <strong>${brandName}</strong> to MP4<br><small style="color:#0f0;">Stage 4/4: Ready for download (${statusData.size_mb}MB)</small></div>`;
+                                            resolve({
+                                                success: true,
+                                                brandName,
+                                                url: statusData.download_url,
+                                                filename: statusData.filename,
+                                                size_mb: statusData.size_mb,
+                                                conversion_time: statusData.conversion_time
+                                            });
+                                        } else if (statusData.status === 'failed') {
+                                            // Failed
+                                            console.error(`[CONVERT] Job ${jobId.substr(0,8)} failed:`, statusData.error);
+                                            const errorMsg = statusData.stderr_preview || statusData.error || 'Unknown error';
+                                            reject(new Error(`Conversion failed: ${errorMsg}`));
+                                        } else if (statusData.status === 'processing' || statusData.status === 'queued') {
+                                            // Still processing - poll again
+                                            pollCount++;
+                                            if (pollCount >= maxPolls) {
+                                                reject(new Error('Conversion timeout (>3min)'));
+                                            } else {
+                                                const elapsed = Math.floor(pollCount * pollInterval / 1000);
+                                                statusDiv.innerHTML = `<div class="status processing">⚙️ Converting ${index + 1}/${totalBrands}: <strong>${brandName}</strong>...<br><small style="color:#888;">Stage 3/4: ${statusData.message || 'Processing'} (${elapsed}s elapsed)</small></div>`;
+                                                setTimeout(pollStatus, pollInterval);
+                                            }
+                                        } else {
+                                            reject(new Error(`Unknown status: ${statusData.status}`));
+                                        }
+                                    } catch (pollError) {
+                                        reject(new Error(`Polling error: ${pollError.message}`));
+                                    }
+                                };
+                                
+                                // Start polling immediately
+                                setTimeout(pollStatus, 1000); // Wait 1s before first poll
+                                
+                            } else {
+                                reject(new Error(`HTTP ${xhr.status}: ${response.message || response.error || 'Unknown error'}`));
+                            }
+                        } catch (parseError) {
+                            reject(new Error(`Failed to parse server response: ${parseError.message}`));
+                        }
+                    };
+                    
+                    xhr.onerror = () => reject(new Error('Network error during upload'));
+                    xhr.send(formData);
+                });
+            }
+            
+            // Process brands in batches
+            for (let i = 0; i < totalBrands; i++) {
                 const brandName = selected[i].value;
                 const watermarkFile = selected[i].getAttribute('data-file');
                 
-                // Update progress state
-                currentModalProgress = { current: i + 1, total: selected.length, brandName, percent: 0 };
+                currentModalProgress = { current: i + 1, total: totalBrands, brandName, percent: 0 };
                 
                 try {
-                    // Progress bar
+                    // Stage 1: Watermark rendering
                     const progressHTML = `
                         <div class="status processing">
-                            ⏳ Processing ${i+1}/${selected.length}: <strong>${brandName}</strong><br>
-                            <div style="background:#333; border-radius:4px; overflow:hidden; height:8px; margin-top:6px;">
-                                <div id="progressBar${i}" style="background:#0f0; height:100%; width:0%; transition:width 0.3s;"></div>
+                            ⏳ Processing ${i + 1}/${totalBrands}: <strong>${brandName}</strong><br>
+                            <div style="background:#333; border-radius:4px; overflow:hidden; height:10px; margin:8px 0;">
+                                <div id="progressBar${i}" style="background:linear-gradient(90deg, #0f0, #0aa); height:100%; width:0%; transition:width 0.3s;"></div>
                             </div>
-                            <small id="progressText${i}" style="color:#888;">Starting...</small>
+                            <small id="progressText${i}" style="color:#888; display:block; margin-top:4px;">Stage 1/4: Applying watermark...</small>
                         </div>
                     `;
                     statusDiv.innerHTML = progressHTML;
@@ -884,110 +1056,74 @@
                     
                     const videoFile = new File([pendingVideoBlob], pendingVideoFilename, { type: pendingVideoBlob.type });
                     const watermarkedBlob = await applyWatermarkToVideo(videoFile, watermarkFile, brandName, (progress) => {
-                        // Update progress bar
                         const bar = document.getElementById(`progressBar${i}`);
                         const text = document.getElementById(`progressText${i}`);
                         if (bar) bar.style.width = `${progress}%`;
-                        if (text) text.textContent = `${progress}% complete`;
-                        
-                        // Update minimized bar
+                        if (text) text.textContent = `Stage 1/4: Watermark ${progress}% complete`;
                         currentModalProgress.percent = progress;
                         updateMinimizedBar();
                     });
                     
-                    // Upload WebM to server for MP4 conversion
-                    statusDiv.innerHTML = `<div class="status processing">⏳ Uploading ${i+1}/${selected.length}: <strong>${brandName}</strong>...<br><div style="background:#333; border-radius:4px; overflow:hidden; height:8px; margin-top:6px;"><div id="uploadBar${i}" style="background:#0f0; height:100%; width:0%; transition:width 0.3s;"></div></div><small id="uploadText${i}" style="color:#888;">Preparing upload...</small></div>`;
+                    // Stage 2: Upload
+                    statusDiv.innerHTML = `<div class="status processing">📤 Uploading ${i + 1}/${totalBrands}: <strong>${brandName}</strong>...<br><div style="background:#333; border-radius:4px; overflow:hidden; height:10px; margin:8px 0;"><div id="uploadBar${i}" style="background:linear-gradient(90deg, #0ff, #08f); height:100%; width:0%; transition:width 0.3s;"></div></div><small id="uploadText${i}" style="color:#888; display:block; margin-top:4px;">Stage 2/4: Preparing upload...</small></div>`;
                     updateMinimizedBar();
                     
-                    const webmFilename = `${brandName}_${pendingVideoFilename.replace(/\.[^/.]+$/, '')}.webm`;
-                    const formData = new FormData();
-                    formData.append('video', watermarkedBlob, webmFilename);
+                    // Stage 3 & 4: Convert (with retry and busy-wait)
+                    const result = await uploadAndConvert(watermarkedBlob, brandName, i);
                     
-                    // Track upload progress
-                    const xhr = new XMLHttpRequest();
-                    
-                    xhr.upload.addEventListener('progress', (e) => {
-                        if (e.lengthComputable) {
-                            const percent = Math.round((e.loaded / e.total) * 100);
-                            const uploadBar = document.getElementById(`uploadBar${i}`);
-                            const uploadText = document.getElementById(`uploadText${i}`);
-                            if (uploadBar) uploadBar.style.width = `${percent}%`;
-                            if (uploadText) uploadText.textContent = `Uploading: ${percent}%`;
-                        }
-                    });
-                    
-                    // Fetch conversion response
-                    const convertResponse = await new Promise((resolve, reject) => {
-                        xhr.open('POST', '/api/videos/convert-watermark');
-                        
-                        xhr.onload = () => {
-                            if (xhr.status >= 200 && xhr.status < 300) {
-                                // Update status to converting
-                                statusDiv.innerHTML = `<div class="status processing">⚙️ Converting ${i+1}/${selected.length}: <strong>${brandName}</strong> to MP4...<br><small style="color:#888;">Server is processing (H.264 encoding)...</small></div>`;
-                                updateMinimizedBar();
-                                resolve({
-                                    ok: true,
-                                    json: async () => JSON.parse(xhr.responseText)
-                                });
-                            } else {
-                                reject(new Error(`Upload failed: ${xhr.status}`));
-                            }
-                        };
-                        
-                        xhr.onerror = () => reject(new Error('Upload failed'));
-                        xhr.send(formData);
-                    });
-                    
-                    if (!convertResponse.ok) {
-                        const errorData = await convertResponse.json();
-                        throw new Error(errorData.error || 'Conversion failed');
-                    }
-                    
-                    const convertResult = await convertResponse.json();
-                    const url = convertResult.download_url;
-                    const filename = convertResult.filename;
-                    
-                    results.push({ brandName, url, filename, size_mb: convertResult.size_mb });
-                    
-                    // Save to history
-                    saveHistoryEntry({ type: 'watermark', name: filename, url, size_mb: convertResult.size_mb });
+                    results.push(result);
+                    saveHistoryEntry({ type: 'watermark', name: result.filename, url: result.url, size_mb: result.size_mb });
                     
                 } catch (err) {
                     console.error(`[WATERMARK ERROR] ${brandName}:`, err);
                     
-                    // Check if it's a server error (500/502)
-                    const isServerError = err.message.includes('500') || err.message.includes('502') || err.message.includes('Upload failed');
-                    const errorMsg = isServerError 
-                        ? `Server overload (Render free tier ran out of memory). Try processing fewer brands at once (1-2 max), or use shorter videos (<15 seconds).`
-                        : err.message || err;
+                    const is429 = err.message.includes('busy') || err.message.includes('429');
+                    const is50x = err.message.includes('500') || err.message.includes('502') || err.message.includes('Server error');
                     
-                    // Show error on screen with full details
+                    let errorMsg = err.message || String(err);
+                    if (is429) {
+                        errorMsg = 'Server was too busy after multiple retries. Try again in a moment.';
+                    } else if (is50x) {
+                        errorMsg = 'Server overload or crash. Try shorter videos or wait for server to restart.';
+                    }
+                    
                     results.push({ 
                         brandName, 
                         error: errorMsg,
-                        errorDetails: `🚫 ${err.name || 'Error'}: ${errorMsg}<br><small style="color:#888;">${isServerError ? 'Tip: Process 1-2 brands at a time to avoid crashes' : err.stack ? err.stack.split('\n')[0] : ''}</small>`
+                        errorDetails: `🚫 ${err.name || 'Error'}: ${errorMsg}<br><small style="color:#888;">${is429 || is50x ? 'Skipped this brand - continuing with others' : err.stack ? err.stack.split('\n')[0] : ''}</small>`
                     });
                 }
             }
             
-            // Show results
-            const successCount = results.filter(r => !r.error).length;
-            const items = results.map(r => {
+            // Show final results
+            const successCount = results.filter(r => r.success).length;
+            const failedCount = results.filter(r => r.error).length;
+            const items = results.map((r, idx) => {
                 if (r.error) {
                     return `<div class="watermark-result" style="border-left-color:#ff5555; padding:15px;">✗ <strong>${r.brandName}</strong><br>${r.errorDetails || r.error}</div>`;
                 }
-                return `<div class="watermark-result">✓ <strong>${r.brandName}</strong> (${r.size_mb}MB)<br><a href="${r.url}" download="${r.filename}" style="display:inline-block; margin-top:8px; padding:8px 16px; background:#00aa00; color:#000; text-decoration:none; border-radius:6px; font-weight:600;">📥 Download ${r.filename}</a></div>`;
+                return `<div class="watermark-result">✓ <strong>${r.brandName}</strong> (${r.size_mb}MB, ${r.conversion_time}s)<br><button onclick="downloadVideo('${r.url}', '${r.filename}', ${idx})" id="dlBtn${idx}" style="display:inline-block; margin-top:8px; padding:10px 18px; background:#00aa00; color:#000; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:14px;">📥 Download ${r.filename}</button></div>`;
             }).join('');
             
-            statusDiv.innerHTML = `<div class="status completed">✓ Generated ${successCount}/${results.length} watermarked videos<br><small style="color:#0f0; margin-top:8px; display:block; font-weight:600;">👇 Click each link below to download:</small></div>${items}`;
+            const summaryColor = failedCount === 0 ? '#0f0' : (successCount > 0 ? '#ff6600' : '#ff5555');
+            statusDiv.innerHTML = `<div class="status completed">✓ Complete: ${successCount} successful, ${failedCount} failed<br><small style="color:${summaryColor}; margin-top:8px; display:block; font-weight:600;">👇 Click each button below to download:</small></div>${items}`;
             
-            // Reset progress and update minimized bar
+            // Auto-download if enabled
+            if (autoDownload && successCount > 0) {
+                console.log('[AUTO-DOWNLOAD] Starting auto-download for', successCount, 'videos');
+                for (let idx = 0; idx < results.length; idx++) {
+                    if (results[idx].success) {
+                        // Small delay between downloads to avoid browser blocking
+                        await new Promise(r => setTimeout(r, 500));
+                        downloadVideo(results[idx].url, results[idx].filename, idx);
+                    }
+                }
+            }
+            
             currentModalProgress = { current: 0, total: 0, brandName: '', percent: 0 };
             updateMinimizedBar();
             
-            // Don't auto-download or auto-close - let user click download buttons manually
-            // Auto-download disabled for PC compatibility - use manual download links
-            console.log(`[DOWNLOAD] ${successCount} videos ready. User can click download links.`);
+            console.log(`[BATCH COMPLETE] ${successCount}/${totalBrands} brands successful`);
             
             renderHistory();
             document.getElementById('modalGenerateBtn').disabled = false;

@@ -7,6 +7,8 @@ import uuid
 from werkzeug.utils import secure_filename
 import subprocess
 import tempfile
+import threading
+import time
 try:
     from yt_dlp import YoutubeDL
 except ImportError:
@@ -24,6 +26,13 @@ app = Flask(__name__,
             static_url_path='/portal/static')
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_SIZE
+
+# Global conversion lock - only one FFmpeg process at a time (Render free tier 512MB RAM)
+conversion_lock = threading.Lock()
+conversion_in_progress = {'active': False, 'start_time': None}
+
+# Job status dictionary for async watermark conversions
+watermark_jobs = {}
 
 # ============================================================================
 # FRONTEND ROUTES
@@ -44,7 +53,8 @@ def test_page():
             '/portal/',
             '/api/videos/fetch',
             '/api/videos/download/<filename>',
-            '/api/videos/convert-watermark'
+            '/api/videos/convert-watermark',
+            '/api/videos/convert-status/<job_id>'
         ]
     })
 
@@ -185,19 +195,22 @@ def download_video(filename):
 
 @app.route('/api/videos/convert-watermark', methods=['POST'])
 def convert_watermark():
-    """Convert client-side watermarked WebM video to MP4 for Instagram compatibility"""
+    """Queue a watermark conversion job (async, non-blocking)"""
     try:
         if 'video' not in request.files:
-            return jsonify({'error': 'No video file provided'}), 400
+            return jsonify({'error': 'No video file provided', 'reason': 'no_file'}), 400
         
         file = request.files['video']
         
         if file.filename == '':
-            return jsonify({'error': 'Empty filename'}), 400
+            return jsonify({'error': 'Empty filename', 'reason': 'empty_filename'}), 400
+        
+        # Generate job ID
+        job_id = uuid.uuid4().hex
         
         # Save WebM file temporarily
         webm_filename = secure_filename(file.filename)
-        temp_webm = os.path.join(tempfile.gettempdir(), f"{uuid.uuid4().hex}_{webm_filename}")
+        temp_webm = os.path.join(tempfile.gettempdir(), f"{job_id}_{webm_filename}")
         file.save(temp_webm)
         
         # Generate output MP4 filename
@@ -207,26 +220,69 @@ def convert_watermark():
         
         output_path = os.path.join(OUTPUT_DIR, mp4_filename)
         
-        print(f"[CONVERT] Converting {webm_filename} to MP4...")
-        log_event('info', None, f'Converting watermarked video: {webm_filename}')
+        # Initialize job status
+        watermark_jobs[job_id] = {
+            'status': 'queued',
+            'filename': mp4_filename,
+            'webm_path': temp_webm,
+            'output_path': output_path,
+            'created_at': time.time(),
+            'message': 'Waiting for conversion worker...'
+        }
         
-        # FFmpeg command: Convert WebM to MP4 with H.264 codec (Instagram compatible)
-        # -c:v libx264: H.264 video codec
-        # -preset fast: Encoding speed
-        # -crf 23: Quality (18-28, lower = better quality)
-        # -profile:v baseline: Compatibility profile for all devices
-        # -level 3.0: H.264 level for mobile compatibility
-        # -pix_fmt yuv420p: Pixel format (required for compatibility)
-        # -c:a aac: AAC audio codec
-        # -b:a 128k: Audio bitrate
-        # -ar 44100: Audio sample rate
-        # -movflags +faststart: Optimize for web streaming
-        # -max_muxing_queue_size 1024: Prevent muxing errors
+        print(f"[CONVERT] Job {job_id[:8]} queued: {webm_filename} → {mp4_filename}")
+        log_event('info', None, f'Watermark conversion queued: {job_id[:8]} - {webm_filename}')
+        
+        # Start background conversion thread
+        thread = threading.Thread(
+            target=_watermark_conversion_worker,
+            args=(job_id, temp_webm, output_path, mp4_filename),
+            daemon=True
+        )
+        thread.start()
+        
+        # Return immediately with job ID
+        return jsonify({
+            'success': True,
+            'job_id': job_id,
+            'status': 'queued',
+            'filename': mp4_filename,
+            'message': 'Conversion job queued. Poll /api/videos/convert-status/<job_id> for progress.'
+        })
+        
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"[CONVERT QUEUE EXCEPTION]: {error_trace}")
+        log_event('error', None, f'Conversion queue error: {str(e)}')
+        return jsonify({
+            'error': str(e),
+            'reason': 'exception',
+            'message': f'Failed to queue conversion: {str(e)}'
+        }), 500
+
+
+def _watermark_conversion_worker(job_id, temp_webm, output_path, mp4_filename):
+    """Background worker for FFmpeg watermark conversion (runs in separate thread)"""
+    try:
+        # Update status to processing
+        watermark_jobs[job_id]['status'] = 'processing'
+        watermark_jobs[job_id]['message'] = 'Converting WebM to MP4...'
+        watermark_jobs[job_id]['started_at'] = time.time()
+        
+        print(f"[CONVERT] Job {job_id[:8]} started: {mp4_filename}")
+        
+        # FFmpeg command: Optimized for Render free tier (512MB RAM)
         cmd = [
             'ffmpeg',
+            '-analyzeduration', '1000000',
+            '-probesize', '1048576',
             '-i', temp_webm,
+            '-map', '0:v:0',
+            '-map', '0:a?',
             '-c:v', 'libx264',
-            '-preset', 'fast',
+            '-preset', 'veryfast',
+            '-threads', '1',
             '-crf', '23',
             '-profile:v', 'baseline',
             '-level', '3.0',
@@ -234,13 +290,15 @@ def convert_watermark():
             '-c:a', 'aac',
             '-b:a', '128k',
             '-ar', '44100',
+            '-shortest',
+            '-fflags', '+genpts',
             '-movflags', '+faststart',
             '-max_muxing_queue_size', '1024',
-            '-y',  # Overwrite output file
+            '-y',
             output_path
         ]
         
-        # Run FFmpeg conversion
+        # Run FFmpeg conversion (background thread won't block Gunicorn worker)
         result = subprocess.run(
             cmd,
             stdout=subprocess.PIPE,
@@ -248,40 +306,101 @@ def convert_watermark():
             timeout=300  # 5 minute timeout
         )
         
-        # Clean up temp file
+        # Clean up temp WebM
         try:
             os.remove(temp_webm)
         except:
             pass
         
         if result.returncode != 0:
-            error_msg = result.stderr.decode('utf-8', errors='ignore')
-            print(f"[CONVERT ERROR] FFmpeg failed: {error_msg}")
-            log_event('error', None, f'Conversion failed: {error_msg[:200]}')
-            return jsonify({'error': f'Conversion failed: {error_msg[:200]}'}), 500
+            stderr_output = result.stderr.decode('utf-8', errors='ignore')
+            error_preview = stderr_output[:500] if len(stderr_output) > 500 else stderr_output
+            print(f"[CONVERT] Job {job_id[:8]} FAILED (exit {result.returncode}): {error_preview}")
+            
+            watermark_jobs[job_id]['status'] = 'failed'
+            watermark_jobs[job_id]['error'] = 'FFmpeg conversion failed'
+            watermark_jobs[job_id]['stderr_preview'] = error_preview
+            watermark_jobs[job_id]['exit_code'] = result.returncode
+            watermark_jobs[job_id]['message'] = 'Video conversion failed. Try a shorter video.'
+            log_event('error', None, f'Conversion {job_id[:8]} failed: {error_preview[:100]}')
+            return
         
-        # Get file size
+        # Success
         file_size_mb = os.path.getsize(output_path) / (1024 * 1024)
+        elapsed = time.time() - watermark_jobs[job_id]['started_at']
         
-        print(f"[CONVERT] Success: {mp4_filename} ({file_size_mb:.2f}MB)")
-        log_event('info', None, f'Conversion complete: {mp4_filename} ({file_size_mb:.2f}MB)')
+        watermark_jobs[job_id]['status'] = 'completed'
+        watermark_jobs[job_id]['download_url'] = f'/api/videos/download/{mp4_filename}'
+        watermark_jobs[job_id]['size_mb'] = round(file_size_mb, 2)
+        watermark_jobs[job_id]['conversion_time'] = round(elapsed, 1)
+        watermark_jobs[job_id]['message'] = 'Video converted to MP4 successfully'
+        watermark_jobs[job_id]['completed_at'] = time.time()
         
-        return jsonify({
-            'success': True,
-            'filename': mp4_filename,
-            'download_url': f'/api/videos/download/{mp4_filename}',
-            'size_mb': round(file_size_mb, 2),
-            'message': 'Video converted to MP4 successfully'
-        })
+        print(f"[CONVERT] Job {job_id[:8]} SUCCESS: {mp4_filename} ({file_size_mb:.2f}MB) in {elapsed:.1f}s")
+        log_event('info', None, f'Conversion {job_id[:8]} complete: {mp4_filename} ({file_size_mb:.2f}MB, {elapsed:.1f}s)')
         
     except subprocess.TimeoutExpired:
-        log_event('error', None, 'Conversion timeout (>5min)')
-        return jsonify({'error': 'Conversion timeout. Video may be too long.'}), 500
+        print(f"[CONVERT] Job {job_id[:8]} TIMEOUT (>5min)")
+        watermark_jobs[job_id]['status'] = 'failed'
+        watermark_jobs[job_id]['error'] = 'Conversion timeout'
+        watermark_jobs[job_id]['message'] = 'Video took too long to convert (>5min). Try a shorter video.'
+        log_event('error', None, f'Conversion {job_id[:8]} timeout')
+        
+        # Clean up
+        try:
+            os.remove(temp_webm)
+        except:
+            pass
+            
     except Exception as e:
         import traceback
-        print(f"[CONVERT EXCEPTION]: {traceback.format_exc()}")
-        log_event('error', None, f'Conversion exception: {str(e)}')
-        return jsonify({'error': str(e)}), 500
+        error_trace = traceback.format_exc()
+        print(f"[CONVERT] Job {job_id[:8]} EXCEPTION: {error_trace}")
+        
+        watermark_jobs[job_id]['status'] = 'failed'
+        watermark_jobs[job_id]['error'] = str(e)
+        watermark_jobs[job_id]['message'] = f'Unexpected error: {str(e)}'
+        log_event('error', None, f'Conversion {job_id[:8]} exception: {str(e)}')
+        
+        # Clean up
+        try:
+            os.remove(temp_webm)
+        except:
+            pass
+
+
+@app.route('/api/videos/convert-status/<job_id>', methods=['GET'])
+def get_conversion_status(job_id):
+    """Poll conversion job status (non-blocking)"""
+    if job_id not in watermark_jobs:
+        return jsonify({
+            'error': 'Job not found',
+            'job_id': job_id,
+            'message': 'Invalid job ID or job expired.'
+        }), 404
+    
+    job = watermark_jobs[job_id]
+    
+    # Build response based on status
+    response = {
+        'job_id': job_id,
+        'status': job['status'],
+        'filename': job['filename'],
+        'message': job.get('message', '')
+    }
+    
+    if job['status'] == 'completed':
+        response['download_url'] = job['download_url']
+        response['size_mb'] = job['size_mb']
+        response['conversion_time'] = job['conversion_time']
+    elif job['status'] == 'failed':
+        response['error'] = job.get('error', 'Unknown error')
+        if 'stderr_preview' in job:
+            response['stderr_preview'] = job['stderr_preview']
+        if 'exit_code' in job:
+            response['exit_code'] = job['exit_code']
+    
+    return jsonify(response)
 
 # Stub endpoints removed - focus on core watermarking functionality
 

@@ -77,8 +77,13 @@ portal/
 
 2. **Start Command**:
    ```bash
-   gunicorn run_portal:app --bind 0.0.0.0:10000
+   gunicorn run_portal:app --bind 0.0.0.0:10000 --timeout 120 --graceful-timeout 120 --workers 1
    ```
+   
+   **Important flags:**
+   - `--timeout 120`: Allow up to 2 minutes for FFmpeg conversions (free tier is slow)
+   - `--graceful-timeout 120`: Give workers time to finish current request before restart
+   - `--workers 1`: Single worker to stay within 512MB RAM limit
 
 3. **Environment Variables**:
    - `WTF_PORTAL_KEY`: Your secret authentication key
