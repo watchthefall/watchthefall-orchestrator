@@ -87,18 +87,30 @@ def process_video(job_id, video_path, template_name, aspect_ratio='9:16'):
         
         # Run FFmpeg with full stderr capture for debugging
         print(f"[PROCESSOR] Executing FFmpeg...")
-        process = subprocess.run(
-            ffmpeg_cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            timeout=600
-        )
+        try:
+            process = subprocess.run(
+                ffmpeg_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=120  # 2 minute timeout to prevent hanging
+            )
+        except subprocess.TimeoutExpired as e:
+            print(f"[FFMPEG TIMEOUT] Process exceeded 120 seconds")
+            raise Exception("FFmpeg processing timeout (>120s) - likely memory issue on Render free tier")
         
         # Print ALL stderr for complete debugging visibility
         if process.stderr:
             print(f"[FFMPEG STDERR - FULL OUTPUT]:")
             for line in process.stderr.split('\n'):
+                if line.strip():
+                    print(f"  {line}")
+        else:
+            print(f"[FFMPEG] No stderr output")
+        
+        if process.stdout:
+            print(f"[FFMPEG STDOUT]:")
+            for line in process.stdout.split('\n'):
                 if line.strip():
                     print(f"  {line}")
         
