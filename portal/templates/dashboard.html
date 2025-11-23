@@ -845,9 +845,6 @@
                     
                     // Adaptive opacity: 20% (bright) to 40% (dark) - INCREASED for visibility
                     const opacity = 0.20 + (0.20 * (1 - brightness / 255));
-                    console.log(`[WATERMARK] Brand: ${brandName}, Brightness: ${brightness.toFixed(0)}, Opacity: ${(opacity*100).toFixed(0)}%`);
-                    console.log(`[WATERMARK] Watermark position: X=${watermarkX.toFixed(0)}, Y=${watermarkY.toFixed(0)}, W=${watermarkWidth.toFixed(0)}, H=${watermarkHeight.toFixed(0)}`);
-                    console.log(`[WATERMARK] Video duration: ${video.duration.toFixed(2)}s, Size: ${video.videoWidth}x${video.videoHeight}`);
                     
                     // Watermark positioning (bottom-right, 5% safe zone)
                     const safeZone = 0.05;
@@ -857,6 +854,11 @@
                     const watermarkHeight = watermark.height * watermarkScale;
                     const watermarkX = targetWidth - watermarkWidth - (targetWidth * safeZone);
                     const watermarkY = targetHeight - watermarkHeight - (targetHeight * safeZone);
+                    
+                    // Debug logging
+                    console.log(`[WATERMARK] Brand: ${brandName}, Brightness: ${brightness.toFixed(0)}, Opacity: ${(opacity*100).toFixed(0)}%`);
+                    console.log(`[WATERMARK] Watermark position: X=${watermarkX.toFixed(0)}, Y=${watermarkY.toFixed(0)}, W=${watermarkWidth.toFixed(0)}, H=${watermarkHeight.toFixed(0)}`);
+                    console.log(`[WATERMARK] Video duration: ${video.duration.toFixed(2)}s, Size: ${video.videoWidth}x${video.videoHeight}`);
                     
                     // Encode using MediaRecorder
                     const stream = canvas.captureStream(30);
