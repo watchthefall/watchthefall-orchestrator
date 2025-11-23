@@ -898,16 +898,46 @@
                     });
                     
                     // Upload WebM to server for MP4 conversion
-                    statusDiv.innerHTML = `<div class="status processing">⏳ Converting ${i+1}/${selected.length}: <strong>${brandName}</strong> to MP4...<br><small style="color:#888;">Making Instagram-compatible...</small></div>`;
+                    statusDiv.innerHTML = `<div class="status processing">⏳ Uploading ${i+1}/${selected.length}: <strong>${brandName}</strong>...<br><div style="background:#333; border-radius:4px; overflow:hidden; height:8px; margin-top:6px;"><div id="uploadBar${i}" style="background:#0f0; height:100%; width:0%; transition:width 0.3s;"></div></div><small id="uploadText${i}" style="color:#888;">Preparing upload...</small></div>`;
                     updateMinimizedBar();
                     
                     const webmFilename = `${brandName}_${pendingVideoFilename.replace(/\.[^/.]+$/, '')}.webm`;
                     const formData = new FormData();
                     formData.append('video', watermarkedBlob, webmFilename);
                     
-                    const convertResponse = await fetch('/api/videos/convert-watermark', {
-                        method: 'POST',
-                        body: formData
+                    // Track upload progress
+                    const xhr = new XMLHttpRequest();
+                    
+                    xhr.upload.addEventListener('progress', (e) => {
+                        if (e.lengthComputable) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            const uploadBar = document.getElementById(`uploadBar${i}`);
+                            const uploadText = document.getElementById(`uploadText${i}`);
+                            if (uploadBar) uploadBar.style.width = `${percent}%`;
+                            if (uploadText) uploadText.textContent = `Uploading: ${percent}%`;
+                        }
+                    });
+                    
+                    // Fetch conversion response
+                    const convertResponse = await new Promise((resolve, reject) => {
+                        xhr.open('POST', '/api/videos/convert-watermark');
+                        
+                        xhr.onload = () => {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                // Update status to converting
+                                statusDiv.innerHTML = `<div class="status processing">⚙️ Converting ${i+1}/${selected.length}: <strong>${brandName}</strong> to MP4...<br><small style="color:#888;">Server is processing (H.264 encoding)...</small></div>`;
+                                updateMinimizedBar();
+                                resolve({
+                                    ok: true,
+                                    json: async () => JSON.parse(xhr.responseText)
+                                });
+                            } else {
+                                reject(new Error(`Upload failed: ${xhr.status}`));
+                            }
+                        };
+                        
+                        xhr.onerror = () => reject(new Error('Upload failed'));
+                        xhr.send(formData);
                     });
                     
                     if (!convertResponse.ok) {
@@ -950,17 +980,30 @@
             currentModalProgress = { current: 0, total: 0, brandName: '', percent: 0 };
             updateMinimizedBar();
             
-            // Auto-download all successful videos
+            // Auto-download all successful videos by fetching from server
             results.filter(r => !r.error).forEach((r, index) => {
-                setTimeout(() => {
-                    const a = document.createElement('a');
-                    a.href = r.url;
-                    a.download = r.filename;
-                    a.target = '_blank';  // Open in new tab to ensure proper download
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                }, index * 800); // Increased stagger to 800ms for server requests
+                setTimeout(async () => {
+                    try {
+                        // Fetch the actual MP4 file from server
+                        const response = await fetch(r.url);
+                        const blob = await response.blob();
+                        const url = URL.createObjectURL(blob);
+                        
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = r.filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        
+                        // Clean up blob URL after a delay
+                        setTimeout(() => URL.revokeObjectURL(url), 1000);
+                    } catch (err) {
+                        console.error(`[DOWNLOAD ERROR] ${r.filename}:`, err);
+                        // Fallback to direct link
+                        window.open(r.url, '_blank');
+                    }
+                }, index * 1000); // 1 second stagger for downloads
             });
             
             // Auto-close modal after downloads start (2 seconds delay)
