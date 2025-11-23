@@ -849,17 +849,21 @@
                     }
                     brightness /= (imageData.data.length / 4);
                     
-                    // Adaptive opacity: 50% (bright) to 80% (dark) - HIGHLY VISIBLE FOR TESTING
-                    const opacity = 0.50 + (0.30 * (1 - brightness / 255));
+                    // Adaptive opacity: 15% (bright) to 25% (dark) - subtle but visible
+                    const opacity = 0.15 + (0.10 * (1 - brightness / 255));
                     
-                    // Watermark positioning (bottom-right, 5% safe zone)
-                    const safeZone = 0.05;
-                    const watermarkMaxWidth = targetWidth * 0.3; // 30% of width
-                    const watermarkScale = watermarkMaxWidth / watermark.width;
+                    // Watermark positioning - FULL COVERAGE centered on video
+                    const safeZone = 0.0; // No safe zone for full coverage
+                    // Scale watermark to cover most of the video while maintaining aspect ratio
+                    const watermarkScale = Math.min(
+                        (targetWidth * 0.9) / watermark.width,  // 90% of video width
+                        (targetHeight * 0.9) / watermark.height // 90% of video height
+                    );
                     const watermarkWidth = watermark.width * watermarkScale;
                     const watermarkHeight = watermark.height * watermarkScale;
-                    const watermarkX = targetWidth - watermarkWidth - (targetWidth * safeZone);
-                    const watermarkY = targetHeight - watermarkHeight - (targetHeight * safeZone);
+                    // Center the watermark
+                    const watermarkX = (targetWidth - watermarkWidth) / 2;
+                    const watermarkY = (targetHeight - watermarkHeight) / 2;
                     
                     // Debug logging
                     console.log(`[WATERMARK] Brand: ${brandName}, Brightness: ${brightness.toFixed(0)}, Opacity: ${(opacity*100).toFixed(0)}%`);
@@ -933,11 +937,6 @@
                         }
                         
                         ctx.drawImage(video, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
-                        
-                        // DEBUG: Draw red rectangle where watermark should be
-                        ctx.strokeStyle = 'red';
-                        ctx.lineWidth = 5;
-                        ctx.strokeRect(watermarkX, watermarkY, watermarkWidth, watermarkHeight);
                         
                         // Draw watermark with adaptive opacity
                         ctx.globalAlpha = opacity;
