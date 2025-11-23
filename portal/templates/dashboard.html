@@ -240,6 +240,55 @@
             margin-bottom: 8px;
             border-left: 3px solid #00ff00;
         }
+        
+        /* Brand selector modal */
+        .brand-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 9999;
+            overflow-y: auto;
+        }
+        .brand-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .brand-modal-content {
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 25px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .brand-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        .brand-modal-close {
+            background: #444;
+            color: #fff;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .brand-modal-close:hover {
+            background: #ff5555;
+        }
     </style>
 </head>
 <body>
@@ -345,6 +394,26 @@
                     <p style="color: #666;">No history yet</p>
                 </div>
             </div>
+        </div>
+    </div>
+    
+    <!-- Brand Selector Modal -->
+    <div id="brandModal" class="brand-modal">
+        <div class="brand-modal-content">
+            <div class="brand-modal-header">
+                <h3 style="color:#00ff00; margin:0;">🎨 Select Brands for Watermarking</h3>
+                <button class="brand-modal-close" onclick="closeBrandModal()">×</button>
+            </div>
+            <div id="modalVideoName" style="color:#aaa; font-size:13px; margin-bottom:15px;"></div>
+            <p style="color:#888; font-size:14px; margin-bottom:15px;">Choose up to 10 brands to watermark this video. Each will be downloaded separately.</p>
+            <div class="brand-grid" id="modalBrandGrid">
+                <!-- Brands loaded dynamically -->
+            </div>
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button id="modalGenerateBtn" style="flex:1; background:#00aa00;" disabled>⚡ Generate Watermarked Videos</button>
+                <button onclick="closeBrandModal()" style="flex:1; background:#444;">❌ Cancel</button>
+            </div>
+            <div id="modalStatus" style="margin-top:15px;"></div>
         </div>
     </div>
     
@@ -481,12 +550,54 @@
         // ========== PHASE B: CLIENT-SIDE WATERMARK SYSTEM ==========
         let selectedVideoFile = null;
         let brandWatermarks = {};
+        let pendingVideoBlob = null;
+        let pendingVideoFilename = null;
+        
+        // Brand modal functions
+        function closeBrandModal() {
+            document.getElementById('brandModal').classList.remove('active');
+            document.querySelectorAll('.modal-brand-check').forEach(cb => cb.checked = false);
+            document.getElementById('modalStatus').innerHTML = '';
+            pendingVideoBlob = null;
+            pendingVideoFilename = null;
+        }
+        
+        async function openBrandModalForUrl(videoUrl, filename) {
+            try {
+                // Fetch video as blob
+                document.getElementById('modalVideoName').textContent = `🎬 Loading: ${filename}...`;
+                document.getElementById('brandModal').classList.add('active');
+                
+                const response = await fetch(videoUrl);
+                if (!response.ok) throw new Error('Failed to load video');
+                
+                pendingVideoBlob = await response.blob();
+                pendingVideoFilename = filename;
+                
+                document.getElementById('modalVideoName').textContent = `🎬 ${filename} (${(pendingVideoBlob.size/(1024*1024)).toFixed(2)}MB)`;
+            } catch (err) {
+                alert('Failed to load video: ' + err.message);
+                closeBrandModal();
+            }
+        }
+        
+        // Intercept download link clicks
+        document.addEventListener('click', (e) => {
+            if (e.target && e.target.classList.contains('download-link')) {
+                e.preventDefault();
+                const url = e.target.getAttribute('href');
+                const filename = e.target.getAttribute('download') || 'video.mp4';
+                openBrandModalForUrl(url, filename);
+            }
+        });
         
         // Load brand watermarks config
         fetch('/portal/static/watermarks/brands.json')
             .then(r => r.json())
             .then(brands => {
                 brandWatermarks = brands;
+                
+                // Populate main brand grid
                 const grid = document.getElementById('brandGrid');
                 grid.innerHTML = Object.keys(brands).map((brandName, idx) => `
                     <label class="brand-checkbox">
@@ -495,7 +606,16 @@
                     </label>
                 `).join('');
                 
-                // Enable/disable button based on selection
+                // Populate modal brand grid
+                const modalGrid = document.getElementById('modalBrandGrid');
+                modalGrid.innerHTML = Object.keys(brands).map((brandName, idx) => `
+                    <label class="brand-checkbox">
+                        <input type="checkbox" class="modal-brand-check" value="${brandName}" data-file="${brands[brandName]}">
+                        <span>${brandName}</span>
+                    </label>
+                `).join('');
+                
+                // Enable/disable button based on selection (main section)
                 document.querySelectorAll('.brand-check').forEach(cb => {
                     cb.addEventListener('change', () => {
                         const selected = document.querySelectorAll('.brand-check:checked').length;
@@ -507,7 +627,80 @@
                         }
                     });
                 });
+                
+                // Enable/disable button based on selection (modal)
+                document.querySelectorAll('.modal-brand-check').forEach(cb => {
+                    cb.addEventListener('change', () => {
+                        const selected = document.querySelectorAll('.modal-brand-check:checked').length;
+                        const generateBtn = document.getElementById('modalGenerateBtn');
+                        generateBtn.disabled = !(selected > 0 && selected <= 10);
+                        if (selected > 10) {
+                            alert('Maximum 10 brands at a time');
+                            cb.checked = false;
+                        }
+                    });
+                });
             });
+        
+        // Modal Generate button handler
+        document.getElementById('modalGenerateBtn').addEventListener('click', async () => {
+            const selected = Array.from(document.querySelectorAll('.modal-brand-check:checked'));
+            if (!pendingVideoBlob || !selected.length) return;
+            
+            const statusDiv = document.getElementById('modalStatus');
+            statusDiv.innerHTML = '<div class="status processing">⏳ Processing watermarks...</div>';
+            document.getElementById('modalGenerateBtn').disabled = true;
+            
+            const results = [];
+            
+            for (let i = 0; i < selected.length; i++) {
+                const brandName = selected[i].value;
+                const watermarkFile = selected[i].getAttribute('data-file');
+                
+                try {
+                    statusDiv.innerHTML = `<div class="status processing">⏳ Processing ${i+1}/${selected.length}: ${brandName}...</div>`;
+                    
+                    const videoFile = new File([pendingVideoBlob], pendingVideoFilename, { type: pendingVideoBlob.type });
+                    const watermarkedBlob = await applyWatermarkToVideo(videoFile, watermarkFile, brandName);
+                    const url = URL.createObjectURL(watermarkedBlob);
+                    const filename = `${brandName}_${pendingVideoFilename.replace(/\.[^/.]+$/, '')}.mp4`;
+                    
+                    results.push({ brandName, url, filename, size_mb: (watermarkedBlob.size/(1024*1024)).toFixed(2) });
+                    
+                    // Save to history
+                    saveHistoryEntry({ type: 'watermark', name: filename, url, size_mb: (watermarkedBlob.size/(1024*1024)).toFixed(2) });
+                    
+                } catch (err) {
+                    results.push({ brandName, error: err.message });
+                }
+            }
+            
+            // Show results
+            const successCount = results.filter(r => !r.error).length;
+            const items = results.map(r => {
+                if (r.error) {
+                    return `<div class="watermark-result" style="border-left-color:#ff5555;">✗ ${r.brandName}: ${r.error}</div>`;
+                }
+                return `<div class="watermark-result">✓ <strong>${r.brandName}</strong><br><a href="${r.url}" download="${r.filename}" style="color:#00ff00;">📥 ${r.filename}</a> <span style="color:#666;">(${r.size_mb}MB)</span> <button class="share-btn" data-url="${r.url}" data-filename="${r.filename}" style="margin-left:8px;">🤝 Share</button></div>`;
+            }).join('');
+            
+            statusDiv.innerHTML = `<div class="status completed">✓ Generated ${successCount}/${results.length} watermarked videos</div>${items}`;
+            
+            // Auto-download if enabled
+            if (autoDownloadEnabled) {
+                results.filter(r => !r.error).forEach(r => {
+                    const a = document.createElement('a');
+                    a.href = r.url;
+                    a.download = r.filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                });
+            }
+            
+            renderHistory();
+            document.getElementById('modalGenerateBtn').disabled = false;
+        });
         
         // Select video file
         document.getElementById('selectVideoBtn').addEventListener('click', () => {
