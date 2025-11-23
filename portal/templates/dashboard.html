@@ -906,14 +906,32 @@
                         updateMinimizedBar();
                     });
                     
-                    const url = URL.createObjectURL(watermarkedBlob);
-                    // Use .webm extension for proper file type recognition
-                    const filename = `${brandName}_${pendingVideoFilename.replace(/\.[^/.]+$/, '')}.webm`;
+                    // Upload WebM to server for MP4 conversion
+                    statusDiv.innerHTML = `<div class="status processing">⏳ Converting ${i+1}/${selected.length}: <strong>${brandName}</strong> to MP4...<br><small style="color:#888;">Making Instagram-compatible...</small></div>`;
+                    updateMinimizedBar();
                     
-                    results.push({ brandName, url, filename, size_mb: (watermarkedBlob.size/(1024*1024)).toFixed(2) });
+                    const webmFilename = `${brandName}_${pendingVideoFilename.replace(/\.[^/.]+$/, '')}.webm`;
+                    const formData = new FormData();
+                    formData.append('video', watermarkedBlob, webmFilename);
+                    
+                    const convertResponse = await fetch('/api/videos/convert-watermark', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!convertResponse.ok) {
+                        const errorData = await convertResponse.json();
+                        throw new Error(errorData.error || 'Conversion failed');
+                    }
+                    
+                    const convertResult = await convertResponse.json();
+                    const url = convertResult.download_url;
+                    const filename = convertResult.filename;
+                    
+                    results.push({ brandName, url, filename, size_mb: convertResult.size_mb });
                     
                     // Save to history
-                    saveHistoryEntry({ type: 'watermark', name: filename, url, size_mb: (watermarkedBlob.size/(1024*1024)).toFixed(2) });
+                    saveHistoryEntry({ type: 'watermark', name: filename, url, size_mb: convertResult.size_mb });
                     
                 } catch (err) {
                     console.error(`[WATERMARK ERROR] ${brandName}:`, err);

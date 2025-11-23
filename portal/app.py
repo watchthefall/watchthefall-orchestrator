@@ -7,6 +7,8 @@ import uuid
 from werkzeug.utils import secure_filename
 from functools import wraps
 import threading
+import subprocess
+import tempfile
 try:
     from yt_dlp import YoutubeDL
 except ImportError:
@@ -386,6 +388,100 @@ def get_queue_status():
             'jobs': queued + processing
         })
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ============================================================================
+# API: WATERMARK CONVERSION (WebM to MP4)
+# ============================================================================
+
+@app.route('/api/videos/convert-watermark', methods=['POST'])
+def convert_watermark():
+    """Convert client-side watermarked WebM video to MP4 for Instagram compatibility"""
+    try:
+        if 'video' not in request.files:
+            return jsonify({'error': 'No video file provided'}), 400
+        
+        file = request.files['video']
+        
+        if file.filename == '':
+            return jsonify({'error': 'Empty filename'}), 400
+        
+        # Save WebM file temporarily
+        webm_filename = secure_filename(file.filename)
+        temp_webm = os.path.join(tempfile.gettempdir(), f"{uuid.uuid4().hex}_{webm_filename}")
+        file.save(temp_webm)
+        
+        # Generate output MP4 filename
+        mp4_filename = webm_filename.replace('.webm', '.mp4')
+        if not mp4_filename.endswith('.mp4'):
+            mp4_filename = os.path.splitext(mp4_filename)[0] + '.mp4'
+        
+        output_path = os.path.join(OUTPUT_DIR, mp4_filename)
+        
+        print(f"[CONVERT] Converting {webm_filename} to MP4...")
+        log_event('info', None, f'Converting watermarked video: {webm_filename}')
+        
+        # FFmpeg command: Convert WebM to MP4 with H.264 codec (Instagram compatible)
+        # -c:v libx264: H.264 video codec
+        # -preset fast: Encoding speed (faster = lower quality, slower = better quality)
+        # -crf 23: Quality (18-28, lower = better quality, 23 is default)
+        # -c:a aac: AAC audio codec (Instagram compatible)
+        # -b:a 128k: Audio bitrate
+        # -movflags +faststart: Optimize for web streaming
+        cmd = [
+            'ffmpeg',
+            '-i', temp_webm,
+            '-c:v', 'libx264',
+            '-preset', 'fast',
+            '-crf', '23',
+            '-c:a', 'aac',
+            '-b:a', '128k',
+            '-movflags', '+faststart',
+            '-y',  # Overwrite output file
+            output_path
+        ]
+        
+        # Run FFmpeg conversion
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=300  # 5 minute timeout
+        )
+        
+        # Clean up temp file
+        try:
+            os.remove(temp_webm)
+        except:
+            pass
+        
+        if result.returncode != 0:
+            error_msg = result.stderr.decode('utf-8', errors='ignore')
+            print(f"[CONVERT ERROR] FFmpeg failed: {error_msg}")
+            log_event('error', None, f'Conversion failed: {error_msg[:200]}')
+            return jsonify({'error': f'Conversion failed: {error_msg[:200]}'}), 500
+        
+        # Get file size
+        file_size_mb = os.path.getsize(output_path) / (1024 * 1024)
+        
+        print(f"[CONVERT] Success: {mp4_filename} ({file_size_mb:.2f}MB)")
+        log_event('info', None, f'Conversion complete: {mp4_filename} ({file_size_mb:.2f}MB)')
+        
+        return jsonify({
+            'success': True,
+            'filename': mp4_filename,
+            'download_url': f'/api/videos/download/{mp4_filename}',
+            'size_mb': round(file_size_mb, 2),
+            'message': 'Video converted to MP4 successfully'
+        })
+        
+    except subprocess.TimeoutExpired:
+        log_event('error', None, 'Conversion timeout (>5min)')
+        return jsonify({'error': 'Conversion timeout. Video may be too long.'}), 500
+    except Exception as e:
+        import traceback
+        print(f"[CONVERT EXCEPTION]: {traceback.format_exc()}")
+        log_event('error', None, f'Conversion exception: {str(e)}')
         return jsonify({'error': str(e)}), 500
 
 # ============================================================================
