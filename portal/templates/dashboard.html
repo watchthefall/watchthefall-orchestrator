@@ -371,6 +371,7 @@
             </div>
             
             <p style="color:#888; font-size:14px; margin-bottom:15px;">Choose up to 10 brands to watermark this video. Each will be downloaded separately.</p>
+            <p style="color:#ff6600; font-size:13px; margin-bottom:15px; font-weight:600;">⚠️ Server Limit: Process 1-2 brands at a time to avoid crashes (Render free tier has limited memory)</p>
             
             <!-- Quality Preset Selector -->
             <div style="margin-bottom:15px; padding:10px; background:rgba(0,255,0,0.05); border:1px solid #333; border-radius:6px;">
@@ -953,11 +954,18 @@
                     
                 } catch (err) {
                     console.error(`[WATERMARK ERROR] ${brandName}:`, err);
+                    
+                    // Check if it's a server error (500/502)
+                    const isServerError = err.message.includes('500') || err.message.includes('502') || err.message.includes('Upload failed');
+                    const errorMsg = isServerError 
+                        ? `Server overload (Render free tier ran out of memory). Try processing fewer brands at once (1-2 max), or use shorter videos (<15 seconds).`
+                        : err.message || err;
+                    
                     // Show error on screen with full details
                     results.push({ 
                         brandName, 
-                        error: `${err.message || err}`,
-                        errorDetails: `🚫 ${err.name || 'Error'}: ${err.message || err}<br><small style="color:#888;">${err.stack ? err.stack.split('\n')[0] : ''}</small>`
+                        error: errorMsg,
+                        errorDetails: `🚫 ${err.name || 'Error'}: ${errorMsg}<br><small style="color:#888;">${isServerError ? 'Tip: Process 1-2 brands at a time to avoid crashes' : err.stack ? err.stack.split('\n')[0] : ''}</small>`
                     });
                 }
             }
