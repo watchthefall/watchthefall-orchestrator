@@ -699,7 +699,7 @@
                 } catch (err) {
                     reject(err);
                 }
-            }
+            });
         }
         // ========== END PHASE B ==========
         
@@ -721,7 +721,7 @@
                 const response = await fetch('/api/videos/upload', {
                     method: 'POST',
                     body: formData
-                }
+                });
                 
                 const result = await response.json();
                 
@@ -736,7 +736,7 @@
                 uploadText.innerHTML = `<p style="color: #ff5555;">✗ Upload failed: ${err.message}</p>`;
                 uploadZone.classList.remove('active');
             }
-        }
+        });
         
         // Helpers (fetch batch + paste/drag + reset)
         async function fetchBatchUrls(targetUrls) {
@@ -744,7 +744,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ urls: targetUrls })
-            }
+            });
             if (!response.ok) {
                 const text = await response.text();
                 throw new Error(`Server error (${response.status}): ${text}`);
@@ -767,7 +767,7 @@
                 resetBtn.addEventListener('click', ()=>{
                     if (linksInput) linksInput.value = '';
                     if (fetchStatus) fetchStatus.innerHTML = '';
-                }
+                });
             }
             if (linksInput) {
                 // Paste-to-start
@@ -798,7 +798,7 @@
                         linksInput.value = urls.join('\n');
                         fetchStatus.innerHTML = `<div class=\"status queued\">📋 ${urls.length} URLs pasted. Tap \"Download All Links\".</div>`;
                     }
-                }
+                });
                 // Drag & drop URLs
                 linksInput.addEventListener('dragover', (e)=>{ e.preventDefault(); linksInput.style.borderColor = '#00ff00'; });
                 linksInput.addEventListener('dragleave', ()=>{ linksInput.style.borderColor = '#333'; });
@@ -827,7 +827,7 @@
                         linksInput.value = urls.join('\n');
                         fetchStatus.innerHTML = `<div class=\"status queued\">📋 ${urls.length} URLs dropped. Tap \"Download All Links\".</div>`;
                     }
-                }
+                });
             }
         })();
 
@@ -850,7 +850,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ urls: targetUrls })
-                }
+                });
                 if (!response.ok) {
                     const text = await response.text();
                     throw new Error(`Server error (${response.status}): ${text}`);
@@ -893,7 +893,7 @@
                         <p style="margin-top:12px; font-size:12px; color:#888;">📱 Tap each link to save to your phone</p>
                         <button id="copyAllLinksBtn" style="margin-top:10px; width:100%; background:#0066ff;">📋 Copy All Download Links</button>
                     </div>
-                }
+                `;
                 
                 // Auto-download
                 if (autoDownloadEnabled) {
@@ -904,7 +904,7 @@
                         document.body.appendChild(a);
                         a.click();
                         a.remove();
-                    }
+                    });
                 }
                 
                 document.getElementById('linksInput').value = '';
@@ -917,7 +917,7 @@
             } finally {
                 document.getElementById('fetchLinksBtn').disabled = false;
             }
-        }
+        });
         
         // Process video
         document.getElementById('processBtn').addEventListener('click', async () => {
@@ -945,8 +945,8 @@
                             filename: uploadedFilename,
                             template: template,
                             aspect_ratio: aspectRatio
-                        }
-                    }
+                        })
+                    });
                     if (!response.ok) {
                         const errorText = await response.text();
                         throw new Error(`Server error (${response.status}): ${errorText}`);
@@ -971,7 +971,7 @@
             }
             
             tryProcess();
-        }
+        });
         
         // Poll job status
         function pollJobStatus(jobId) {
@@ -998,7 +998,7 @@
                         statusPollInterval = null;
                         statusDiv.innerHTML = `
                             <div class=\"status completed\">\n                                ✓ Processing complete!<br>\n                                <a href=\"${job.download_url}\" class=\"download-link\" download=\"${job.output_file}\">📥 Download ${job.output_file}</a> <button class=\"share-btn\" data-url=\"${job.download_url}\" data-filename=\"${job.output_file}\" style=\"margin-left:10px;\">🤝 Share</button>\n                            </div>
-                        }
+                        `;
                         loadRecentJobs();
                         // Save history
                         saveHistoryEntry({ type: 'process', name: job.output_file, url: job.download_url });
@@ -1038,7 +1038,7 @@
             document.getElementById('uploadText').innerHTML = `
                 <p style="font-size: 18px; margin-bottom: 10px;">📁 Click or drag video here</p>
                 <p style="color: #888; font-size: 14px;">Supported: MP4, MOV, AVI (max 500MB)</p>
-            }
+            `;
             document.getElementById('uploadZone').classList.remove('active');
             document.getElementById('fileInput').value = '';
         }
@@ -1064,7 +1064,7 @@
                             </div>
                         </div>
                     `).join('');
-                }
+                });
         }
         
         // Load system logs
@@ -1084,7 +1084,7 @@
                             ${log.message}
                         </div>
                     `).join('');
-                }
+                });
         }
         
         // Auto-refresh
