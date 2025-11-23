@@ -251,6 +251,8 @@
     
     <script>
         let uploadedFilename = null;
+        let activeJobId = null;
+        let statusPollInterval = null;
         
         // Load templates
         fetch('/api/templates')
@@ -301,6 +303,12 @@
         document.getElementById('processBtn').addEventListener('click', async () => {
             if (!uploadedFilename) return;
             
+            // Clear any existing status polling
+            if (statusPollInterval) {
+                clearInterval(statusPollInterval);
+                statusPollInterval = null;
+            }
+            
             const template = document.getElementById('templateSelect').value;
             const aspectRatio = document.getElementById('aspectRatioSelect').value;
             const statusDiv = document.getElementById('statusMessage');
@@ -342,6 +350,7 @@
                 }
                 
                 if (result.success) {
+                    activeJobId = result.job_id;
                     statusDiv.innerHTML = `<div class="status processing">Processing... Job ID: ${result.job_id}</div>`;
                     
                     // Poll for status
@@ -358,7 +367,18 @@
         
         // Poll job status
         function pollJobStatus(jobId) {
-            const interval = setInterval(async () => {
+            // Clear any existing interval
+            if (statusPollInterval) {
+                clearInterval(statusPollInterval);
+            }
+            
+            statusPollInterval = setInterval(async () => {
+                // Only poll if this is still the active job
+                if (activeJobId !== jobId) {
+                    clearInterval(statusPollInterval);
+                    return;
+                }
+                
                 try {
                     const response = await fetch(`/api/videos/status/${jobId}`);
                     const job = await response.json();
@@ -366,22 +386,29 @@
                     const statusDiv = document.getElementById('statusMessage');
                     
                     if (job.status === 'completed') {
-                        clearInterval(interval);
+                        clearInterval(statusPollInterval);
+                        statusPollInterval = null;
                         statusDiv.innerHTML = `
                             <div class="status completed">
                                 ✓ Processing complete!<br>
-                                <a href="${job.download_url}" class="download-link">📥 Download ${job.output_file}</a>
+                                <a href="${job.download_url}" class="download-link" download>📥 Download ${job.output_file}</a>
                             </div>
                         `;
                         loadRecentJobs();
                         resetUpload();
                     } else if (job.status === 'failed') {
-                        clearInterval(interval);
+                        clearInterval(statusPollInterval);
+                        statusPollInterval = null;
                         statusDiv.innerHTML = `<div class="status failed">✗ Processing failed: ${job.error || 'Unknown error'}</div>`;
                         resetUpload();
+                    } else {
+                        // Still processing - update status message
+                        statusDiv.innerHTML = `<div class="status processing">⏳ Processing... Job ID: ${jobId}</div>`;
                     }
                 } catch (err) {
-                    clearInterval(interval);
+                    console.error('Status poll error:', err);
+                    clearInterval(statusPollInterval);
+                    statusPollInterval = null;
                 }
             }, 2000);
         }
@@ -389,6 +416,8 @@
         // Reset upload
         function resetUpload() {
             uploadedFilename = null;
+            activeJobId = null;
+            document.getElementById('processBtn').disabled = false;
             document.getElementById('uploadText').innerHTML = `
                 <p style="font-size: 18px; margin-bottom: 10px;">📁 Click or drag video here</p>
                 <p style="color: #888; font-size: 14px;">Supported: MP4, MOV, AVI (max 500MB)</p>
