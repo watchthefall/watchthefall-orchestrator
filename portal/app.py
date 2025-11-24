@@ -21,7 +21,8 @@ from .config import (
 from .database import log_event
 
 # Instagram cookies file path
-IG_COOKIES_PATH = '/opt/render/project/src/app/ig_cookies.txt'
+# Use relative path for compatibility between local and Render environments
+IG_COOKIES_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'app', 'ig_cookies.txt')
 
 app = Flask(__name__, 
             template_folder='templates',
