@@ -2,7 +2,6 @@
 const CACHE_NAME = 'wtf-portal-v1';
 const ASSETS = [
   '/portal/',
-  '/portal/index.html',
   '/portal/static/manifest.json',
   '/portal/static/watermarks/brands.json',
   '/portal/static/js/offline.js'
@@ -67,7 +66,7 @@ self.addEventListener('fetch', (event) => {
               return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
             });
         })
-        .catch(() => caches.match('/portal/index.html'))  // 8️⃣ PATCH: Fallback to cached index.html
+        .catch(() => caches.match('/portal/'))  // 8️⃣ PATCH: Fallback to cached portal page
     );
   } else {
     // For other requests, use network first approach
