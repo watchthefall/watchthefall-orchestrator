@@ -1047,6 +1047,9 @@
                 const brandName = selected[i].value;
                 const watermarkFile = selected[i].getAttribute('data-file');
                 
+                // DEBUG: Log brand mapping
+                console.log(`[BRAND ${i+1}/${totalBrands}] Selected: "${brandName}" -> File: "${watermarkFile}"`);
+                
                 currentModalProgress = { current: i + 1, total: totalBrands, brandName, percent: 0 };
                 
                 try {
@@ -1252,6 +1255,7 @@
                     // Load watermark
                     const watermark = new Image();
                     watermark.src = `/portal/static/watermarks/${watermarkFileName}`;
+                    console.log(`[WATERMARK] Loading image for brand "${brandName}": ${watermarkFileName}`);
                     await new Promise((res, rej) => {
                         watermark.onload = () => {
                             console.log(`[WATERMARK] Image loaded: ${watermarkFileName}, Size: ${watermark.width}x${watermark.height}`);
