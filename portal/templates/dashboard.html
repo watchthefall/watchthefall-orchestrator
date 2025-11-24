@@ -1021,6 +1021,8 @@
                 const tempVideo = document.createElement('video');
                 tempVideo.src = blobUrl;
                 tempVideo.muted = true;
+                tempVideo.volume = 0; // Extra safety: force volume to 0
+                tempVideo.preload = 'metadata'; // Only load metadata, not audio buffer
                 
                 await new Promise((res, rej) => {
                     tempVideo.onloadedmetadata = res;
@@ -1040,12 +1042,13 @@
                 canvas2.width = 180 * aspectRatio;
                 canvas2.height = 180;
                 
-                // Capture first frame (0.1s)
+                // Capture first frame (0.1s) - ensure paused
+                tempVideo.pause();
                 tempVideo.currentTime = 0.1;
                 await new Promise(res => { tempVideo.onseeked = res; });
                 ctx1.drawImage(tempVideo, 0, 0, canvas1.width, canvas1.height);
                 
-                // Capture middle frame
+                // Capture middle frame - keep paused
                 tempVideo.currentTime = duration / 2;
                 await new Promise(res => { tempVideo.onseeked = res; });
                 ctx2.drawImage(tempVideo, 0, 0, canvas2.width, canvas2.height);
