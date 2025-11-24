@@ -993,115 +993,24 @@
             const results = [];
             const totalBrands = selected.length;
             
-            // Helper: Upload and convert with async job polling (non-blocking)
-            async function uploadAndConvert(watermarkedBlob, brandName, index, retryCount = 0) {
+            // Helper: Direct WebM download (no server conversion - instant!)
+            async function downloadWebM(watermarkedBlob, brandName, index) {
                 const webmFilename = `${brandName}_${pendingVideoFilename.replace(/\.[^/.]+$/, '')}.webm`;
-                const formData = new FormData();
-                formData.append('video', watermarkedBlob, webmFilename);
+                const webmUrl = URL.createObjectURL(watermarkedBlob);
+                const sizeMB = (watermarkedBlob.size / (1024 * 1024)).toFixed(2);
                 
-                const xhr = new XMLHttpRequest();
+                console.log(`[WEBM] Generated download for ${brandName}: ${webmFilename} (${sizeMB}MB)`);
                 
-                // Upload progress tracking
-                xhr.upload.addEventListener('progress', (e) => {
-                    if (e.lengthComputable) {
-                        const percent = Math.round((e.loaded / e.total) * 100);
-                        const uploadBar = document.getElementById(`uploadBar${index}`);
-                        const uploadText = document.getElementById(`uploadText${index}`);
-                        if (uploadBar) uploadBar.style.width = `${percent}%`;
-                        if (uploadText) uploadText.textContent = `Stage 2/4: Uploading ${percent}%`;
-                    }
-                });
-                
-                return new Promise(async (resolve, reject) => {
-                    xhr.open('POST', '/api/videos/convert-watermark');
-                    
-                    xhr.onload = async () => {
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            
-                            if (xhr.status >= 200 && xhr.status < 300) {
-                                // Job queued - start polling for status
-                                const jobId = response.job_id;
-                                console.log(`[CONVERT] Job ${jobId.substr(0,8)} queued for ${brandName}`);
-                                
-                                statusDiv.innerHTML = `<div class="status processing">⚙️ Converting ${index + 1}/${totalBrands}: <strong>${brandName}</strong>...<br><small style="color:#888;">Stage 3/4: FFmpeg processing (this may take a minute)...</small></div>`;
-                                
-                                // Poll job status until complete
-                                const pollInterval = 2000; // 2 seconds
-                                const maxPolls = 90; // 3 minutes max (90 * 2s = 180s)
-                                let pollCount = 0;
-                                
-                                const pollStatus = async () => {
-                                    try {
-                                        const statusResp = await fetch(`/api/videos/convert-status/${jobId}`);
-                                        const statusData = await statusResp.json();
-                                        
-                                        if (statusData.status === 'completed') {
-                                            // Success!
-                                            console.log(`[CONVERT] Job ${jobId.substr(0,8)} completed: ${statusData.filename}`);
-                                            statusDiv.innerHTML = `<div class="status processing">✅ Converted ${index + 1}/${totalBrands}: <strong>${brandName}</strong> to MP4<br><small style="color:#0f0;">Stage 4/4: Ready for download (${statusData.size_mb}MB)</small></div>`;
-                                            resolve({
-                                                success: true,
-                                                brandName,
-                                                url: statusData.download_url,
-                                                filename: statusData.filename,
-                                                size_mb: statusData.size_mb,
-                                                conversion_time: statusData.conversion_time
-                                            });
-                                        } else if (statusData.status === 'failed') {
-                                            // Failed
-                                            console.error(`[CONVERT] Job ${jobId.substr(0,8)} failed:`, statusData.error);
-                                            const errorMsg = statusData.stderr_preview || statusData.error || 'Unknown error';
-                                            reject(new Error(`Conversion failed: ${errorMsg}`));
-                                        } else if (statusData.status === 'processing' || statusData.status === 'queued') {
-                                            // Still processing - poll again
-                                            pollCount++;
-                                            if (pollCount >= maxPolls) {
-                                                reject(new Error('Conversion timeout (>3min)'));
-                                            } else {
-                                                const elapsed = Math.floor(pollCount * pollInterval / 1000);
-                                                statusDiv.innerHTML = `<div class="status processing">⚙️ Converting ${index + 1}/${totalBrands}: <strong>${brandName}</strong>...<br><small style="color:#888;">Stage 3/4: ${statusData.message || 'Processing'} (${elapsed}s elapsed)</small></div>`;
-                                                setTimeout(pollStatus, pollInterval);
-                                            }
-                                        } else {
-                                            reject(new Error(`Unknown status: ${statusData.status}`));
-                                        }
-                                    } catch (pollError) {
-                                        reject(new Error(`Polling error: ${pollError.message}`));
-                                    }
-                                };
-                                
-                                // Start polling immediately
-                                setTimeout(pollStatus, 1000); // Wait 1s before first poll
-                                
-                            } else {
-                                reject(new Error(`HTTP ${xhr.status}: ${response.message || response.error || 'Unknown error'}`));
-                            }
-                        } catch (parseError) {
-                            reject(new Error(`Failed to parse server response: ${parseError.message}`));
-                        }
-                    };
-                    
-                    xhr.onerror = () => {
-                        // Upload failed - likely blocked by security extension
-                        console.error('[UPLOAD BLOCKED] Network error during upload - security extension may be interfering');
-                        
-                        // Offer direct WebM download as fallback
-                        const webmUrl = URL.createObjectURL(watermarkedBlob);
-                        statusDiv.innerHTML = `
-                            <div class="status" style="border-left-color:#ff6600;">
-                                ⚠️ Upload blocked (security extension interference)<br>
-                                <small style="color:#888; display:block; margin:8px 0;">Your browser extension blocked the upload. Download the watermarked WebM instead:</small>
-                                <a href="${webmUrl}" download="${webmFilename}" style="display:inline-block; margin-top:8px; padding:10px 18px; background:#0f0; color:#000; border-radius:6px; font-weight:600; text-decoration:none; cursor:pointer;">
-                                    💾 Download ${brandName} WebM (works offline)
-                                </a>
-                                <div style="font-size:11px; color:#666; margin-top:8px;">Tip: Disable Trend Micro/HP Wolf extension or use Incognito mode</div>
-                            </div>
-                        `;
-                        
-                        reject(new Error('Network error during upload (security extension blocked)'));
-                    };
-                    xhr.send(formData);
+                return new Promise((resolve) => {
+                    // Instant success - no upload needed!
+                    resolve({
+                        success: true,
+                        brandName,
+                        url: webmUrl,
+                        filename: webmFilename,
+                        size_mb: parseFloat(sizeMB),
+                        isWebM: true
+                    });
                 });
             }
             
@@ -1120,7 +1029,7 @@
                             <div style="background:#333; border-radius:4px; overflow:hidden; height:10px; margin:8px 0;">
                                 <div id="progressBar${i}" style="background:linear-gradient(90deg, #0f0, #0aa); height:100%; width:0%; transition:width 0.3s;"></div>
                             </div>
-                            <small id="progressText${i}" style="color:#888; display:block; margin-top:4px;">Stage 1/4: Applying watermark...</small>
+                            <small id="progressText${i}" style="color:#888; display:block; margin-top:4px;">Applying watermark...</small>
                         </div>
                     `;
                     statusDiv.innerHTML = progressHTML;
@@ -1131,17 +1040,16 @@
                         const bar = document.getElementById(`progressBar${i}`);
                         const text = document.getElementById(`progressText${i}`);
                         if (bar) bar.style.width = `${progress}%`;
-                        if (text) text.textContent = `Stage 1/4: Watermark ${progress}% complete`;
+                        if (text) text.textContent = `Watermark ${progress}% complete`;
                         currentModalProgress.percent = progress;
                         updateMinimizedBar();
                     });
                     
-                    // Stage 2: Upload
-                    statusDiv.innerHTML = `<div class="status processing">📤 Uploading ${i + 1}/${totalBrands}: <strong>${brandName}</strong>...<br><div style="background:#333; border-radius:4px; overflow:hidden; height:10px; margin:8px 0;"><div id="uploadBar${i}" style="background:linear-gradient(90deg, #0ff, #08f); height:100%; width:0%; transition:width 0.3s;"></div></div><small id="uploadText${i}" style="color:#888; display:block; margin-top:4px;">Stage 2/4: Preparing upload...</small></div>`;
+                    // Direct WebM download (no server conversion!)
+                    statusDiv.innerHTML = `<div class="status processing">✅ Watermarked ${i + 1}/${totalBrands}: <strong>${brandName}</strong><br><small style="color:#0f0;">Generating download link...</small></div>`;
                     updateMinimizedBar();
                     
-                    // Stage 3 & 4: Convert (with retry and busy-wait)
-                    const result = await uploadAndConvert(watermarkedBlob, brandName, i);
+                    const result = await downloadWebM(watermarkedBlob, brandName, i);
                     
                     results.push(result);
                     saveHistoryEntry({ type: 'watermark', name: result.filename, url: result.url, size_mb: result.size_mb });
@@ -1174,11 +1082,11 @@
                 if (r.error) {
                     return `<div class="watermark-result" style="border-left-color:#ff5555; padding:15px;">✗ <strong>${r.brandName}</strong><br>${r.errorDetails || r.error}</div>`;
                 }
-                return `<div class="watermark-result">✓ <strong>${r.brandName}</strong> (${r.size_mb}MB, ${r.conversion_time}s)<br><button onclick="downloadVideo('${r.url}', '${r.filename}', ${idx})" id="dlBtn${idx}" style="display:inline-block; margin-top:8px; padding:10px 18px; background:#00aa00; color:#000; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:14px;">📥 Download ${r.filename}</button></div>`;
+                return `<div class="watermark-result">✓ <strong>${r.brandName}</strong> (${r.size_mb}MB WebM)<br><button onclick="downloadVideo('${r.url}', '${r.filename}', ${idx})" id="dlBtn${idx}" style="display:inline-block; margin-top:8px; padding:10px 18px; background:#00aa00; color:#000; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:14px;">📥 Download ${r.filename}</button><br><small style="color:#888; margin-top:4px; display:block;">💡 Convert to MP4 using VLC or HandBrake (free)</small></div>`;
             }).join('');
             
             const summaryColor = failedCount === 0 ? '#0f0' : (successCount > 0 ? '#ff6600' : '#ff5555');
-            statusDiv.innerHTML = `<div class="status completed">✓ Complete: ${successCount} successful, ${failedCount} failed<br><small style="color:${summaryColor}; margin-top:8px; display:block; font-weight:600;">👇 Click each button below to download:</small></div>${items}`;
+            statusDiv.innerHTML = `<div class="status completed">✓ Complete: ${successCount} successful, ${failedCount} failed<br><small style="color:${summaryColor}; margin-top:8px; display:block; font-weight:600;">👇 Click each button to download WebM (no server conversion needed!):</small></div>${items}`;
             
             // Auto-download if enabled
             if (autoDownload && successCount > 0) {
