@@ -986,6 +986,49 @@
             console.warn('[TSS DETECTION]', warnings.join(', '));
         }
         
+        // Enhanced video loading with TSS workaround
+        async function loadVideoSafely(videoElement, videoFile) {
+            return new Promise((resolve, reject) => {
+                // Try multiple approaches for TSS compatibility
+                let attempts = 0;
+                const maxAttempts = 3;
+                
+                const tryLoad = () => {
+                    attempts++;
+                    console.log(`[VIDEO LOAD] Attempt ${attempts}/${maxAttempts}`);
+                    
+                    // Clear any existing source
+                    videoElement.src = '';
+                    
+                    // Create blob URL
+                    const blobUrl = URL.createObjectURL(videoFile);
+                    
+                    // Add error handling
+                    videoElement.onloadedmetadata = () => {
+                        console.log('[VIDEO LOAD] Success');
+                        resolve();
+                    };
+                    
+                    videoElement.onerror = (err) => {
+                        console.error(`[VIDEO LOAD] Error on attempt ${attempts}:`, err);
+                        URL.revokeObjectURL(blobUrl);
+                        
+                        if (attempts < maxAttempts) {
+                            // Wait before retry
+                            setTimeout(tryLoad, 100 * attempts);
+                        } else {
+                            reject(new Error('Failed to load video after multiple attempts'));
+                        }
+                    };
+                    
+                    // Set source
+                    videoElement.src = blobUrl;
+                };
+                
+                tryLoad();
+            });
+        }
+        
         // Run detection after page load
         setTimeout(showExtensionWarning, 2000);
         
@@ -1189,17 +1232,12 @@
                 pendingVideoFilename = filename;
                 
                 // Generate thumbnails (memory efficient - no video element kept in DOM)
-                const blobUrl = URL.createObjectURL(pendingVideoBlob);
                 const tempVideo = document.createElement('video');
-                tempVideo.src = blobUrl;
                 tempVideo.muted = true;
                 tempVideo.volume = 0; // Extra safety: force volume to 0
                 tempVideo.preload = 'metadata'; // Only load metadata, not audio buffer
                 
-                await new Promise((res, rej) => {
-                    tempVideo.onloadedmetadata = res;
-                    tempVideo.onerror = rej;
-                });
+                await loadVideoSafely(tempVideo, pendingVideoBlob);
                 
                 const duration = tempVideo.duration;
                 const canvas1 = document.getElementById('modalThumb1');
@@ -1235,7 +1273,14 @@
                 console.log('[MODAL] Thumbnails generated, video element cleaned up');
             } catch (err) {
                 console.error('[MODAL] Error:', err);
-                alert('Failed to load video: ' + err.message);
+                
+                // Check if this is a TSS-related error
+                if (err.message.includes('TSS') || err.message.includes('security') || err.message.includes('extension')) {
+                    alert('Failed to load video due to browser security extension interference. Please disable security extensions or try Incognito mode.');
+                } else {
+                    alert('Failed to load video: ' + err.message);
+                }
+                
                 closeBrandModal();
             }
         }
@@ -1557,16 +1602,12 @@
                     
                     if (onProgress) onProgress(5);
                     
-                    // Load video
+                    // Load video with TSS workaround
                     const video = document.createElement('video');
-                    video.src = URL.createObjectURL(videoFile);
                     video.muted = true;
                     video.playsInline = true;
                     
-                    await new Promise((res, rej) => {
-                        video.onloadedmetadata = res;
-                        video.onerror = rej;
-                    });
+                    await loadVideoSafely(video, videoFile);
                     
                     if (onProgress) onProgress(10);
                     
@@ -1641,14 +1682,10 @@
                     try {
                         // Create a separate video element just for audio capture
                         const audioVideo = document.createElement('video');
-                        audioVideo.src = URL.createObjectURL(videoFile);
                         audioVideo.muted = false; // Keep audio enabled
                         
-                        // Wait for it to load
-                        await new Promise((res, rej) => {
-                            audioVideo.onloadedmetadata = res;
-                            audioVideo.onerror = rej;
-                        });
+                        // Wait for it to load with TSS workaround
+                        await loadVideoSafely(audioVideo, videoFile);
                         
                         // Try to capture media stream from video (works on modern browsers)
                         if (audioVideo.captureStream) {
@@ -1748,7 +1785,14 @@
                     render();
                     
                 } catch (err) {
-                    reject(err);
+                    console.error('[WATERMARK] Critical error:', err);
+                    
+                    // Check if this is a TSS-related error
+                    if (err.message.includes('TSS') || err.message.includes('security') || err.message.includes('extension')) {
+                        reject(new Error('Video processing failed due to browser security extension interference. Please disable security extensions or try Incognito mode.'));
+                    } else {
+                        reject(err);
+                    }
                 }
             });
         }
