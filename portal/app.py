@@ -188,31 +188,51 @@ def fetch_videos_from_urls():
                 
                 with YoutubeDL(ydl_opts) as ydl:
                     print(f"[FETCH] Downloading: {url_input[:50]}...")
-                    info = ydl.extract_info(url_input, download=True)
-                    filename = ydl.prepare_filename(info)
-                    
-                    # Ensure .mp4 extension
-                    if not filename.endswith('.mp4'):
-                        base, _ = os.path.splitext(filename)
-                        filename = base + '.mp4'
-                    
-                    name = os.path.basename(filename)
-                    file_size_mb = os.path.getsize(filename) / (1024 * 1024) if os.path.exists(filename) else 0
-                    
-                    print(f"[FETCH] Success: {name} ({file_size_mb:.2f}MB)")
-                    return {
-                        'url': url_input,
-                        'filename': name,
-                        'download_url': f'/api/videos/download/{name}',
-                        'size_mb': round(file_size_mb, 2),
-                        'success': True
-                    }
+                    try:
+                        info = ydl.extract_info(url_input, download=True)
+                        filename = ydl.prepare_filename(info)
+                        
+                        # Ensure .mp4 extension
+                        if not filename.endswith('.mp4'):
+                            base, _ = os.path.splitext(filename)
+                            filename = base + '.mp4'
+                        
+                        name = os.path.basename(filename)
+                        file_exists = os.path.exists(filename)
+                        file_size_mb = os.path.getsize(filename) / (1024 * 1024) if file_exists else 0
+                        
+                        if not file_exists or file_size_mb == 0:
+                            print(f"[FETCH WARNING] File may not have downloaded properly: {filename} (exists: {file_exists}, size: {file_size_mb:.2f}MB)")
+                            # Check if we have error information in the info dict
+                            if info and 'error' in info:
+                                print(f"[FETCH ERROR DETAIL] yt-dlp error: {info['error']}")
+                        
+                        print(f"[FETCH] Success: {name} ({file_size_mb:.2f}MB)")
+                        return {
+                            'url': url_input,
+                            'filename': name,
+                            'download_url': f'/api/videos/download/{name}',
+                            'size_mb': round(file_size_mb, 2),
+                            'success': file_exists and file_size_mb > 0
+                        }
+                    except Exception as download_error:
+                        print(f"[FETCH ERROR] Download failed for {url_input}: {str(download_error)}")
+                        import traceback
+                        traceback.print_exc()
+                        return {
+                            'url': url_input,
+                            'error': str(download_error),
+                            'success': False
+                        }
             except Exception as e:
                 print(f"[FETCH ERROR] {url_input}: {str(e)}")
+                import traceback
+                traceback.print_exc()
                 return {
                     'url': url_input,
                     'error': str(e),
-                    'success': False
+                    'success': False,
+                    'details': traceback.format_exc()
                 }
         
         # Download sequentially to keep memory low
@@ -272,7 +292,7 @@ def download_video(filename):
         print(f"[DOWNLOAD EXCEPTION] {filename}: {str(e)}")
         import traceback
         traceback.print_exc()
-        return jsonify({'error': 'File not found', 'details': str(e)}), 404
+        return jsonify({'error': 'File not found', 'details': str(e), 'filename': filename, 'filepath': filepath}), 404
 
 # Recent videos endpoint removed - using localStorage history only
 
