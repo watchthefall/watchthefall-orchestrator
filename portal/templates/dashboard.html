@@ -1664,6 +1664,7 @@
                     const video = document.createElement('video');
                     video.muted = true;
                     video.playsInline = true;
+                    video.volume = 0; // Extra safety: force volume to 0
                     
                     await loadVideoSafely(video, videoFile);
                     
@@ -1740,7 +1741,7 @@
                     try {
                         // Create a separate video element just for audio capture
                         const audioVideo = document.createElement('video');
-                        audioVideo.muted = false; // Keep audio enabled
+                        audioVideo.muted = true; // Keep audio muted to prevent playback
                         
                         // Wait for it to load with TSS workaround
                         await loadVideoSafely(audioVideo, videoFile);
@@ -1752,9 +1753,8 @@
                             if (audioTracks.length > 0) {
                                 audioTracks.forEach(track => stream.addTrack(track));
                                 console.log(`[WATERMARK] ✓ Added ${audioTracks.length} audio track(s) from video`);
-                                // Play the audio video in sync
+                                // Seek to beginning but don't play (to capture audio stream)
                                 audioVideo.currentTime = 0;
-                                audioVideo.play();
                             } else {
                                 console.warn('[WATERMARK] Video has no audio tracks');
                             }
