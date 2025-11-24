@@ -173,13 +173,17 @@ def fetch_videos_from_urls():
                     'noplaylist': True,
                     'quiet': True,
                     'no_warnings': True,
+                    'geo_bypass': True,
+                    'force_ipv4': True,
                 }
                 
                 # Add Instagram cookies if available
                 if os.path.exists(IG_COOKIES_PATH):
                     ydl_opts['cookiefile'] = IG_COOKIES_PATH
+                    print("[IG-COOKIES] Authenticated mode enabled")
                     print(f"[FETCH] Using Instagram cookies from {IG_COOKIES_PATH}")
                 else:
+                    print("[IG-COOKIES] Fallback to public mode")
                     print("[FETCH] No Instagram cookies found, using normal mode")
                 
                 with YoutubeDL(ydl_opts) as ydl:
