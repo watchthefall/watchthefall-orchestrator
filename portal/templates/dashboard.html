@@ -1790,17 +1790,20 @@
                     // Use timeslice for better memory management (1 second chunks)
                     recorder.start(1000);
                     video.currentTime = 0;
-                    video.play();
+                    // Video is not played to prevent audio playback - frames are processed manually
                     
                     let frameCount = 0;
                     const totalFrames = Math.ceil(video.duration * preset.fps);
                     
-                    // Render loop
+                    // Render loop - manually advance video time instead of playing
                     function render() {
-                        if (video.paused || video.ended) {
+                        // Calculate current time based on frame count
+                        const currentTime = frameCount / preset.fps;
+                        
+                        // Stop when we've processed all frames
+                        if (frameCount >= totalFrames) {
                             console.log(`[WATERMARK] Rendering complete. Total frames: ${frameCount}`);
                             recorder.stop();
-                            video.pause();
                             return;
                         }
                         
@@ -1813,32 +1816,39 @@
                         }
                         
                         if (frameCount === 1 || frameCount % 30 === 0) {
-                            console.log(`[WATERMARK] Frame ${frameCount}, Time: ${video.currentTime.toFixed(2)}s`);
+                            console.log(`[WATERMARK] Frame ${frameCount}, Time: ${currentTime.toFixed(2)}s`);
                         }
                         
-                        // Draw video frame (cropped/scaled to target aspect ratio)
-                        const srcAspect = video.videoWidth / video.videoHeight;
-                        const targetAspect = targetWidth / targetHeight;
-                        let sx = 0, sy = 0, sw = video.videoWidth, sh = video.videoHeight;
+                        // Seek to the current frame time
+                        video.currentTime = currentTime;
                         
-                        if (srcAspect > targetAspect) {
-                            // Video wider: crop width
-                            sw = video.videoHeight * targetAspect;
-                            sx = (video.videoWidth - sw) / 2;
-                        } else {
-                            // Video taller: crop height
-                            sh = video.videoWidth / targetAspect;
-                            sy = (video.videoHeight - sh) / 2;
-                        }
-                        
-                        ctx.drawImage(video, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
-                        
-                        // Draw watermark with adaptive opacity
-                        ctx.globalAlpha = opacity;
-                        ctx.drawImage(watermark, watermarkX, watermarkY, watermarkWidth, watermarkHeight);
-                        ctx.globalAlpha = 1.0;
-                        
-                        requestAnimationFrame(render);
+                        // Wait for seek to complete before drawing
+                        video.onseeked = function() {
+                            // Draw video frame (cropped/scaled to target aspect ratio)
+                            const srcAspect = video.videoWidth / video.videoHeight;
+                            const targetAspect = targetWidth / targetHeight;
+                            let sx = 0, sy = 0, sw = video.videoWidth, sh = video.videoHeight;
+                            
+                            if (srcAspect > targetAspect) {
+                                // Video wider: crop width
+                                sw = video.videoHeight * targetAspect;
+                                sx = (video.videoWidth - sw) / 2;
+                            } else {
+                                // Video taller: crop height
+                                sh = video.videoWidth / targetAspect;
+                                sy = (video.videoHeight - sh) / 2;
+                            }
+                            
+                            ctx.drawImage(video, sx, sy, sw, sh, 0, 0, targetWidth, targetHeight);
+                            
+                            // Draw watermark with adaptive opacity
+                            ctx.globalAlpha = opacity;
+                            ctx.drawImage(watermark, watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+                            ctx.globalAlpha = 1.0;
+                            
+                            // Continue to next frame
+                            requestAnimationFrame(render);
+                        };
                     }
                     render();
                     
