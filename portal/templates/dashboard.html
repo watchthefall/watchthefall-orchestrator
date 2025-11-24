@@ -331,6 +331,7 @@
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
                     <input type="file" id="igCookiesFile" accept=".txt" style="display: none;">
                     <button id="uploadIgCookiesBtn" style="flex: 1; background: #9370db;">📤 Upload cookies.txt</button>
+                    <button id="instaLoginBtn" style="flex: 1; background: #405de6;">📸 Login to Instagram</button>
                     <button id="deleteIgCookiesBtn" style="flex: 1; background: #ff5555; display: none;">🗑️ Delete Cookies</button>
                 </div>
                 
@@ -452,6 +453,34 @@
     <!-- Minimized Modal Bar Container (bottom of screen) -->
     <div id="minimizedModalsContainer" style="position:fixed; bottom:0; left:0; right:0; z-index:9999; pointer-events:none; padding:8px; display:flex; flex-direction:column; gap:8px;"></div>
     
+    <!-- Instagram Login Modal -->
+    <div id="instaLoginModal" class="brand-modal" style="display: none;">
+        <div class="brand-modal-content" style="max-width: 500px;">
+            <div class="brand-modal-header">
+                <h3 style="color:#405de6; margin:0;">📸 Login to Instagram</h3>
+                <button class="brand-modal-close" onclick="document.getElementById('instaLoginModal').style.display='none'">×</button>
+            </div>
+            <div style="color:#aaa; font-size:14px; margin-bottom:20px;">
+                <p>Follow these steps to generate your Instagram cookies:</p>
+                <ol style="padding-left: 20px; margin: 15px 0;">
+                    <li style="margin-bottom: 10px;">Install the <a href="https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid" target="_blank" style="color: #405de6;">"Get cookies.txt" Chrome extension</a></li>
+                    <li style="margin-bottom: 10px;">Open <a href="https://instagram.com" target="_blank" style="color: #405de6;">instagram.com</a> and log in to your account</li>
+                    <li style="margin-bottom: 10px;">Click the extension icon in your browser toolbar</li>
+                    <li style="margin-bottom: 10px;">Select "Export cookies for this site"</li>
+                    <li style="margin-bottom: 10px;">Save the file as <code>cookies.txt</code></li>
+                    <li style="margin-bottom: 10px;">Upload the file using the "Upload cookies.txt" button</li>
+                </ol>
+                <p style="background: rgba(64, 93, 230, 0.1); padding: 10px; border-radius: 4px; border-left: 3px solid #405de6;">
+                    <strong>💡 Tip:</strong> Make sure you're logged into Instagram before exporting cookies.
+                </p>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="document.getElementById('instaLoginModal').style.display='none'" style="flex:1; background:#444;">Cancel</button>
+                <button onclick="window.open('https://instagram.com', '_blank'); document.getElementById('instaLoginModal').style.display='none'" style="flex:1; background:#405de6;">Open Instagram</button>
+            </div>
+        </div>
+    </div>
+    
     <script src="/portal/static/js/offline.js"></script>
     <script>
         let statusPollInterval = null;
@@ -479,8 +508,11 @@
                 const statusDiv = document.getElementById('igCookiesStatus');
                 const deleteBtn = document.getElementById('deleteIgCookiesBtn');
                 
-                if (data.has_cookies) {
-                    statusDiv.innerHTML = `<span style="color: #0f0;">✅ Instagram cookies active</span> <span style="color: #666; font-size: 12px;">(Uploaded: ${new Date().toLocaleDateString()})</span>`;
+                if (data.exists && data.readable) {
+                    statusDiv.innerHTML = `<span style="color: #0f0;">✅ Instagram cookies active</span> <span style="color: #666; font-size: 12px;">(Uploaded: ${new Date().toLocaleDateString()}, Size: ${data.size} bytes)</span>`;
+                    deleteBtn.style.display = 'block';
+                } else if (data.exists) {
+                    statusDiv.innerHTML = '<span style="color: #ff6600;">⚠️ Instagram cookies file exists but not readable</span>';
                     deleteBtn.style.display = 'block';
                 } else {
                     statusDiv.innerHTML = '<span style="color: #ff6600;">⚠️ No Instagram cookies - age-restricted content may fail</span>';
@@ -572,6 +604,11 @@
                 } catch (err) {
                     showToast(`Delete error: ${err.message}`, 'error');
                 }
+            });
+            
+            // Instagram login button
+            document.getElementById('instaLoginBtn').addEventListener('click', () => {
+                document.getElementById('instaLoginModal').style.display = 'flex';
             });
         });
         
