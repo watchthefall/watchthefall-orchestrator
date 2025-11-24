@@ -272,28 +272,30 @@ def _watermark_conversion_worker(job_id, temp_webm, output_path, mp4_filename):
         
         print(f"[CONVERT] Job {job_id[:8]} started: {mp4_filename}")
         
-        # FFmpeg command: Optimized for Render free tier (512MB RAM)
+        # FFmpeg command: MAXIMUM SPEED for Render free tier
+        # Sacrificing quality for speed to avoid timeouts
         cmd = [
             'ffmpeg',
-            '-analyzeduration', '1000000',
-            '-probesize', '1048576',
+            '-analyzeduration', '500000',    # Reduced analysis time
+            '-probesize', '500000',          # Reduced probe size
             '-i', temp_webm,
             '-map', '0:v:0',
             '-map', '0:a?',
             '-c:v', 'libx264',
-            '-preset', 'veryfast',
-            '-threads', '1',
-            '-crf', '23',
+            '-preset', 'ultrafast',          # FASTEST preset (was veryfast)
+            '-tune', 'fastdecode',           # Optimize for fast decode
+            '-threads', '0',                 # Use all available threads (was 1)
+            '-crf', '28',                    # Higher = lower quality but MUCH faster (was 23)
             '-profile:v', 'baseline',
             '-level', '3.0',
             '-pix_fmt', 'yuv420p',
             '-c:a', 'aac',
-            '-b:a', '128k',
+            '-b:a', '96k',                   # Lower audio bitrate (was 128k)
             '-ar', '44100',
             '-shortest',
             '-fflags', '+genpts',
             '-movflags', '+faststart',
-            '-max_muxing_queue_size', '1024',
+            '-max_muxing_queue_size', '512', # Reduced queue (was 1024)
             '-y',
             output_path
         ]
