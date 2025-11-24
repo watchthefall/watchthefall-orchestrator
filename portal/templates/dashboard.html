@@ -1264,7 +1264,6 @@
                 ctx2.drawImage(tempVideo, 0, 0, canvas2.width, canvas2.height);
                 
                 // Clean up temp video immediately
-                URL.revokeObjectURL(blobUrl);
                 tempVideo.remove();
                 
                 const durationStr = duration ? ` • ${Math.floor(duration)}s` : '';
