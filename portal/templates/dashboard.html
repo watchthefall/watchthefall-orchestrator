@@ -493,9 +493,18 @@
         // Check for Instagram URLs and show cookie section if needed
         function checkForInstagramUrls() {
             const linksInput = document.getElementById('linksInput');
-            if (linksInput && linksInput.value.includes('instagram.com')) {
-                document.getElementById('igCookiesSection').style.display = 'block';
-                checkIgCookiesStatus();
+            const igCookiesSection = document.getElementById('igCookiesSection');
+            
+            // Always show cookies section when there are URLs in the input
+            if (linksInput && linksInput.value.trim() !== '') {
+                igCookiesSection.style.display = 'block';
+                // Check for Instagram URLs specifically
+                if (linksInput.value.includes('instagram.com')) {
+                    checkIgCookiesStatus();
+                }
+            } else {
+                // Hide section when input is empty (optional - can keep it visible)
+                // igCookiesSection.style.display = 'none';
             }
         }
         
@@ -535,6 +544,8 @@
         
         // Initialize portal function
         function initPortal() {
+            // Show Instagram cookies section by default to make login button visible
+            document.getElementById('igCookiesSection').style.display = 'block';
         }
         
         // Initialize Instagram cookies functionality
@@ -607,9 +618,15 @@
             });
             
             // Instagram login button
-            document.getElementById('instaLoginBtn').addEventListener('click', () => {
-                document.getElementById('instaLoginModal').style.display = 'flex';
-            });
+            const instaLoginBtn = document.getElementById('instaLoginBtn');
+            if (instaLoginBtn) {
+                instaLoginBtn.addEventListener('click', () => {
+                    const modal = document.getElementById('instaLoginModal');
+                    if (modal) {
+                        modal.style.display = 'flex';
+                    }
+                });
+            }
         });
         
         // Process queued downloads periodically (every 8 seconds)
