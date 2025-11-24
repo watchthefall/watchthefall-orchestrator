@@ -20,6 +20,9 @@ from .config import (
 )
 from .database import log_event
 
+# Instagram cookies file path
+IG_COOKIES_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'app', 'ig_cookies.txt')
+
 app = Flask(__name__, 
             template_folder='templates',
             static_folder='static',
@@ -54,9 +57,86 @@ def test_page():
             '/api/videos/fetch',
             '/api/videos/download/<filename>',
             '/api/videos/convert-watermark',
-            '/api/videos/convert-status/<job_id>'
+            '/api/videos/convert-status/<job_id>',
+            '/api/instagram/cookies'  # POST, DELETE, GET
         ]
     })
+
+# ============================================================================
+# API: VIDEO PROCESSING
+# ============================================================================
+
+@app.route('/api/instagram/cookies', methods=['POST'])
+def upload_instagram_cookies():
+    """Upload Instagram cookies file"""
+    try:
+        if 'cookies' not in request.files:
+            return jsonify({'success': False, 'error': 'No cookies file provided'}), 400
+        
+        file = request.files['cookies']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'Empty filename'}), 400
+        
+        # Ensure app directory exists
+        app_dir = os.path.dirname(IG_COOKIES_PATH)
+        os.makedirs(app_dir, exist_ok=True)
+        
+        # Save cookies file
+        file.save(IG_COOKIES_PATH)
+        
+        print(f"[IG COOKIES] Saved Instagram cookies to {IG_COOKIES_PATH}")
+        log_event('info', None, 'Instagram cookies uploaded')
+        
+        return jsonify({
+            'success': True,
+            'message': 'Instagram cookies uploaded successfully'
+        })
+        
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"[IG COOKIES ERROR]: {error_trace}")
+        log_event('error', None, f'Instagram cookies upload failed: {str(e)}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/instagram/cookies', methods=['DELETE'])
+def delete_instagram_cookies():
+    """Delete Instagram cookies file"""
+    try:
+        if os.path.exists(IG_COOKIES_PATH):
+            os.remove(IG_COOKIES_PATH)
+            print(f"[IG COOKIES] Deleted Instagram cookies from {IG_COOKIES_PATH}")
+            log_event('info', None, 'Instagram cookies deleted')
+            
+            return jsonify({
+                'success': True,
+                'message': 'Instagram cookies deleted successfully'
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'message': 'No Instagram cookies file found'
+            })
+            
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"[IG COOKIES ERROR]: {error_trace}")
+        log_event('error', None, f'Instagram cookies delete failed: {str(e)}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/instagram/cookies/status', methods=['GET'])
+def get_instagram_cookies_status():
+    """Check if Instagram cookies file exists"""
+    try:
+        exists = os.path.exists(IG_COOKIES_PATH)
+        return jsonify({
+            'success': True,
+            'has_cookies': exists,
+            'path': IG_COOKIES_PATH if exists else None
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # ============================================================================
 # API: VIDEO PROCESSING
@@ -85,6 +165,7 @@ def fetch_videos_from_urls():
         
         def download_one(url_input):
             try:
+                # Base yt-dlp options
                 ydl_opts = {
                     'outtmpl': os.path.join(OUTPUT_DIR, '%(id)s.%(ext)s'),
                     'merge_output_format': 'mp4',
@@ -93,6 +174,13 @@ def fetch_videos_from_urls():
                     'quiet': True,
                     'no_warnings': True,
                 }
+                
+                # Add Instagram cookies if available
+                if os.path.exists(IG_COOKIES_PATH):
+                    ydl_opts['cookiefile'] = IG_COOKIES_PATH
+                    print(f"[FETCH] Using Instagram cookies from {IG_COOKIES_PATH}")
+                else:
+                    print("[FETCH] No Instagram cookies found, using normal mode")
                 
                 with YoutubeDL(ydl_opts) as ydl:
                     print(f"[FETCH] Downloading: {url_input[:50]}...")

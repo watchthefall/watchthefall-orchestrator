@@ -323,6 +323,31 @@
             <h2>🔗 Bulk Download & Upload</h2>
             <p style="color: #888; font-size: 14px; margin-bottom: 15px;">Paste up to 5 TikTok, Instagram, or X links (one per line) OR upload from your device</p>
             
+            <!-- Instagram Cookies Section -->
+            <div id="igCookiesSection" style="background: rgba(75, 0, 130, 0.2); border: 1px solid #4b0082; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: none;">
+                <h3 style="color: #9370db; margin-top: 0;">📸 Instagram Authentication</h3>
+                <p style="color: #aaa; font-size: 13px; margin: 8px 0;">Upload cookies.txt to access age-restricted, private, and region-locked Instagram content</p>
+                
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="file" id="igCookiesFile" accept=".txt" style="display: none;">
+                    <button id="uploadIgCookiesBtn" style="flex: 1; background: #9370db;">📤 Upload cookies.txt</button>
+                    <button id="deleteIgCookiesBtn" style="flex: 1; background: #ff5555; display: none;">🗑️ Delete Cookies</button>
+                </div>
+                
+                <div id="igCookiesStatus" style="margin-top: 10px; font-size: 13px; color: #888;"></div>
+                
+                <details style="margin-top: 10px;">
+                    <summary style="color: #9370db; cursor: pointer; font-size: 12px;">📋 How to get cookies.txt</summary>
+                    <div style="font-size: 11px; color: #aaa; margin-top: 5px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 4px;">
+                        1. Install "Get cookies.txt" Chrome extension<br>
+                        2. Log into Instagram normally<br>
+                        3. Click extension → "Export cookies for this site"<br>
+                        4. Save as cookies.txt<br>
+                        5. Upload using the button above
+                    </div>
+                </details>
+            </div>
+            
             <textarea id="linksInput" placeholder="https://tiktok.com/@user/video/123...&#10;https://instagram.com/reel/abc...&#10;https://x.com/user/status/456..." 
                 style="width:100%; min-height:120px; background:#111; border:1px solid #333; color:#ddd; padding:12px; border-radius:8px; font-size:14px; font-family:monospace; resize:vertical;"></textarea>
             
@@ -436,6 +461,36 @@
             navigator.serviceWorker.register('/portal/static/sw.js').catch(() => {});
         }
         
+        // Check for Instagram URLs and show cookie section if needed
+        function checkForInstagramUrls() {
+            const linksInput = document.getElementById('linksInput');
+            if (linksInput && linksInput.value.includes('instagram.com')) {
+                document.getElementById('igCookiesSection').style.display = 'block';
+                checkIgCookiesStatus();
+            }
+        }
+        
+        // Check Instagram cookies status
+        async function checkIgCookiesStatus() {
+            try {
+                const response = await fetch('/api/instagram/cookies/status');
+                const data = await response.json();
+                
+                const statusDiv = document.getElementById('igCookiesStatus');
+                const deleteBtn = document.getElementById('deleteIgCookiesBtn');
+                
+                if (data.has_cookies) {
+                    statusDiv.innerHTML = `<span style="color: #0f0;">✅ Instagram cookies active</span> <span style="color: #666; font-size: 12px;">(Uploaded: ${new Date().toLocaleDateString()})</span>`;
+                    deleteBtn.style.display = 'block';
+                } else {
+                    statusDiv.innerHTML = '<span style="color: #ff6600;">⚠️ No Instagram cookies - age-restricted content may fail</span>';
+                    deleteBtn.style.display = 'none';
+                }
+            } catch (err) {
+                console.error('[IG COOKIES] Status check failed:', err);
+            }
+        }
+        
         // 2️⃣ PATCH: UI Loads Instantly Without Waiting on Server
         // Initialize portal immediately, check server in background
         document.addEventListener('DOMContentLoaded', function() {
@@ -449,6 +504,76 @@
         // Initialize portal function
         function initPortal() {
         }
+        
+        // Initialize Instagram cookies functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for Instagram URLs periodically
+            setInterval(checkForInstagramUrls, 3000);
+            
+            // Upload cookies button
+            document.getElementById('uploadIgCookiesBtn').addEventListener('click', () => {
+                document.getElementById('igCookiesFile').click();
+            });
+            
+            // File input change handler
+            document.getElementById('igCookiesFile').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const statusDiv = document.getElementById('igCookiesStatus');
+                statusDiv.innerHTML = '<span style="color: #ff6600;">⏳ Uploading cookies...</span>';
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('cookies', file);
+                    
+                    const response = await fetch('/api/instagram/cookies', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        statusDiv.innerHTML = '<span style="color: #0f0;">✅ Instagram cookies uploaded successfully!</span>';
+                        showToast('Instagram cookies uploaded successfully!', 'success');
+                        checkIgCookiesStatus();
+                    } else {
+                        statusDiv.innerHTML = `<span style="color: #f55;">❌ Upload failed: ${data.error}</span>`;
+                        showToast(`Upload failed: ${data.error}`, 'error');
+                    }
+                } catch (err) {
+                    statusDiv.innerHTML = `<span style="color: #f55;">❌ Upload error: ${err.message}</span>`;
+                    showToast(`Upload error: ${err.message}`, 'error');
+                }
+                
+                // Clear input
+                e.target.value = '';
+            });
+            
+            // Delete cookies button
+            document.getElementById('deleteIgCookiesBtn').addEventListener('click', async () => {
+                if (!confirm('Delete Instagram cookies? You\'ll need to re-upload them to access restricted content.')) return;
+                
+                try {
+                    const response = await fetch('/api/instagram/cookies', {
+                        method: 'DELETE'
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        document.getElementById('igCookiesStatus').innerHTML = '<span style="color: #0f0;">✅ Instagram cookies deleted</span>';
+                        showToast('Instagram cookies deleted', 'success');
+                        checkIgCookiesStatus();
+                    } else {
+                        showToast(`Delete failed: ${data.error}`, 'error');
+                    }
+                } catch (err) {
+                    showToast(`Delete error: ${err.message}`, 'error');
+                }
+            });
+        });
         
         // Process queued downloads periodically (every 8 seconds)
         setInterval(processQueuedDownloads, 8000);
