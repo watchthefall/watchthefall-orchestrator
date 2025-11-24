@@ -589,6 +589,9 @@
         // Make showToast available globally
         window.showToast = showToast;
         
+        // Stub function to fix mobile UI error
+        window.loadRecentJobs = function() { return []; };
+        
         // Auto-download toggle
         let autoDownloadEnabled = false;
         document.addEventListener('DOMContentLoaded', () => {
