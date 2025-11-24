@@ -571,6 +571,135 @@
             }
         }
         
+        // ========== QUICK ACTIONS: CapCut, Drive, Delete ==========
+        
+        // Open WebM in CapCut (mobile-only)
+        function openInCapCut(blobUrl, filename) {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (!isMobile) {
+                alert('🎬 CapCut import is only available on mobile devices.\n\nOn desktop: Download the WebM and import manually.');
+                return;
+            }
+            
+            // Try CapCut deep link (may not work on all devices)
+            const capCutUrl = `capcut://import?url=${encodeURIComponent(blobUrl)}`;
+            window.location.href = capCutUrl;
+            
+            // Fallback: show instructions
+            setTimeout(() => {
+                const shouldDownload = confirm('🎬 If CapCut didn\'t open, download the file manually?');
+                if (shouldDownload) {
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                }
+            }, 2000);
+        }
+        
+        // Share to Google Drive
+        function shareToGoogleDrive(blobUrl, filename) {
+            // Google Drive doesn't support direct blob URL uploads
+            // Best we can do is trigger download and show instructions
+            
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            
+            // Show toast notification
+            showToast(`☁️ Download started! Upload to Drive manually from your Downloads folder.`, 'info');
+            
+            // Alternative: Open Drive in new tab
+            setTimeout(() => {
+                if (confirm('📂 Open Google Drive to upload manually?')) {
+                    window.open('https://drive.google.com/drive/my-drive', '_blank');
+                }
+            }, 1000);
+        }
+        
+        // Delete WebM from results
+        function deleteWebM(blobUrl, idx) {
+            if (!confirm('🗑️ Delete this WebM? You can always regenerate it.')) return;
+            
+            // Revoke blob URL to free memory
+            URL.revokeObjectURL(blobUrl);
+            
+            // Remove result element
+            const resultEl = document.getElementById(`result${idx}`);
+            if (resultEl) {
+                resultEl.style.transition = 'opacity 0.3s, transform 0.3s';
+                resultEl.style.opacity = '0';
+                resultEl.style.transform = 'scale(0.9)';
+                setTimeout(() => resultEl.remove(), 300);
+            }
+            
+            showToast('✅ Deleted!', 'success');
+            console.log(`[CLEANUP] Deleted WebM: ${blobUrl.substring(0, 50)}...`);
+        }
+        
+        // Toast notification helper
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const bgColors = { success: '#0a0', info: '#0af', warning: '#fa0', error: '#f55' };
+            toast.style.cssText = `position:fixed; bottom:20px; right:20px; z-index:10000; background:${bgColors[type] || '#0af'}; color:#fff; padding:12px 20px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.3); font-weight:600; animation:slideIn 0.3s ease-out;`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // ========== AUTO CLEANUP: Delete old blob URLs from history (24h) ==========
+        
+        function cleanupOldWebMs() {
+            const key = 'wtf_history';
+            let hist = [];
+            try { hist = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+            
+            const now = Date.now();
+            const oneDayMs = 24 * 60 * 60 * 1000;
+            let deletedCount = 0;
+            
+            // Filter out entries older than 24 hours
+            const cleaned = hist.filter(entry => {
+                const age = now - (entry.ts || 0);
+                if (age > oneDayMs && entry.url && entry.url.startsWith('blob:')) {
+                    // Revoke blob URL
+                    try {
+                        URL.revokeObjectURL(entry.url);
+                        deletedCount++;
+                    } catch (e) {
+                        console.warn('[CLEANUP] Failed to revoke blob:', e);
+                    }
+                    return false; // Remove from history
+                }
+                return true; // Keep
+            });
+            
+            if (deletedCount > 0) {
+                localStorage.setItem(key, JSON.stringify(cleaned));
+                console.log(`[CLEANUP] ✅ Deleted ${deletedCount} old WebM blob URLs (>24h old)`);
+                renderHistory();
+            } else {
+                console.log('[CLEANUP] No old WebMs to delete');
+            }
+        }
+        
+        // Run cleanup on page load
+        setTimeout(cleanupOldWebMs, 3000);
+        
+        // Run cleanup every 4 hours
+        setInterval(cleanupOldWebMs, 4 * 60 * 60 * 1000);
+        
         // Delegate click for share buttons and copy-all-links
         document.addEventListener('click', async (e) => {
             if (e.target && e.target.classList.contains('share-btn')) {
@@ -1113,7 +1242,16 @@
                 if (r.error) {
                     return `<div class="watermark-result" style="border-left-color:#ff5555; padding:15px;">✗ <strong>${r.brandName}</strong><br>${r.errorDetails || r.error}</div>`;
                 }
-                return `<div class="watermark-result">✓ <strong>${r.brandName}</strong> (${r.size_mb}MB WebM)<br><button onclick="downloadVideo('${r.url}', '${r.filename}', ${idx})" id="dlBtn${idx}" style="display:inline-block; margin-top:8px; padding:10px 18px; background:#00aa00; color:#000; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:14px;">📥 Download ${r.filename}</button><br><small style="color:#888; margin-top:4px; display:block;">💡 Convert to MP4 using VLC or HandBrake (free)</small></div>`;
+                return `<div class="watermark-result" id="result${idx}">
+                    ✓ <strong>${r.brandName}</strong> (${r.size_mb}MB WebM)<br>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+                        <button onclick="downloadVideo('${r.url}', '${r.filename}', ${idx})" id="dlBtn${idx}" style="flex:1; min-width:120px; padding:10px 12px; background:#00aa00; color:#000; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px;">📥 Save</button>
+                        <button onclick="openInCapCut('${r.url}', '${r.filename}')" style="flex:1; min-width:120px; padding:10px 12px; background:#ff6600; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px;">🎬 CapCut</button>
+                        <button onclick="shareToGoogleDrive('${r.url}', '${r.filename}')" style="flex:1; min-width:120px; padding:10px 12px; background:#4285f4; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px;">☁️ Drive</button>
+                        <button onclick="deleteWebM('${r.url}', ${idx})" style="padding:10px 12px; background:#ff5555; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px;">🗑️</button>
+                    </div>
+                    <small style="color:#888; margin-top:8px; display:block;">💡 Export from CapCut as MP4 for Instagram/TikTok</small>
+                </div>`;
             }).join('');
             
             const summaryColor = failedCount === 0 ? '#0f0' : (successCount > 0 ? '#ff6600' : '#ff5555');
