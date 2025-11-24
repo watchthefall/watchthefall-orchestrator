@@ -29,6 +29,23 @@
             min-height: 100vh;
         }
         
+        body.offline-mode {
+            border-top: 4px solid #ff6600;
+        }
+        
+        #offlineBanner {
+            background: #ff6600;
+            color: #000;
+            padding: 12px 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+        
+        body.offline-mode #offlineBanner {
+            display: block;
+        }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -292,6 +309,7 @@
     </style>
 </head>
 <body>
+    <div id="offlineBanner">⚡ Portal is offline — continuing in local mode</div>
     <header>
         <div class="container">
             <h1>⚡ WatchTheFall Portal</h1>
@@ -409,6 +427,7 @@
     <!-- Minimized Modal Bar Container (bottom of screen) -->
     <div id="minimizedModalsContainer" style="position:fixed; bottom:0; left:0; right:0; z-index:9999; pointer-events:none; padding:8px; display:flex; flex-direction:column; gap:8px;"></div>
     
+    <script src="/portal/static/js/offline.js"></script>
     <script>
         let statusPollInterval = null;
         
@@ -416,6 +435,34 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/portal/static/sw.js').catch(() => {});
         }
+        
+        // 2️⃣ PATCH: UI Loads Instantly Without Waiting on Server
+        // Initialize portal immediately, check server in background
+        document.addEventListener('DOMContentLoaded', function() {
+            initPortal(); // Run immediately
+            safeTestCheck().then(() => {
+                console.log('[OFFLINE] Server check completed');
+                // Portal is already initialized, just update status if needed
+            });
+        });
+        
+        // Initialize portal function
+        function initPortal() {
+        }
+        
+        // Process queued downloads periodically (every 8 seconds)
+        setInterval(processQueuedDownloads, 8000);
+        
+        // 3️⃣ PATCH: Graceful Server Failure Handling
+        window.addEventListener('unhandledrejection', (e) => {
+          if (e.reason?.message?.includes('Failed to fetch')) {
+            showToast('Server waking up — UI still works.', 'warning');
+            e.preventDefault();
+          }
+        });
+        
+        // Make showToast available globally
+        window.showToast = showToast;
         
         // Auto-download toggle
         let autoDownloadEnabled = false;
@@ -1079,8 +1126,7 @@
         });
         
         // Load brand watermarks config
-        fetch('/portal/static/watermarks/brands.json')
-            .then(r => r.json())
+        loadBrandConfig()
             .then(brands => {
                 brandWatermarks = brands;
                 
@@ -1356,6 +1402,12 @@
         
         // Canvas-based watermark application with adaptive opacity (10-20%)
         async function applyWatermarkToVideo(videoFile, watermarkFileName, brandName, onProgress = null) {
+            // 6️⃣ PATCH: Watermarker Always Works, Even Without Server
+            if (!videoFile) {
+                showToast('Video unavailable — try reloading it.', 'error');
+                return Promise.reject(new Error('Video unavailable'));
+            }
+            
             return new Promise(async (resolve, reject) => {
                 try {
                     // Get quality preset
@@ -1578,8 +1630,52 @@
         // ========== END PHASE B ==========
         
         // Helpers (fetch batch + paste/drag + reset)
+        // 4️⃣ PATCH: Download Queue Works Offline
+        function queueDownload(url) {
+            const q = JSON.parse(localStorage.getItem('download_queue') || '[]');
+            q.push({ url, timestamp: Date.now() });
+            localStorage.setItem('download_queue', JSON.stringify(q));
+            console.log('[OFFLINE] Queued download:', url);
+            showToast('Download queued - will process when online', 'info');
+        }
+
+        async function processQueuedDownloads() {
+            const q = JSON.parse(localStorage.getItem('download_queue') || '[]');
+            if (q.length === 0) return;
+            
+            console.log(`[OFFLINE] Processing ${q.length} queued downloads...`);
+            const remaining = [];
+
+            for (const item of q) {
+                // Check if item is older than 24 hours
+                if (Date.now() - item.timestamp > 24 * 60 * 60 * 1000) {
+                    console.log('[OFFLINE] Skipping old queued download:', item.url);
+                    continue;
+                }
+                
+                const res = await safeFetch('/api/videos/fetch', {
+                    method: 'POST',
+                    body: JSON.stringify({ urls: [item.url] }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!res.ok) {
+                    remaining.push(item);
+                    console.log('[OFFLINE] Re-queuing failed download:', item.url);
+                } else {
+                    console.log('[OFFLINE] Successfully processed queued download:', item.url);
+                    // Show notification or update UI as needed
+                }
+            }
+
+            localStorage.setItem('download_queue', JSON.stringify(remaining));
+            if (remaining.length > 0) {
+                console.log(`[OFFLINE] ${remaining.length} downloads still queued`);
+            }
+        }
+
         async function fetchBatchUrls(targetUrls) {
-            const response = await fetch('/api/videos/fetch', {
+            const response = await safeFetch('/api/videos/fetch', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ urls: targetUrls })
@@ -1685,7 +1781,7 @@
             document.getElementById('fetchLinksBtn').disabled = true;
             
             async function fetchBatch(targetUrls) {
-                const response = await fetch('/api/videos/fetch', {
+                const response = await safeFetch('/api/videos/fetch', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ urls: targetUrls })
@@ -1752,7 +1848,14 @@
                 
             } catch (err) {
                 console.error('Fetch error:', err);
-                fetchStatus.innerHTML = `<div class="status failed">✗ Error: ${err.message}</div>`;
+                // 4️⃣ PATCH: Queue downloads when offline
+                if (err.message.includes('Failed to fetch')) {
+                    // Queue all URLs for later processing
+                    urls.forEach(url => queueDownload(url));
+                    fetchStatus.innerHTML = `<div class="status failed">⚡ Offline mode: ${urls.length} video${urls.length > 1 ? 's' : ''} queued for download when online.</div>`;
+                } else {
+                    fetchStatus.innerHTML = `<div class="status failed">✗ Error: ${err.message}</div>`;
+                }
             } finally {
                 document.getElementById('fetchLinksBtn').disabled = false;
             }
