@@ -1265,6 +1265,8 @@
                 
                 // Clean up temp video immediately
                 tempVideo.remove();
+                tempVideo.src = '';
+                tempVideo.load();
                 
                 const durationStr = duration ? ` • ${Math.floor(duration)}s` : '';
                 document.getElementById('modalVideoName').textContent = `🎬 ${filename} (${(pendingVideoBlob.size/(1024*1024)).toFixed(2)}MB${durationStr})`;
